@@ -80,8 +80,8 @@ static void fft_ct_1d(size_t nrows, size_t ncols)
     fft_tr_fft_1d(p_fft1, p_fft2, mat_fft1_out, mat_fft2_in, nrows, ncols);
 
     // Cleanup
-    data_free(mat_fft2_in, mat_fft2_out, p_fft2, nrows);
-    data_free(mat_fft1_in, mat_fft1_out, p_fft1, ncols);
+    data_free(mat_fft2_in, mat_fft2_out, p_fft2, ncols);
+    data_free(mat_fft1_in, mat_fft1_out, p_fft1, nrows);
 }
 
 static void usage(void)
