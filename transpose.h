@@ -11,7 +11,7 @@
 
 #include <fftw3.h>
 
-void transpose(const fftw_complex *A, fftw_complex *B,
+void transpose(fftw_complex *A, fftw_complex *B,
                size_t A_rows, size_t A_cols);
 
 int test_transpose(void);

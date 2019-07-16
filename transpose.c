@@ -11,7 +11,7 @@
 
 #include "util.h"
 
-void transpose(const fftw_complex *A, fftw_complex *B,
+void transpose(fftw_complex *A, fftw_complex *B,
                size_t A_rows, size_t A_cols)
 {
     size_t r, c;
@@ -31,8 +31,8 @@ void transpose(const fftw_complex *A, fftw_complex *B,
 #define TEST_COLS 3
 #endif
 
-static int check_transpose(const fftw_complex A[TEST_ROWS][TEST_COLS],
-                           const fftw_complex B[TEST_COLS][TEST_ROWS])
+static int check_transpose(fftw_complex A[TEST_ROWS][TEST_COLS],
+                           fftw_complex B[TEST_COLS][TEST_ROWS])
 {
     size_t r, c;
     for (r = 0; r < TEST_ROWS; r++)

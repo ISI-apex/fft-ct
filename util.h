@@ -13,7 +13,7 @@
 
 void complex_fill_rand(fftw_complex *a, size_t len);
 
-void matrix_print(const fftw_complex *A, size_t nrows, size_t ncols);
+void matrix_print(fftw_complex *A, size_t nrows, size_t ncols);
 
 int is_complex_eq(const fftw_complex a, const fftw_complex b);
 

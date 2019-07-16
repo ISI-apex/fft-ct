@@ -50,7 +50,7 @@ static void data_free(fftw_complex *A, fftw_complex *B, fftw_plan *p,
 }
 
 static void fft_tr_fft_1d(const fftw_plan *p1, const fftw_plan *p2,
-                          const fftw_complex *fft1_out, fftw_complex *fft2_in,
+                          fftw_complex *fft1_out, fftw_complex *fft2_in,
                           size_t fft1_rows, size_t fft1_cols)
 {
     size_t i;
