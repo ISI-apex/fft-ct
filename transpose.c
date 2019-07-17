@@ -9,6 +9,7 @@
 
 #include <fftw3.h>
 
+#include "transpose.h"
 #include "util.h"
 
 void transpose(fftw_complex *A, fftw_complex *B,

@@ -10,6 +10,8 @@
 
 #include <fftw3.h>
 
+#include "util.h"
+
 static double dbl_rand(void)
 {
     // random number in range [-0.5, 0.5] - this is what FFTW's benchfft does
