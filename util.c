@@ -4,6 +4,7 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-07-15 
  */
+#include <errno.h>
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,4 +50,14 @@ static int is_dbl_eq(double a, double b)
 int is_complex_eq(const fftw_complex a, const fftw_complex b)
 {
     return is_dbl_eq(a[0], b[0]) && is_dbl_eq(a[1], b[1]);
+}
+
+void *assert_fftw_malloc(size_t sz)
+{
+    void *ptr = fftw_malloc(sz);
+    if (!ptr) {
+        perror("fftw_malloc");
+        exit(ENOMEM);
+    }
+    return ptr;
 }

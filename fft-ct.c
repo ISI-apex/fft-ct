@@ -4,7 +4,7 @@
  * 1-D FFTs -> Transpose -> 1-D FFTs
  *
  * @author Connor Imes <cimes@isi.edu>
- * @date 2019-07-15 
+ * @date 2019-07-15
  */
 #include <errno.h>
 #include <stdio.h>
@@ -14,16 +14,6 @@
 
 #include "transpose.h"
 #include "util.h"
-
-static void *assert_fftw_malloc(size_t sz)
-{
-    void *ptr = fftw_malloc(sz);
-    if (!ptr) {
-        perror("fftw_malloc");
-        exit(ENOMEM);
-    }
-    return ptr;
-}
 
 static void data_alloc(fftw_complex **A, fftw_complex **B, fftw_plan **p,
                        size_t nrows, size_t ncols)
