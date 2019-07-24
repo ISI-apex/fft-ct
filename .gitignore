@@ -1,6 +1,7 @@
 # Project-specific
 fft-2d
 fft-ct
+transp
 test-transpose
 
 # Prerequisites
