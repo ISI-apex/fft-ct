@@ -8,6 +8,8 @@
 
 #include <fftw3.h>
 
+#include <mkl.h>
+
 #include "transpose.h"
 
 void transpose(fftw_complex *A, fftw_complex *B, size_t A_rows, size_t A_cols)
@@ -19,4 +21,19 @@ void transpose(fftw_complex *A, fftw_complex *B, size_t A_rows, size_t A_cols)
             B[c * A_rows + r][1] = A[r * A_cols + c][1]; // im
         }
     }
+}
+
+void transpose_dbl_mkl(const double *A, double *B, size_t A_rows, size_t A_cols)
+{
+    mkl_domatcopy('r', 't', A_rows, A_cols, 1, A, A_cols, B, A_rows);
+}
+
+void transpose_cmplx16_mkl(const MKL_Complex16 *A, MKL_Complex16 *B,
+                           size_t A_rows, size_t A_cols)
+{
+    static const MKL_Complex16 alpha = {
+        .real = 1,
+        .imag = 0,
+    };
+    mkl_zomatcopy('r', 't', A_rows, A_cols, alpha, A, A_cols, B, A_rows);
 }
