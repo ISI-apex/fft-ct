@@ -12,6 +12,17 @@
 
 #include "transpose.h"
 
+void transpose_dbl_naive(const double *A, double *B,
+			 size_t A_rows, size_t A_cols) {
+    size_t r, c;
+    for (r = 0; r < A_rows; r++) {
+        for (c = 0; c < A_cols; c++) {
+            B[c * A_rows + r] = A[r * A_cols + c]; // re
+            B[c * A_rows + r] = A[r * A_cols + c]; // im
+        }
+    }
+}
+
 void transpose_fftw_complex_naive(fftw_complex *A, fftw_complex *B,
                                   size_t A_rows, size_t A_cols)
 {
