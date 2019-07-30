@@ -20,12 +20,30 @@ static double dbl_rand(void)
     return (d / (double) RAND_MAX) - 0.5;
 }
 
+void dbl_fill_rand(double *a, size_t len)
+{
+    size_t i;
+    for (i = 0; i < len; i++)
+        a[i] = dbl_rand();
+}
+
 void complex_fill_rand(fftw_complex *a, size_t len)
 {
     size_t i;
     for (i = 0; i < len; i++) {
         a[i][0] = dbl_rand(); // re
         a[i][1] = dbl_rand(); // im
+    }
+}
+
+void matrix_dbl_print(const double *A, size_t nrows, size_t ncols)
+{
+    size_t r, c;
+    for (r = 0; r < nrows; r++) {
+        for (c = 0; c < ncols; c++) {
+            printf("%s%f", (c > 0 ? ", " : ""), A[r * ncols + c]);
+        }
+        printf("\n");
     }
 }
 
@@ -41,7 +59,7 @@ void matrix_print(fftw_complex *A, size_t nrows, size_t ncols)
     }
 }
 
-static int is_dbl_eq(double a, double b)
+int is_dbl_eq(double a, double b)
 {
     double v = a - b;
     return v >= 0.0 ? (v < DBL_EPSILON) : (v > -DBL_EPSILON);
