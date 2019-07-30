@@ -12,7 +12,7 @@
 
 #include "transpose.h"
 
-void transpose_dbl_naive(const double *A, double *B,
+void transpose_dbl_naive(const double* restrict A, double* restrict B,
 			 size_t A_rows, size_t A_cols) {
     size_t r, c;
     for (r = 0; r < A_rows; r++) {
@@ -22,7 +22,7 @@ void transpose_dbl_naive(const double *A, double *B,
     }
 }
 
-void transpose_fftw_complex_naive(fftw_complex *A, fftw_complex *B,
+void transpose_fftw_complex_naive(fftw_complex* restrict A, fftw_complex* restrict B,
                                   size_t A_rows, size_t A_cols)
 {
     size_t r, c;
@@ -34,13 +34,13 @@ void transpose_fftw_complex_naive(fftw_complex *A, fftw_complex *B,
     }
 }
 
-void transpose_dbl_mkl(const double *A, double *B,
+void transpose_dbl_mkl(const double* restrict A, double* restrict B,
                        size_t A_rows, size_t A_cols)
 {
     mkl_domatcopy('r', 't', A_rows, A_cols, 1, A, A_cols, B, A_rows);
 }
 
-void transpose_cmplx16_mkl(const MKL_Complex16 *A, MKL_Complex16 *B,
+void transpose_cmplx16_mkl(const MKL_Complex16* restrict A, MKL_Complex16* restrict B,
                            size_t A_rows, size_t A_cols)
 {
     static const MKL_Complex16 alpha = {
