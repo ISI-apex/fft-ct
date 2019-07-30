@@ -13,6 +13,9 @@
 
 #include <mkl.h>
 
+void transpose_dbl_naive(const double *A, double *B,
+			 size_t A_rows, size_t A_cols);
+
 void transpose_fftw_complex_naive(fftw_complex *A, fftw_complex *B,
                                   size_t A_rows, size_t A_cols);
 
