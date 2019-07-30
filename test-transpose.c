@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <fftw3.h>
+
+#include <mkl.h>
+
 #include "transpose.h"
 #include "util.h"
 
@@ -18,8 +22,8 @@
 #define TEST_COLS 3
 #endif
 
-static int check_transpose(fftw_complex A[TEST_ROWS][TEST_COLS],
-                           fftw_complex B[TEST_COLS][TEST_ROWS])
+static int check_transpose_fftw_complex(fftw_complex A[TEST_ROWS][TEST_COLS],
+                                        fftw_complex B[TEST_COLS][TEST_ROWS])
 {
     size_t r, c;
     for (r = 0; r < TEST_ROWS; r++)
@@ -29,7 +33,29 @@ static int check_transpose(fftw_complex A[TEST_ROWS][TEST_COLS],
     return 0;
 }
 
-static int test_transpose(void)
+static int check_transpose_dbl(double A[TEST_ROWS][TEST_COLS],
+                               double B[TEST_COLS][TEST_ROWS])
+{
+    size_t r, c;
+    for (r = 0; r < TEST_ROWS; r++)
+        for (c = 0; c < TEST_COLS; c++)
+            if (!is_dbl_eq(A[r][c], B[c][r]))
+                return -1;
+    return 0;
+}
+
+static int check_transpose_cmplx16(MKL_Complex16 A[TEST_ROWS][TEST_COLS],
+                                   MKL_Complex16 B[TEST_COLS][TEST_ROWS])
+{
+    size_t r, c;
+    for (r = 0; r < TEST_ROWS; r++)
+        for (c = 0; c < TEST_COLS; c++)
+            if (!is_cmplx16_eq(A[r][c], B[c][r]))
+                return -1;
+    return 0;
+}
+
+static int test_transpose_fftw_complex(void)
 {
     fftw_complex A[TEST_ROWS][TEST_COLS];
     fftw_complex B[TEST_COLS][TEST_ROWS];
@@ -43,12 +69,58 @@ static int test_transpose(void)
     printf("Out:\n");
     matrix_print(&B[0][0], TEST_COLS, TEST_ROWS);
     // verify
-    return check_transpose(A, B);
+    return check_transpose_fftw_complex(A, B);
+}
+
+static int test_transpose_dbl_mkl(void)
+{
+    double A[TEST_ROWS][TEST_COLS];
+    double B[TEST_COLS][TEST_ROWS];
+    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
+    // init matrix
+    dbl_fill_rand(&A[0][0], TEST_ROWS * TEST_COLS);
+    // execute
+    printf("In:\n");
+    matrix_dbl_print(&A[0][0], TEST_ROWS, TEST_COLS);
+    transpose_dbl_mkl(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
+    printf("Out:\n");
+    matrix_dbl_print(&B[0][0], TEST_COLS, TEST_ROWS);
+    // verify
+    return check_transpose_dbl(A, B);
+}
+
+static int test_transpose_cmplx16_mkl(void)
+{
+    MKL_Complex16 A[TEST_ROWS][TEST_COLS];
+    MKL_Complex16 B[TEST_COLS][TEST_ROWS];
+    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
+    // init matrix
+    cmplx16_fill_rand(&A[0][0], TEST_ROWS * TEST_COLS);
+    // execute
+    printf("In:\n");
+    matrix_cmplx16_print(&A[0][0], TEST_ROWS, TEST_COLS);
+    transpose_cmplx16_mkl(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
+    printf("Out:\n");
+    matrix_cmplx16_print(&B[0][0], TEST_COLS, TEST_ROWS);
+    // verify
+    return check_transpose_cmplx16(A, B);
 }
 
 int main(void)
 {
-    int rc = test_transpose();
+    int ret = 0;
+    int rc;
+    printf("transpose_fftw_complex:\n");
+    rc = test_transpose_fftw_complex();
+    ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
-    return rc;
+    printf("transpose_dbl_mkl:\n");
+    rc = test_transpose_dbl_mkl();
+    ret |= rc;
+    printf("%s\n", rc ? "Failed" : "Success");
+    printf("transpose_cmplx16_mkl:\n");
+    rc = test_transpose_cmplx16_mkl();
+    ret |= rc;
+    printf("%s\n", rc ? "Failed" : "Success");
+    return ret;
 }
