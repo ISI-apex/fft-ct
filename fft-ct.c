@@ -48,7 +48,7 @@ static void fft_tr_fft_1d(const fftw_plan *p1, const fftw_plan *p2,
     for (i = 0; i < fft1_rows; i++)
         fftw_execute(p1[i]);
     // Matrix transpose
-    transpose(fft1_out, fft2_in, fft1_rows, fft1_cols);
+    transpose_fftw_complex_naive(fft1_out, fft2_in, fft1_rows, fft1_cols);
     // Perform second set of 1D FFTs
     for (i = 0; i < fft1_cols; i++)
         fftw_execute(p2[i]);
@@ -64,7 +64,7 @@ static void fft_ct_1d(size_t nrows, size_t ncols)
     data_alloc(&mat_fft2_in, &mat_fft2_out, &p_fft2, ncols, nrows);
 
     // Populate input with random data
-    complex_fill_rand(mat_fft1_in, nrows * ncols);
+    fill_rand_fftw_complex(mat_fft1_in, nrows * ncols);
 
     // Execute FFT 1 -> Transpose -> FFT2
     fft_tr_fft_1d(p_fft1, p_fft2, mat_fft1_out, mat_fft2_in, nrows, ncols);

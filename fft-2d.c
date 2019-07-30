@@ -35,7 +35,7 @@ static void fft_2d(size_t nrows, size_t ncols)
     fftw_plan p;
     data_alloc(&mat_in, &mat_out, &p, nrows, ncols);
     // Populate input with random data
-    complex_fill_rand(mat_in, nrows * ncols);
+    fill_rand_fftw_complex(mat_in, nrows * ncols);
     fftw_execute(p);
     data_free(mat_in, mat_out, p);
 }

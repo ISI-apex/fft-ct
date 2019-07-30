@@ -19,8 +19,8 @@ static void transp(size_t nrows, size_t ncols)
 {
     fftw_complex *A = assert_fftw_malloc(nrows * ncols * sizeof(fftw_complex));
     fftw_complex *B = assert_fftw_malloc(nrows * ncols * sizeof(fftw_complex));
-    complex_fill_rand(A, nrows * ncols);
-    transpose(A, B, nrows, ncols);
+    fill_rand_fftw_complex(A, nrows * ncols);
+    transpose_fftw_complex_naive(A, B, nrows, ncols);
     fftw_free(B);
     fftw_free(A);
 }

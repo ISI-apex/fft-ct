@@ -12,7 +12,8 @@
 
 #include "transpose.h"
 
-void transpose(fftw_complex *A, fftw_complex *B, size_t A_rows, size_t A_cols)
+void transpose_fftw_complex_naive(fftw_complex *A, fftw_complex *B,
+                                  size_t A_rows, size_t A_cols)
 {
     size_t r, c;
     for (r = 0; r < A_rows; r++) {
@@ -23,7 +24,8 @@ void transpose(fftw_complex *A, fftw_complex *B, size_t A_rows, size_t A_cols)
     }
 }
 
-void transpose_dbl_mkl(const double *A, double *B, size_t A_rows, size_t A_cols)
+void transpose_dbl_mkl(const double *A, double *B,
+                       size_t A_rows, size_t A_cols)
 {
     mkl_domatcopy('r', 't', A_rows, A_cols, 1, A, A_cols, B, A_rows);
 }

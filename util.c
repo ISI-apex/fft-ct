@@ -22,14 +22,14 @@ static double dbl_rand(void)
     return (d / (double) RAND_MAX) - 0.5;
 }
 
-void dbl_fill_rand(double *a, size_t len)
+void fill_rand_dbl(double *a, size_t len)
 {
     size_t i;
     for (i = 0; i < len; i++)
         a[i] = dbl_rand();
 }
 
-void complex_fill_rand(fftw_complex *a, size_t len)
+void fill_rand_fftw_complex(fftw_complex *a, size_t len)
 {
     size_t i;
     for (i = 0; i < len; i++) {
@@ -38,7 +38,7 @@ void complex_fill_rand(fftw_complex *a, size_t len)
     }
 }
 
-void cmplx16_fill_rand(MKL_Complex16 *a, size_t len)
+void fill_rand_cmplx16(MKL_Complex16 *a, size_t len)
 {
     size_t i;
     for (i = 0; i < len; i++) {
@@ -47,7 +47,7 @@ void cmplx16_fill_rand(MKL_Complex16 *a, size_t len)
     }
 }
 
-void matrix_dbl_print(const double *A, size_t nrows, size_t ncols)
+void matrix_print_dbl(const double *A, size_t nrows, size_t ncols)
 {
     size_t r, c;
     for (r = 0; r < nrows; r++) {
@@ -58,7 +58,7 @@ void matrix_dbl_print(const double *A, size_t nrows, size_t ncols)
     }
 }
 
-void matrix_print(fftw_complex *A, size_t nrows, size_t ncols)
+void matrix_print_fftw_complex(fftw_complex *A, size_t nrows, size_t ncols)
 {
     size_t r, c, i;
     for (r = 0; r < nrows; r++) {
@@ -70,7 +70,7 @@ void matrix_print(fftw_complex *A, size_t nrows, size_t ncols)
     }
 }
 
-void matrix_cmplx16_print(const MKL_Complex16 *A, size_t nrows, size_t ncols)
+void matrix_print_cmplx16(const MKL_Complex16 *A, size_t nrows, size_t ncols)
 {
     size_t r, c, i;
     for (r = 0; r < nrows; r++) {
@@ -82,30 +82,20 @@ void matrix_cmplx16_print(const MKL_Complex16 *A, size_t nrows, size_t ncols)
     }
 }
 
-int is_dbl_eq(double a, double b)
+int is_eq_dbl(double a, double b)
 {
     double v = a - b;
     return v >= 0.0 ? (v < DBL_EPSILON) : (v > -DBL_EPSILON);
 }
 
-int is_complex_eq(const fftw_complex a, const fftw_complex b)
+int is_eq_fftw_complex(const fftw_complex a, const fftw_complex b)
 {
-    return is_dbl_eq(a[0], b[0]) && is_dbl_eq(a[1], b[1]);
+    return is_eq_dbl(a[0], b[0]) && is_eq_dbl(a[1], b[1]);
 }
 
-int is_cmplx16_eq(const MKL_Complex16 a, const MKL_Complex16 b)
+int is_eq_cmplx16(const MKL_Complex16 a, const MKL_Complex16 b)
 {
-    return is_dbl_eq(a.real, b.real) && is_dbl_eq(a.imag, b.imag);
-}
-
-void *assert_fftw_malloc(size_t sz)
-{
-    void *ptr = fftw_malloc(sz);
-    if (!ptr) {
-        perror("fftw_malloc");
-        exit(ENOMEM);
-    }
-    return ptr;
+    return is_eq_dbl(a.real, b.real) && is_eq_dbl(a.imag, b.imag);
 }
 
 void *assert_malloc(size_t sz)
@@ -113,6 +103,16 @@ void *assert_malloc(size_t sz)
     void *ptr = malloc(sz);
     if (!ptr) {
         perror("malloc");
+        exit(ENOMEM);
+    }
+    return ptr;
+}
+
+void *assert_fftw_malloc(size_t sz)
+{
+    void *ptr = fftw_malloc(sz);
+    if (!ptr) {
+        perror("fftw_malloc");
         exit(ENOMEM);
     }
     return ptr;
