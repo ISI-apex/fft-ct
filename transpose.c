@@ -12,6 +12,16 @@
 
 #include "transpose.h"
 
+void transpose_flt_naive(const float* restrict A, float* restrict B,
+			 size_t A_rows, size_t A_cols) {
+    size_t r, c;
+    for (r = 0; r < A_rows; r++) {
+        for (c = 0; c < A_cols; c++) {
+            B[c * A_rows + r] = A[r * A_cols + c];
+        }
+    }
+}
+
 void transpose_dbl_naive(const double* restrict A, double* restrict B,
 			 size_t A_rows, size_t A_cols) {
     size_t r, c;

@@ -15,6 +15,20 @@
 
 #include "util.h"
 
+static float flt_rand(void)
+{
+    // random number in range [-0.5, 0.5] - this is what FFTW's benchfft does
+    float d = rand();
+    return (d / (float) RAND_MAX) - 0.5;
+}
+
+void fill_rand_flt(float *a, size_t len)
+{
+    size_t i;
+    for (i = 0; i < len; i++)
+        a[i] = flt_rand();
+}
+
 static double dbl_rand(void)
 {
     // random number in range [-0.5, 0.5] - this is what FFTW's benchfft does
@@ -44,6 +58,17 @@ void fill_rand_cmplx16(MKL_Complex16 *a, size_t len)
     for (i = 0; i < len; i++) {
         a[i].real = dbl_rand();
         a[i].imag = dbl_rand();
+    }
+}
+
+void matrix_print_flt(const float *A, size_t nrows, size_t ncols)
+{
+    size_t r, c;
+    for (r = 0; r < nrows; r++) {
+        for (c = 0; c < ncols; c++) {
+            printf("%s%f", (c > 0 ? ", " : ""), A[r * ncols + c]);
+        }
+        printf("\n");
     }
 }
 
@@ -80,6 +105,12 @@ void matrix_print_cmplx16(const MKL_Complex16 *A, size_t nrows, size_t ncols)
         }
         printf("\n");
     }
+}
+
+int is_eq_flt(float a, float b)
+{
+    float v = a - b;
+    return v >= 0.0 ? (v < FLT_EPSILON) : (v > -FLT_EPSILON);
 }
 
 int is_eq_dbl(double a, double b)
