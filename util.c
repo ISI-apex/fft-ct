@@ -11,6 +11,8 @@
 
 #include <fftw3.h>
 
+#include <mkl.h>
+
 #include "util.h"
 
 static double dbl_rand(void)
@@ -33,6 +35,15 @@ void complex_fill_rand(fftw_complex *a, size_t len)
     for (i = 0; i < len; i++) {
         a[i][0] = dbl_rand(); // re
         a[i][1] = dbl_rand(); // im
+    }
+}
+
+void cmplx16_fill_rand(MKL_Complex16 *a, size_t len)
+{
+    size_t i;
+    for (i = 0; i < len; i++) {
+        a[i].real = dbl_rand();
+        a[i].imag = dbl_rand();
     }
 }
 
@@ -59,6 +70,18 @@ void matrix_print(fftw_complex *A, size_t nrows, size_t ncols)
     }
 }
 
+void matrix_cmplx16_print(const MKL_Complex16 *A, size_t nrows, size_t ncols)
+{
+    size_t r, c, i;
+    for (r = 0; r < nrows; r++) {
+        for (c = 0; c < ncols; c++) {
+            i = r * ncols + c;
+            printf("%s(%f, %f)", (c > 0 ? ", " : ""), A[i].real, A[i].imag);
+        }
+        printf("\n");
+    }
+}
+
 int is_dbl_eq(double a, double b)
 {
     double v = a - b;
@@ -70,11 +93,26 @@ int is_complex_eq(const fftw_complex a, const fftw_complex b)
     return is_dbl_eq(a[0], b[0]) && is_dbl_eq(a[1], b[1]);
 }
 
+int is_cmplx16_eq(const MKL_Complex16 a, const MKL_Complex16 b)
+{
+    return is_dbl_eq(a.real, b.real) && is_dbl_eq(a.imag, b.imag);
+}
+
 void *assert_fftw_malloc(size_t sz)
 {
     void *ptr = fftw_malloc(sz);
     if (!ptr) {
         perror("fftw_malloc");
+        exit(ENOMEM);
+    }
+    return ptr;
+}
+
+void *assert_malloc(size_t sz)
+{
+    void *ptr = malloc(sz);
+    if (!ptr) {
+        perror("malloc");
         exit(ENOMEM);
     }
     return ptr;
