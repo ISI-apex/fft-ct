@@ -17,8 +17,7 @@ void transpose_dbl_naive(const double *A, double *B,
     size_t r, c;
     for (r = 0; r < A_rows; r++) {
         for (c = 0; c < A_cols; c++) {
-            B[c * A_rows + r] = A[r * A_cols + c]; // re
-            B[c * A_rows + r] = A[r * A_cols + c]; // im
+            B[c * A_rows + r] = A[r * A_cols + c];
         }
     }
 }
