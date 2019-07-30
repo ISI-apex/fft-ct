@@ -13,6 +13,9 @@
 
 #include <mkl.h>
 
+void transpose_flt_naive(const float* restrict A, float* restrict B,
+			 size_t A_rows, size_t A_cols);
+
 void transpose_dbl_naive(const double* restrict A, double* restrict B,
 			 size_t A_rows, size_t A_cols);
 
