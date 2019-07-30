@@ -7,8 +7,12 @@ This project contains a simple FFT Corner Turn benchmark of the form:
 Prerequisites
 -------------
 
-The benchmark requires the [FFTW3](http://www.fftw.org/) library and development
-files, which are discovered using `pkg-config`.
+The benchmark requires:
+
+* [FFTW3](http://www.fftw.org/) - tested with version `3.3.8`.
+* [Intel MKL](https://software.intel.com/mkl) - tested with version `2019 Update 4`.
+
+Compiler and linker flags are discovered using `pkg-config`.
 
 Building
 --------
