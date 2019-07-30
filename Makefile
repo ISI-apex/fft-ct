@@ -9,6 +9,10 @@ BINS = fft-ct fft-2d transp test-transpose
 CFLAGS += $(shell pkg-config --cflags fftw3)
 LDFLAGS += $(shell pkg-config --libs --static fftw3)
 
+# MKL (e.g., at /opt/intel/compilers_and_libraries/linux/mkl/bin/pkgconfig/)
+CFLAGS += $(shell pkg-config --cflags mkl-static-ilp64-seq)
+LDFLAGS += $(shell pkg-config --libs --static mkl-static-ilp64-seq)
+
 .PHONY: all
 all: $(BINS)
 
