@@ -155,23 +155,28 @@ int main(void)
 {
     int ret = 0;
     int rc;
+
     printf("transpose_flt_naive:\n");
     rc = test_transpose_flt_naive();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
-    printf("transpose_dbl_naive:\n");
+
+    printf("\ntranspose_dbl_naive:\n");
     rc = test_transpose_dbl_naive();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
-    printf("transpose_fftw_complex:\n");
+
+    printf("\ntranspose_fftw_complex:\n");
     rc = test_transpose_fftw_complex_naive();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
-    printf("transpose_dbl_mkl:\n");
+
+    printf("\ntranspose_dbl_mkl:\n");
     rc = test_transpose_dbl_mkl();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
-    printf("transpose_cmplx16_mkl:\n");
+
+    printf("\ntranspose_cmplx16_mkl:\n");
     rc = test_transpose_cmplx16_mkl();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
