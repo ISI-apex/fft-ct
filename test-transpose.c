@@ -15,11 +15,11 @@
 #include "util.h"
 
 #ifndef TEST_ROWS
-#define TEST_ROWS 2
+#define TEST_ROWS 3
 #endif
 
 #ifndef TEST_COLS
-#define TEST_COLS 3
+#define TEST_COLS 5
 #endif
 
 #ifndef TEST_BLK_ROWS
@@ -27,7 +27,7 @@
 #endif
 
 #ifndef TEST_BLK_COLS
-#define TEST_BLK_COLS 2
+#define TEST_BLK_COLS 3
 #endif
 
 #define num2str(x) str(x)
@@ -206,7 +206,7 @@ int main(void)
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
 
-    printf("transpose_flt_blocked (block size = " num2str(TEST_BLK_ROWS) " x " num2str(TEST_BLK_COLS) "):\n");
+    printf("\ntranspose_flt_blocked (block size = " num2str(TEST_BLK_ROWS) "x" num2str(TEST_BLK_COLS) "):\n");
     rc = test_transpose_flt_blocked();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
@@ -216,7 +216,7 @@ int main(void)
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
 
-    printf("\ntranspose_dbl_blocked (block size = " num2str(TEST_BLK_ROWS) " x " num2str(TEST_BLK_COLS) "):\n" );
+    printf("\ntranspose_dbl_blocked (block size = " num2str(TEST_BLK_ROWS) "x" num2str(TEST_BLK_COLS) "):\n" );
     rc = test_transpose_dbl_blocked();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
