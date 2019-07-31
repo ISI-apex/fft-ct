@@ -22,6 +22,17 @@
 #define TEST_COLS 3
 #endif
 
+#ifndef TEST_BLK_ROWS
+#define TEST_BLK_ROWS 2
+#endif
+
+#ifndef TEST_BLK_COLS
+#define TEST_BLK_COLS 2
+#endif
+
+#define num2str(x) str(x)
+#define str(x) #x
+
 static int check_transpose_fftw_complex(fftw_complex A[TEST_ROWS][TEST_COLS],
                                         fftw_complex B[TEST_COLS][TEST_ROWS])
 {
@@ -100,6 +111,23 @@ static int test_transpose_dbl_naive(void)
     return check_transpose_dbl(A, B);
 }
 
+static int test_transpose_dbl_blocked(void)
+{
+    double A[TEST_ROWS][TEST_COLS];
+    double B[TEST_COLS][TEST_ROWS];
+    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
+    // init matrix
+    fill_rand_dbl(&A[0][0], TEST_ROWS * TEST_COLS);
+    // execute
+    printf("In:\n");
+    matrix_print_dbl(&A[0][0], TEST_ROWS, TEST_COLS);
+    transpose_dbl_blocked(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS);
+    printf("Out:\n");
+    matrix_print_dbl(&B[0][0], TEST_COLS, TEST_ROWS);
+    // verify
+    return check_transpose_dbl(A, B);
+}
+
 static int test_transpose_fftw_complex_naive(void)
 {
     fftw_complex A[TEST_ROWS][TEST_COLS];
@@ -163,6 +191,11 @@ int main(void)
 
     printf("\ntranspose_dbl_naive:\n");
     rc = test_transpose_dbl_naive();
+    ret |= rc;
+    printf("%s\n", rc ? "Failed" : "Success");
+
+    printf("\ntranspose_dbl_blocked (block size = " num2str(TEST_BLK_ROWS) " x " num2str(TEST_BLK_COLS) "):\n" );
+    rc = test_transpose_dbl_blocked();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
 
