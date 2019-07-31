@@ -94,6 +94,23 @@ static int test_transpose_flt_naive(void)
     return check_transpose_flt(A, B);
 }
 
+static int test_transpose_flt_blocked(void)
+{
+    float A[TEST_ROWS][TEST_COLS];
+    float B[TEST_COLS][TEST_ROWS];
+    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
+    // init matrix
+    fill_rand_flt(&A[0][0], TEST_ROWS * TEST_COLS);
+    // execute
+    printf("In:\n");
+    matrix_print_flt(&A[0][0], TEST_ROWS, TEST_COLS);
+    transpose_flt_blocked(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS);
+    printf("Out:\n");
+    matrix_print_flt(&B[0][0], TEST_COLS, TEST_ROWS);
+    // verify
+    return check_transpose_flt(A, B);
+}
+
 static int test_transpose_dbl_naive(void)
 {
     double A[TEST_ROWS][TEST_COLS];
@@ -186,6 +203,11 @@ int main(void)
 
     printf("transpose_flt_naive:\n");
     rc = test_transpose_flt_naive();
+    ret |= rc;
+    printf("%s\n", rc ? "Failed" : "Success");
+
+    printf("transpose_flt_blocked (block size = " num2str(TEST_BLK_ROWS) " x " num2str(TEST_BLK_COLS) "):\n");
+    rc = test_transpose_flt_blocked();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
 
