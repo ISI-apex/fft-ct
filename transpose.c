@@ -13,7 +13,7 @@
 #include "transpose.h"
 
 void transpose_flt_naive(const float* restrict A, float* restrict B,
-			 size_t A_rows, size_t A_cols) {
+                         size_t A_rows, size_t A_cols) {
     size_t r, c;
     for (r = 0; r < A_rows; r++) {
         for (c = 0; c < A_cols; c++) {
@@ -23,8 +23,8 @@ void transpose_flt_naive(const float* restrict A, float* restrict B,
 }
 
 void transpose_flt_blocked(const float* restrict A, float* restrict B,
-			   size_t A_rows, size_t A_cols,
-			   size_t blk_rows, size_t blk_cols) {
+                           size_t A_rows, size_t A_cols,
+                           size_t blk_rows, size_t blk_cols) {
     size_t r, c, r_min, c_min, r_max, c_max;
     size_t num_row_blocks, num_col_blocks;
     size_t num_full_row_blocks, num_full_col_blocks;
@@ -45,35 +45,33 @@ void transpose_flt_blocked(const float* restrict A, float* restrict B,
     // perform transpose over all blocks (both full and partial)
     for (row_block_num = 0; row_block_num < num_row_blocks; row_block_num++) {
         for (col_block_num = 0; col_block_num < num_col_blocks; col_block_num++) {
-	    r_min = row_block_num * blk_rows;
-	    c_min = col_block_num * blk_cols;
+            r_min = row_block_num * blk_rows;
+            c_min = col_block_num * blk_cols;
 
-	    if (row_block_num < num_full_row_blocks) {
-	        r_max = r_min + blk_rows;
-	    }
-	    else {
-	        r_max = r_min + row_block_remainder;
-	    }
+            if (row_block_num < num_full_row_blocks) {
+                r_max = r_min + blk_rows;
+            } else {
+                r_max = r_min + row_block_remainder;
+            }
 
-	    if (col_block_num < num_full_col_blocks) {
-	        c_max = c_min + blk_cols;
-	    }
-	    else {
-	        c_max = c_min + col_block_remainder;
-	    }
+            if (col_block_num < num_full_col_blocks) {
+                c_max = c_min + blk_cols;
+            } else {
+                c_max = c_min + col_block_remainder;
+            }
 
-	    // perform actual transpose over current block
-	    for (r = r_min; r < r_max; r++) {
-	        for (c = c_min; c < c_max; c++) {
-		    B[c * A_rows + r] = A[r * A_cols + c];
-		}
-	    }
-	}
+            // perform actual transpose over current block
+            for (r = r_min; r < r_max; r++) {
+                for (c = c_min; c < c_max; c++) {
+                    B[c * A_rows + r] = A[r * A_cols + c];
+                }
+            }
+        }
     }
 }
 
 void transpose_dbl_naive(const double* restrict A, double* restrict B,
-			 size_t A_rows, size_t A_cols) {
+                         size_t A_rows, size_t A_cols) {
     size_t r, c;
     for (r = 0; r < A_rows; r++) {
         for (c = 0; c < A_cols; c++) {
@@ -83,8 +81,8 @@ void transpose_dbl_naive(const double* restrict A, double* restrict B,
 }
 
 void transpose_dbl_blocked(const double* restrict A, double* restrict B,
-			   size_t A_rows, size_t A_cols,
-			   size_t blk_rows, size_t blk_cols) {
+                           size_t A_rows, size_t A_cols,
+                           size_t blk_rows, size_t blk_cols) {
     size_t r, c, r_min, c_min, r_max, c_max;
     size_t num_row_blocks, num_col_blocks;
     size_t num_full_row_blocks, num_full_col_blocks;
@@ -105,30 +103,28 @@ void transpose_dbl_blocked(const double* restrict A, double* restrict B,
     // perform transpose over all blocks (both full and partial)
     for (row_block_num = 0; row_block_num < num_row_blocks; row_block_num++) {
         for (col_block_num = 0; col_block_num < num_col_blocks; col_block_num++) {
-	    r_min = row_block_num * blk_rows;
-	    c_min = col_block_num * blk_cols;
+            r_min = row_block_num * blk_rows;
+            c_min = col_block_num * blk_cols;
 
-	    if (row_block_num < num_full_row_blocks) {
-	        r_max = r_min + blk_rows;
-	    }
-	    else {
-	        r_max = r_min + row_block_remainder;
-	    }
+            if (row_block_num < num_full_row_blocks) {
+                r_max = r_min + blk_rows;
+            } else {
+                r_max = r_min + row_block_remainder;
+            }
 
-	    if (col_block_num < num_full_col_blocks) {
-	        c_max = c_min + blk_cols;
-	    }
-	    else {
-	        c_max = c_min + col_block_remainder;
-	    }
+            if (col_block_num < num_full_col_blocks) {
+                c_max = c_min + blk_cols;
+            } else {
+                c_max = c_min + col_block_remainder;
+            }
 
-	    // perform actual transpose over current block
-	    for (r = r_min; r < r_max; r++) {
-	        for (c = c_min; c < c_max; c++) {
-		    B[c * A_rows + r] = A[r * A_cols + c];
-		}
-	    }
-	}
+            // perform actual transpose over current block
+            for (r = r_min; r < r_max; r++) {
+                for (c = c_min; c < c_max; c++) {
+                    B[c * A_rows + r] = A[r * A_cols + c];
+                }
+            }
+        }
     }
 }
 
