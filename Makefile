@@ -12,6 +12,7 @@ USE_FFTW ?= 1
 ifeq ($(strip $(USE_FFTW)),1)
 CFLAGS += $(CFLAGS_FFTW) -DUSE_FFTW
 LDFLAGS += $(LDFLAGS_FFTW)
+OBJS += transpose-fftw.o
 endif
 
 # MKL (e.g., at /opt/intel/compilers_and_libraries/linux/mkl/bin/pkgconfig/)
@@ -21,6 +22,7 @@ USE_MKL ?= 1
 ifeq ($(strip $(USE_MKL)),1)
 CFLAGS += $(CFLAGS_MKL) -DUSE_MKL
 LDFLAGS += $(LDFLAGS_MKL)
+OBJS += transpose-mkl.o
 endif
 
 .PHONY: all

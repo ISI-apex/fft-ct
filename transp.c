@@ -12,7 +12,7 @@
 
 #include <fftw3.h>
 
-#include "transpose.h"
+#include "transpose-fftw.h"
 #include "util.h"
 
 static void transp_fftw_complex_naive(size_t nrows, size_t ncols)

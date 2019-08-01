@@ -12,7 +12,7 @@
 
 #include <fftw3.h>
 
-#include "transpose.h"
+#include "transpose-fftw.h"
 #include "util.h"
 
 static void data_alloc(fftw_complex **A, fftw_complex **B, fftw_plan **p,

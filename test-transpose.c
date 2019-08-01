@@ -12,6 +12,8 @@
 #include <mkl.h>
 
 #include "transpose.h"
+#include "transpose-fftw.h"
+#include "transpose-mkl.h"
 #include "util.h"
 
 #ifndef TEST_ROWS
