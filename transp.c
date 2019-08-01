@@ -15,7 +15,7 @@
 #include "transpose.h"
 #include "util.h"
 
-static void transp(size_t nrows, size_t ncols)
+static void transp_fftw_complex_naive(size_t nrows, size_t ncols)
 {
     fftw_complex *A = assert_fftw_malloc(nrows * ncols * sizeof(fftw_complex));
     fftw_complex *B = assert_fftw_malloc(nrows * ncols * sizeof(fftw_complex));
@@ -42,6 +42,6 @@ int main(int argc, char **argv)
         fprintf(stderr, "Parameters nrows and ncols must be > 0\n");
         return EINVAL;
     }
-    transp(nrows, ncols);
+    transp_fftw_complex_naive(nrows, ncols);
     return 0;
 }
