@@ -14,6 +14,7 @@
 
 #include "transpose-fftw.h"
 #include "util.h"
+#include "util-fftw.h"
 
 static void transp_fftw_complex_naive(size_t nrows, size_t ncols)
 {

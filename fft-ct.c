@@ -14,6 +14,7 @@
 
 #include "transpose-fftw.h"
 #include "util.h"
+#include "util-fftw.h"
 
 static void data_alloc(fftw_complex **A, fftw_complex **B, fftw_plan **p,
                        size_t nrows, size_t ncols)
