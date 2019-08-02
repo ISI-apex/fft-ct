@@ -51,28 +51,28 @@
     } \
 }
 
-#define TEST_TRANSPOSE(datatype, fn_fill, fn_mat_print, fn_transpose, fn_is_eq, rc) { \
+#define TEST_TRANSPOSE_BEG(datatype, fn_fill, fn_mat_print) \
     datatype A[TEST_ROWS][TEST_COLS]; \
     datatype B[TEST_COLS][TEST_ROWS]; \
     fn_fill(&A[0][0], TEST_ROWS * TEST_COLS); \
     printf("In:\n"); \
-    fn_mat_print(&A[0][0], TEST_ROWS, TEST_COLS); \
-    fn_transpose(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS); \
+    fn_mat_print(&A[0][0], TEST_ROWS, TEST_COLS);
+
+#define TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, rc) \
     printf("Out:\n"); \
     fn_mat_print(&B[0][0], TEST_COLS, TEST_ROWS); \
-    CHECK_TRANSPOSE(A, B, fn_is_eq, rc); \
+    CHECK_TRANSPOSE(A, B, fn_is_eq, rc);
+
+#define TEST_TRANSPOSE(datatype, fn_fill, fn_mat_print, fn_transpose, fn_is_eq, rc) { \
+    TEST_TRANSPOSE_BEG(datatype, fn_fill, fn_mat_print); \
+    fn_transpose(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS); \
+    TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, rc); \
 }
 
 #define TEST_TRANSPOSE_BLOCKED(datatype, fn_fill, fn_mat_print, fn_transpose, fn_is_eq, rc) { \
-    datatype A[TEST_ROWS][TEST_COLS]; \
-    datatype B[TEST_COLS][TEST_ROWS]; \
-    fn_fill(&A[0][0], TEST_ROWS * TEST_COLS); \
-    printf("In:\n"); \
-    fn_mat_print(&A[0][0], TEST_ROWS, TEST_COLS); \
+    TEST_TRANSPOSE_BEG(datatype, fn_fill, fn_mat_print); \
     fn_transpose(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS); \
-    printf("Out:\n"); \
-    fn_mat_print(&B[0][0], TEST_COLS, TEST_ROWS); \
-    CHECK_TRANSPOSE(A, B, fn_is_eq, rc); \
+    TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, rc); \
 }
 
 int main(void)
