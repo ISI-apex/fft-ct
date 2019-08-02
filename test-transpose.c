@@ -37,212 +37,94 @@
 #define num2str(x) str(x)
 #define str(x) #x
 
-static int check_transpose_fftw_complex(fftw_complex A[TEST_ROWS][TEST_COLS],
-                                        fftw_complex B[TEST_COLS][TEST_ROWS])
-{
-    size_t r, c;
-    for (r = 0; r < TEST_ROWS; r++)
-        for (c = 0; c < TEST_COLS; c++)
-            if (!is_eq_fftw_complex(A[r][c], B[c][r]))
-                return -1;
-    return 0;
-}
+#define CHECK_TRANSPOSE(A, B, fn_is_eq, rc) \
+    size_t r, c; \
+    rc = 0; \
+    for (r = 0; r < TEST_ROWS && !rc; r++) { \
+        for (c = 0; c < TEST_COLS && !rc; c++) { \
+            rc = !fn_is_eq(A[r][c], B[c][r]); \
+        } \
+    }
 
-static int check_transpose_flt(float A[TEST_ROWS][TEST_COLS],
-                               float B[TEST_COLS][TEST_ROWS])
-{
-    size_t r, c;
-    for (r = 0; r < TEST_ROWS; r++)
-        for (c = 0; c < TEST_COLS; c++)
-            if (!is_eq_flt(A[r][c], B[c][r]))
-                return -1;
-    return 0;
-}
+#define TEST_TRANSPOSE(datatype, fn_fill, fn_mat_print, fn_transpose, fn_is_eq) \
+    datatype A[TEST_ROWS][TEST_COLS]; \
+    datatype B[TEST_COLS][TEST_ROWS]; \
+    int rc; \
+    fn_fill(&A[0][0], TEST_ROWS * TEST_COLS); \
+    printf("In:\n"); \
+    fn_mat_print(&A[0][0], TEST_ROWS, TEST_COLS); \
+    fn_transpose(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS); \
+    printf("Out:\n"); \
+    fn_mat_print(&B[0][0], TEST_COLS, TEST_ROWS); \
+    CHECK_TRANSPOSE(A, B, fn_is_eq, rc); \
+    return rc;
 
-static int check_transpose_dbl(double A[TEST_ROWS][TEST_COLS],
-                               double B[TEST_COLS][TEST_ROWS])
-{
-    size_t r, c;
-    for (r = 0; r < TEST_ROWS; r++)
-        for (c = 0; c < TEST_COLS; c++)
-            if (!is_eq_dbl(A[r][c], B[c][r]))
-                return -1;
-    return 0;
-}
-
-static int check_transpose_cmplx8(MKL_Complex8 A[TEST_ROWS][TEST_COLS],
-                                  MKL_Complex8 B[TEST_COLS][TEST_ROWS])
-{
-    size_t r, c;
-    for (r = 0; r < TEST_ROWS; r++)
-        for (c = 0; c < TEST_COLS; c++)
-            if (!is_eq_cmplx8(A[r][c], B[c][r]))
-                return -1;
-    return 0;
-}
-
-static int check_transpose_cmplx16(MKL_Complex16 A[TEST_ROWS][TEST_COLS],
-                                   MKL_Complex16 B[TEST_COLS][TEST_ROWS])
-{
-    size_t r, c;
-    for (r = 0; r < TEST_ROWS; r++)
-        for (c = 0; c < TEST_COLS; c++)
-            if (!is_eq_cmplx16(A[r][c], B[c][r]))
-                return -1;
-    return 0;
-}
+#define TEST_TRANSPOSE_BLOCKED(datatype, fn_fill, fn_mat_print, fn_transpose, fn_is_eq) \
+    datatype A[TEST_ROWS][TEST_COLS]; \
+    datatype B[TEST_COLS][TEST_ROWS]; \
+    int rc; \
+    fn_fill(&A[0][0], TEST_ROWS * TEST_COLS); \
+    printf("In:\n"); \
+    fn_mat_print(&A[0][0], TEST_ROWS, TEST_COLS); \
+    fn_transpose(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS); \
+    printf("Out:\n"); \
+    fn_mat_print(&B[0][0], TEST_COLS, TEST_ROWS); \
+    CHECK_TRANSPOSE(A, B, fn_is_eq, rc); \
+    return rc;
 
 static int test_transpose_flt_naive(void)
 {
-    float A[TEST_ROWS][TEST_COLS];
-    float B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_flt(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_flt(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_flt_naive(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_flt(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_flt(A, B);
+    TEST_TRANSPOSE(float, fill_rand_flt, matrix_print_flt, transpose_flt_naive,
+                   is_eq_flt);
 }
 
 static int test_transpose_flt_blocked(void)
 {
-    float A[TEST_ROWS][TEST_COLS];
-    float B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_flt(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_flt(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_flt_blocked(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS);
-    printf("Out:\n");
-    matrix_print_flt(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_flt(A, B);
+    TEST_TRANSPOSE_BLOCKED(float, fill_rand_flt, matrix_print_flt,
+                           transpose_flt_blocked, is_eq_flt);
 }
 
 static int test_transpose_dbl_naive(void)
 {
-    double A[TEST_ROWS][TEST_COLS];
-    double B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_dbl(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_dbl(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_dbl_naive(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_dbl(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_dbl(A, B);
+    TEST_TRANSPOSE(double, fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive,
+                   is_eq_dbl);
 }
 
 static int test_transpose_dbl_blocked(void)
 {
-    double A[TEST_ROWS][TEST_COLS];
-    double B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_dbl(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_dbl(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_dbl_blocked(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS);
-    printf("Out:\n");
-    matrix_print_dbl(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_dbl(A, B);
+    TEST_TRANSPOSE_BLOCKED(double, fill_rand_dbl, matrix_print_dbl,
+                           transpose_dbl_blocked, is_eq_dbl);
 }
 
 static int test_transpose_fftw_complex_naive(void)
 {
-    fftw_complex A[TEST_ROWS][TEST_COLS];
-    fftw_complex B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_fftw_complex(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_fftw_complex(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_fftw_complex_naive(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_fftw_complex(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_fftw_complex(A, B);
+    TEST_TRANSPOSE(fftw_complex, fill_rand_fftw_complex,
+                   matrix_print_fftw_complex, transpose_fftw_complex_naive,
+                   is_eq_fftw_complex);
 }
 
 static int test_transpose_flt_mkl(void)
 {
-    float A[TEST_ROWS][TEST_COLS];
-    float B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_flt(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_flt(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_flt_mkl(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_flt(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_flt(A, B);
+    TEST_TRANSPOSE(float, fill_rand_flt, matrix_print_flt, transpose_flt_mkl,
+                   is_eq_flt);
 }
 
 static int test_transpose_dbl_mkl(void)
 {
-    double A[TEST_ROWS][TEST_COLS];
-    double B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_dbl(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_dbl(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_dbl_mkl(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_dbl(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_dbl(A, B);
+    TEST_TRANSPOSE(double, fill_rand_dbl, matrix_print_dbl, transpose_dbl_mkl,
+                   is_eq_dbl);
 }
 
 static int test_transpose_cmplx8_mkl(void)
 {
-    MKL_Complex8 A[TEST_ROWS][TEST_COLS];
-    MKL_Complex8 B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_cmplx8(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_cmplx8(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_cmplx8_mkl(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_cmplx8(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_cmplx8(A, B);
+    TEST_TRANSPOSE(MKL_Complex8, fill_rand_cmplx8, matrix_print_cmplx8,
+                   transpose_cmplx8_mkl, is_eq_cmplx8);
 }
 
 static int test_transpose_cmplx16_mkl(void)
 {
-    MKL_Complex16 A[TEST_ROWS][TEST_COLS];
-    MKL_Complex16 B[TEST_COLS][TEST_ROWS];
-    printf("Testing transpose of %ux%u matrix\n", TEST_ROWS, TEST_COLS);
-    // init matrix
-    fill_rand_cmplx16(&A[0][0], TEST_ROWS * TEST_COLS);
-    // execute
-    printf("In:\n");
-    matrix_print_cmplx16(&A[0][0], TEST_ROWS, TEST_COLS);
-    transpose_cmplx16_mkl(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS);
-    printf("Out:\n");
-    matrix_print_cmplx16(&B[0][0], TEST_COLS, TEST_ROWS);
-    // verify
-    return check_transpose_cmplx16(A, B);
+    TEST_TRANSPOSE(MKL_Complex16, fill_rand_cmplx16, matrix_print_cmplx16,
+                   transpose_cmplx16_mkl, is_eq_cmplx16);
 }
 
 int main(void)
@@ -255,7 +137,8 @@ int main(void)
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
 
-    printf("\ntranspose_flt_blocked (block size = " num2str(TEST_BLK_ROWS) "x" num2str(TEST_BLK_COLS) "):\n");
+    printf("\ntranspose_flt_blocked (block size = %zux%zu):\n",
+           (size_t) TEST_BLK_ROWS, (size_t) TEST_BLK_COLS);
     rc = test_transpose_flt_blocked();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
@@ -265,7 +148,8 @@ int main(void)
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
 
-    printf("\ntranspose_dbl_blocked (block size = " num2str(TEST_BLK_ROWS) "x" num2str(TEST_BLK_COLS) "):\n" );
+    printf("\ntranspose_dbl_blocked (block size = %zux%zu):\n",
+           (size_t) TEST_BLK_ROWS, (size_t) TEST_BLK_COLS);
     rc = test_transpose_dbl_blocked();
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
