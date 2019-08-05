@@ -110,15 +110,6 @@ endif()
 
 # Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
-  add_executable(test-transp-primitive-mkl-fftw test-transpose.c
-                                                transpose-fftw.c
-                                                util.c util-fftw.c)
-  target_compile_definitions(test-transp-primitive-mkl-fftw
-                             PRIVATE "-DUSE_FFTW")
-  target_compile_options(test-transp-primitive-mkl-fftw
-                         PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
-  target_link_libraries(test-transp-primitive-mkl-fftw ${MKL_LDFLAGS})
-
   add_executable(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c
                                                     transpose-fftw.c
                                                     util.c util-fftw.c)
