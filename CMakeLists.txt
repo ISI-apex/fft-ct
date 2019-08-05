@@ -35,33 +35,25 @@ endif()
 # impl is probably one or more of:
 # [naive, blocked, mkl, mkl-fftw, pthread]
 
-add_executable(test-transp-float-naive test-transpose.c transpose.c util.c)
-target_compile_definitions(test-transp-float-naive
-                           PRIVATE "-DUSE_FLOAT_NAIVE")
+function(add_exec_test_transp name definitions)
+  add_executable(${name} test-transpose.c transpose.c util.c)
+  target_compile_definitions(${name} PRIVATE ${definitions})
+endfunction(add_exec_test_transp)
 
-add_executable(test-transp-double-naive test-transpose.c transpose.c util.c)
-target_compile_definitions(test-transp-double-naive
-                           PRIVATE "-DUSE_DOUBLE_NAIVE")
+function(add_exec_transp name definitions)
+  add_executable(${name} transp.c transpose.c util.c)
+  target_compile_definitions(${name} PRIVATE ${definitions})
+endfunction(add_exec_transp)
 
-add_executable(test-transp-float-blocked test-transpose.c transpose.c util.c)
-target_compile_definitions(test-transp-float-blocked
-                           PRIVATE "-DUSE_FLOAT_BLOCKED")
+add_exec_test_transp(test-transp-float-naive "-DUSE_FLOAT_NAIVE")
+add_exec_test_transp(test-transp-double-naive "-DUSE_DOUBLE_NAIVE")
+add_exec_test_transp(test-transp-float-blocked "-DUSE_FLOAT_BLOCKED")
+add_exec_test_transp(test-transp-double-blocked "-DUSE_DOUBLE_BLOCKED")
 
-add_executable(test-transp-double-blocked test-transpose.c transpose.c util.c)
-target_compile_definitions(test-transp-double-blocked
-                           PRIVATE "-DUSE_DOUBLE_BLOCKED")
-
-add_executable(transp-float-naive transp.c transpose.c util.c)
-target_compile_definitions(transp-float-naive PRIVATE "-DUSE_FLOAT_NAIVE")
-
-add_executable(transp-double-naive transp.c transpose.c util.c)
-target_compile_definitions(transp-double-naive PRIVATE "-DUSE_DOUBLE_NAIVE")
-
-add_executable(transp-float-blocked transp.c transpose.c util.c)
-target_compile_definitions(transp-float-blocked PRIVATE "-DUSE_FLOAT_BLOCKED")
-
-add_executable(transp-double-blocked transp.c transpose.c util.c)
-target_compile_definitions(transp-double-blocked PRIVATE "-DUSE_DOUBLE_BLOCKED")
+add_exec_transp(transp-float-naive "-DUSE_FLOAT_NAIVE")
+add_exec_transp(transp-double-naive "-DUSE_DOUBLE_NAIVE")
+add_exec_transp(transp-float-blocked "-DUSE_FLOAT_BLOCKED")
+add_exec_transp(transp-double-blocked "-DUSE_DOUBLE_BLOCKED")
 
 # Use FFTW library
 if(FFTW_FOUND)
@@ -96,69 +88,29 @@ endif()
 
 # Use MKL library
 if(MKL_FOUND)
-  add_executable(test-transp-float-mkl test-transpose.c
-                                       transpose-mkl.c
-                                       util.c util-mkl.c)
-  target_compile_definitions(test-transp-float-mkl PRIVATE "-DUSE_MKL_FLOAT")
-  target_compile_options(test-transp-float-mkl PRIVATE ${MKL_CFLAGS}
-                                                       ${MKL_CFLAGS_OTHER})
-  target_link_libraries(test-transp-float-mkl ${MKL_LDFLAGS})
+  function(add_exec_test_transp_mkl name definitions)
+    add_executable(${name} test-transpose.c transpose-mkl.c util.c util-mkl.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
+    target_link_libraries(${name} ${MKL_LDFLAGS})
+  endfunction(add_exec_test_transp_mkl)
 
-  add_executable(test-transp-double-mkl test-transpose.c
-                                        transpose-mkl.c
-                                        util.c util-mkl.c)
-  target_compile_definitions(test-transp-double-mkl PRIVATE "-DUSE_MKL_DOUBLE")
-  target_compile_options(test-transp-double-mkl PRIVATE ${MKL_CFLAGS}
-                                                        ${MKL_CFLAGS_OTHER})
-  target_link_libraries(test-transp-double-mkl ${MKL_LDFLAGS})
+  function(add_exec_transp_mkl name definitions)
+    add_executable(${name} transp.c transpose-mkl.c util.c util-mkl.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
+    target_link_libraries(${name} ${MKL_LDFLAGS})
+  endfunction(add_exec_transp_mkl)
 
-  add_executable(test-transp-cmplx8-mkl test-transpose.c
-                                        transpose-mkl.c
-                                        util.c util-mkl.c)
-  target_compile_definitions(test-transp-cmplx8-mkl PRIVATE "-DUSE_MKL_CMPLX8")
-  target_compile_options(test-transp-cmplx8-mkl PRIVATE ${MKL_CFLAGS}
-                                                        ${MKL_CFLAGS_OTHER})
-  target_link_libraries(test-transp-cmplx8-mkl ${MKL_LDFLAGS})
+  add_exec_test_transp_mkl(test-transp-float-mkl "-DUSE_MKL_FLOAT")
+  add_exec_test_transp_mkl(test-transp-double-mkl "-DUSE_MKL_DOUBLE")
+  add_exec_test_transp_mkl(test-transp-cmplx8-mkl "-DUSE_MKL_CMPLX8")
+  add_exec_test_transp_mkl(test-transp-cmplx16-mkl "-DUSE_MKL_CMPLX16")
 
-  add_executable(test-transp-cmplx16-mkl test-transpose.c
-                                         transpose-mkl.c
-                                         util.c util-mkl.c)
-  target_compile_definitions(test-transp-cmplx16-mkl PRIVATE "-DUSE_MKL_CMPLX16")
-  target_compile_options(test-transp-cmplx16-mkl PRIVATE ${MKL_CFLAGS}
-                                                         ${MKL_CFLAGS_OTHER})
-  target_link_libraries(test-transp-cmplx16-mkl ${MKL_LDFLAGS})
-
-  add_executable(transp-float-mkl transp.c
-                                  transpose-mkl.c
-                                  util.c util-mkl.c)
-  target_compile_definitions(transp-float-mkl PRIVATE "-DUSE_MKL_FLOAT")
-  target_compile_options(transp-float-mkl PRIVATE ${MKL_CFLAGS}
-                                                  ${MKL_CFLAGS_OTHER})
-  target_link_libraries(transp-float-mkl ${MKL_LDFLAGS})
-
-  add_executable(transp-double-mkl transp.c
-                                   transpose-mkl.c
-                                   util.c util-mkl.c)
-  target_compile_definitions(transp-double-mkl PRIVATE "-DUSE_MKL_DOUBLE")
-  target_compile_options(transp-double-mkl PRIVATE ${MKL_CFLAGS}
-                                                   ${MKL_CFLAGS_OTHER})
-  target_link_libraries(transp-double-mkl ${MKL_LDFLAGS})
-
-  add_executable(transp-cmplx8-mkl transp.c
-                                   transpose-mkl.c
-                                   util.c util-mkl.c)
-  target_compile_definitions(transp-cmplx8-mkl PRIVATE "-DUSE_MKL_CMPLX8")
-  target_compile_options(transp-cmplx8-mkl PRIVATE ${MKL_CFLAGS}
-                                                   ${MKL_CFLAGS_OTHER})
-  target_link_libraries(transp-cmplx8-mkl ${MKL_LDFLAGS})
-
-  add_executable(transp-cmplx16-mkl transp.c
-                                    transpose-mkl.c
-                                    util.c util-mkl.c)
-  target_compile_definitions(transp-cmplx16-mkl PRIVATE "-DUSE_MKL_CMPLX16")
-  target_compile_options(transp-cmplx16-mkl PRIVATE ${MKL_CFLAGS}
-                                                    ${MKL_CFLAGS_OTHER})
-  target_link_libraries(transp-cmplx16-mkl ${MKL_LDFLAGS})
+  add_exec_transp_mkl(transp-float-mkl "-DUSE_MKL_FLOAT")
+  add_exec_transp_mkl(transp-double-mkl "-DUSE_MKL_DOUBLE")
+  add_exec_transp_mkl(transp-cmplx8-mkl "-DUSE_MKL_CMPLX8")
+  add_exec_transp_mkl(transp-cmplx16-mkl "-DUSE_MKL_CMPLX16")
 endif()
 
 # Use MKL library implementations of the FFTW interface
