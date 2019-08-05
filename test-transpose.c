@@ -10,13 +10,14 @@
 #include "transpose.h"
 #include "util.h"
 
-#if defined(USE_FFTW)
+#if defined(USE_FFTW_NAIVE)
 #include <fftw3.h>
 #include "transpose-fftw.h"
 #include "util-fftw.h"
 #endif
 
-#if defined(USE_MKL)
+#if defined(USE_MKL_FLOAT) || defined(USE_MKL_DOUBLE) || \
+    defined(USE_MKL_CMPLX8) || defined(USE_MKL_CMPLX16)
 #include <mkl.h>
 #include "transpose-mkl.h"
 #include "util-mkl.h"
@@ -77,71 +78,51 @@
 
 int main(void)
 {
-    int ret = 0;
     int rc;
 
-#if defined(USE_PRIMITIVE)
+#if defined(USE_FLOAT_NAIVE)
     printf("transpose_flt_naive:\n");
     TEST_TRANSPOSE(float, fill_rand_flt, matrix_print_flt, transpose_flt_naive,
                    is_eq_flt, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-
+#elif defined(USE_DOUBLE_NAIVE)
+    printf("\ntranspose_dbl_naive:\n");
+    TEST_TRANSPOSE(double, fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive,
+                   is_eq_dbl, rc);
+#elif defined(USE_FLOAT_BLOCKED)
     printf("\ntranspose_flt_blocked (block size = %zux%zu):\n",
            (size_t) TEST_BLK_ROWS, (size_t) TEST_BLK_COLS);
     TEST_TRANSPOSE_BLOCKED(float, fill_rand_flt, matrix_print_flt,
                            transpose_flt_blocked, is_eq_flt, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-
-    printf("\ntranspose_dbl_naive:\n");
-    TEST_TRANSPOSE(double, fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive,
-                   is_eq_dbl, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-
+#elif defined(USE_DOUBLE_BLOCKED)
     printf("\ntranspose_dbl_blocked (block size = %zux%zu):\n",
            (size_t) TEST_BLK_ROWS, (size_t) TEST_BLK_COLS);
     TEST_TRANSPOSE_BLOCKED(double, fill_rand_dbl, matrix_print_dbl,
                            transpose_dbl_blocked, is_eq_dbl, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-#endif
-
-#if defined(USE_FFTW)
+#elif defined(USE_FFTW_NAIVE)
     printf("\ntranspose_fftw_complex_naive:\n");
     TEST_TRANSPOSE(fftw_complex, fill_rand_fftw_complex,
                    matrix_print_fftw_complex, transpose_fftw_complex_naive,
                    is_eq_fftw_complex, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-#endif
-
-#if defined(USE_MKL)
+#elif defined(USE_MKL_FLOAT)
     printf("\ntranspose_flt_mkl:\n");
     TEST_TRANSPOSE(float, fill_rand_flt, matrix_print_flt, transpose_flt_mkl,
                    is_eq_flt, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-
+#elif defined(USE_MKL_DOUBLE)
     printf("\ntranspose_dbl_mkl:\n");
     TEST_TRANSPOSE(double, fill_rand_dbl, matrix_print_dbl, transpose_dbl_mkl,
                    is_eq_dbl, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-
+#elif defined(USE_MKL_CMPLX8)
     printf("\ntranspose_cmplx8_mkl:\n");
     TEST_TRANSPOSE(MKL_Complex8, fill_rand_cmplx8, matrix_print_cmplx8,
                    transpose_cmplx8_mkl, is_eq_cmplx8, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
-
+#elif defined(USE_MKL_CMPLX16)
     printf("\ntranspose_cmplx16_mkl:\n");
     TEST_TRANSPOSE(MKL_Complex16, fill_rand_cmplx16, matrix_print_cmplx16,
                    transpose_cmplx16_mkl, is_eq_cmplx16, rc);
-    ret |= rc;
-    printf("%s\n", rc ? "Failed" : "Success");
+#else
+    #error "No matching transpose implementation found!"
 #endif
 
-    return ret;
+    printf("%s\n", rc ? "Failed" : "Success");
+    return rc;
 }

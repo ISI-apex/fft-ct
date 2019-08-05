@@ -35,8 +35,21 @@ endif()
 # impl is probably one or more of:
 # [naive, blocked, mkl, mkl-fftw, pthread]
 
-add_executable(test-transp-primitive test-transpose.c transpose.c util.c)
-target_compile_definitions(test-transp-primitive PRIVATE "-DUSE_PRIMITIVE")
+add_executable(test-transp-float-naive test-transpose.c transpose.c util.c)
+target_compile_definitions(test-transp-float-naive
+                           PRIVATE "-DUSE_FLOAT_NAIVE")
+
+add_executable(test-transp-double-naive test-transpose.c transpose.c util.c)
+target_compile_definitions(test-transp-double-naive
+                           PRIVATE "-DUSE_DOUBLE_NAIVE")
+
+add_executable(test-transp-float-blocked test-transpose.c transpose.c util.c)
+target_compile_definitions(test-transp-float-blocked
+                           PRIVATE "-DUSE_FLOAT_BLOCKED")
+
+add_executable(test-transp-double-blocked test-transpose.c transpose.c util.c)
+target_compile_definitions(test-transp-double-blocked
+                           PRIVATE "-DUSE_DOUBLE_BLOCKED")
 
 add_executable(transp-float-naive transp.c transpose.c util.c)
 target_compile_definitions(transp-float-naive PRIVATE "-DUSE_FLOAT_NAIVE")
@@ -56,7 +69,7 @@ if(FFTW_FOUND)
                                                 transpose-fftw.c
                                                 util.c util-fftw.c)
   target_compile_definitions(test-transp-fftw_complex-naive
-                             PRIVATE "-DUSE_FFTW")
+                             PRIVATE "-DUSE_FFTW_NAIVE")
   target_link_libraries(test-transp-fftw_complex-naive ${FFTW_LDFLAGS}
                                                        ${FFTW_STATIC_LIBRARIES})
 
@@ -83,13 +96,37 @@ endif()
 
 # Use MKL library
 if(MKL_FOUND)
-  add_executable(test-transp-primitive-mkl test-transpose.c
-                                           transpose-mkl.c
-                                           util.c util-mkl.c)
-  target_compile_definitions(test-transp-primitive-mkl PRIVATE "-DUSE_MKL")
-  target_compile_options(test-transp-primitive-mkl PRIVATE ${MKL_CFLAGS}
-                                                           ${MKL_CFLAGS_OTHER})
-  target_link_libraries(test-transp-primitive-mkl ${MKL_LDFLAGS})
+  add_executable(test-transp-float-mkl test-transpose.c
+                                       transpose-mkl.c
+                                       util.c util-mkl.c)
+  target_compile_definitions(test-transp-float-mkl PRIVATE "-DUSE_MKL_FLOAT")
+  target_compile_options(test-transp-float-mkl PRIVATE ${MKL_CFLAGS}
+                                                       ${MKL_CFLAGS_OTHER})
+  target_link_libraries(test-transp-float-mkl ${MKL_LDFLAGS})
+
+  add_executable(test-transp-double-mkl test-transpose.c
+                                        transpose-mkl.c
+                                        util.c util-mkl.c)
+  target_compile_definitions(test-transp-double-mkl PRIVATE "-DUSE_MKL_DOUBLE")
+  target_compile_options(test-transp-double-mkl PRIVATE ${MKL_CFLAGS}
+                                                        ${MKL_CFLAGS_OTHER})
+  target_link_libraries(test-transp-double-mkl ${MKL_LDFLAGS})
+
+  add_executable(test-transp-cmplx8-mkl test-transpose.c
+                                        transpose-mkl.c
+                                        util.c util-mkl.c)
+  target_compile_definitions(test-transp-cmplx8-mkl PRIVATE "-DUSE_MKL_CMPLX8")
+  target_compile_options(test-transp-cmplx8-mkl PRIVATE ${MKL_CFLAGS}
+                                                        ${MKL_CFLAGS_OTHER})
+  target_link_libraries(test-transp-cmplx8-mkl ${MKL_LDFLAGS})
+
+  add_executable(test-transp-cmplx16-mkl test-transpose.c
+                                         transpose-mkl.c
+                                         util.c util-mkl.c)
+  target_compile_definitions(test-transp-cmplx16-mkl PRIVATE "-DUSE_MKL_CMPLX16")
+  target_compile_options(test-transp-cmplx16-mkl PRIVATE ${MKL_CFLAGS}
+                                                         ${MKL_CFLAGS_OTHER})
+  target_link_libraries(test-transp-cmplx16-mkl ${MKL_LDFLAGS})
 
   add_executable(transp-float-mkl transp.c
                                   transpose-mkl.c
