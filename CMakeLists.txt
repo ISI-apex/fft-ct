@@ -30,6 +30,7 @@ endif()
 add_executable(test-transpose test-transpose.c transpose.c util.c)
 target_compile_definitions(test-transpose PRIVATE "-DUSE_PRIMITIVE")
 
+# Use FFTW library
 if(FFTW_FOUND)
   add_executable(test-transpose-fftw test-transpose.c
                                      transpose-fftw.c
@@ -54,6 +55,7 @@ if(FFTW_FOUND)
   target_link_libraries(transp ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
 endif()
 
+# Use MKL library
 if(MKL_FOUND)
   add_executable(test-transpose-mkl test-transpose.c
                                     transpose-mkl.c
@@ -62,4 +64,30 @@ if(MKL_FOUND)
   target_compile_options(test-transpose-mkl PRIVATE ${MKL_CFLAGS}
                                                     ${MKL_CFLAGS_OTHER})
   target_link_libraries(test-transpose-mkl ${MKL_LDFLAGS})
+endif()
+
+# Use MKL library implementations of the FFTW interface
+if(MKL_FOUND)
+  add_executable(test-transpose-mkl-fftw test-transpose.c
+                                         transpose-fftw.c
+                                         util.c util-fftw.c)
+  target_compile_definitions(test-transpose-mkl-fftw PRIVATE "-DUSE_FFTW")
+  target_compile_options(test-transpose-mkl-fftw PRIVATE ${MKL_CFLAGS}
+                                                         ${MKL_CFLAGS_OTHER})
+  target_link_libraries(test-transpose-mkl-fftw ${MKL_LDFLAGS})
+
+  add_executable(fft-ct-mkl-fftw fft-ct.c
+                                 transpose-fftw.c
+                                 util.c util-fftw.c)
+  target_link_libraries(fft-ct-mkl-fftw ${MKL_LDFLAGS})
+
+  add_executable(fft-2d-mkl-fftw fft-2d.c
+                                 transpose-fftw.c
+                                 util.c util-fftw.c)
+  target_link_libraries(fft-2d-mkl-fftw ${MKL_LDFLAGS})
+
+  add_executable(transp-mkl-fftw transp.c
+                                 transpose-fftw.c
+                                 util.c util-fftw.c)
+  target_link_libraries(transp-mkl-fftw ${MKL_LDFLAGS})
 endif()
