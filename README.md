@@ -17,12 +17,15 @@ Compiler and linker flags are discovered using `pkg-config`.
 Building
 --------
 
-To build using the included Makefile:
+The project uses CMake:
 
+	mkdir build
+	cd build
+	cmake ..
 	make
 
-If `FFTW3` is installed to a non-standard location `${PREFIX}`, you must first
-configure `PKG_CONFIG_PATH`. E.g., when `FFTW3` was configured with
+If dependencies are installed to a non-standard location `${PREFIX}`, you must
+first configure `PKG_CONFIG_PATH`. E.g., when `FFTW3` was configured with
 `./configure --prefix=${PREFIX}`:
 
 	export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig/
