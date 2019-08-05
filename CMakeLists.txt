@@ -42,6 +42,12 @@ target_compile_definitions(transp-float-naive PRIVATE "-DUSE_FLOAT_NAIVE")
 add_executable(transp-double-naive transp.c transpose.c util.c)
 target_compile_definitions(transp-double-naive PRIVATE "-DUSE_DOUBLE_NAIVE")
 
+add_executable(transp-float-blocked transp.c transpose.c util.c)
+target_compile_definitions(transp-float-blocked PRIVATE "-DUSE_FLOAT_BLOCKED")
+
+add_executable(transp-double-blocked transp.c transpose.c util.c)
+target_compile_definitions(transp-double-blocked PRIVATE "-DUSE_DOUBLE_BLOCKED")
+
 # Use FFTW library
 if(FFTW_FOUND)
   add_executable(test-transp-fftw_complex-naive test-transpose.c

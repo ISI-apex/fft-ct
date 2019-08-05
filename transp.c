@@ -40,6 +40,12 @@
     TRANSP_TEARDOWN(A, B, fn_free); \
 }
 
+#define TRANSP_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, nrows, ncols, nblkrows, nblkcols) { \
+    TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
+    fn_transp(A, B, nrows, ncols, nblkrows, nblkcols); \
+    TRANSP_TEARDOWN(A, B, fn_free); \
+}
+
 static void usage(void)
 {
     fprintf(stderr, "Usage: transp <nrows> <ncols>\n");
@@ -57,7 +63,18 @@ int main(int argc, char **argv)
         fprintf(stderr, "Parameters nrows and ncols must be > 0\n");
         return EINVAL;
     }
-// TODO: Add float and double transposes (naive and blocked), MKL transposes
+
+#if defined(USE_FLOAT_BLOCKED) || defined (USE_DOUBLE_BLOCKED)
+    size_t nblkrows, nblkcols;
+    if (argc > 4) {
+        nblkrows = atoi(argv[3]);
+        nblkrows = atoi(argv[4]);
+    } else {
+        nblkrows = nrows;
+        nblkcols = ncols;
+    }
+#endif
+
 #if defined(USE_FLOAT_NAIVE)
     TRANSP(float, assert_malloc, free,
            fill_rand_flt, transpose_flt_naive,
@@ -66,6 +83,14 @@ int main(int argc, char **argv)
     TRANSP(double, assert_malloc, free,
            fill_rand_dbl, transpose_dbl_naive,
            nrows, ncols);
+#elif defined(USE_FLOAT_BLOCKED)
+    TRANSP_BLOCKED(float, assert_malloc, free,
+                   fill_rand_flt, transpose_flt_blocked,
+                   nrows, ncols, nblkrows, nblkcols);
+#elif defined(USE_DOUBLE_BLOCKED)
+    TRANSP_BLOCKED(double, assert_malloc, free,
+                   fill_rand_dbl, transpose_dbl_blocked,
+                   nrows, ncols, nblkrows, nblkcols);
 #elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw_complex, transpose_fftw_complex_naive,
