@@ -11,6 +11,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c99")
 
 # Dependencies
 
+find_package(Threads REQUIRED)
+
 find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
   pkg_check_modules(FFTW fftw3)
