@@ -11,7 +11,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c99 -D_GNU_SOURCE")
 
 # Dependencies
 
-find_package(PkgConfig REQUIRED)
+find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
   pkg_check_modules(FFTW fftw3)
   if(FFTW_FOUND)
