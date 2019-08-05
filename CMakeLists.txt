@@ -30,6 +30,12 @@ endif()
 add_executable(test-transpose test-transpose.c transpose.c util.c)
 target_compile_definitions(test-transpose PRIVATE "-DUSE_PRIMITIVE")
 
+add_executable(transp-float-naive transp.c transpose.c util.c)
+target_compile_definitions(transp-float-naive PRIVATE "-DUSE_FLOAT_NAIVE")
+
+add_executable(transp-double-naive transp.c transpose.c util.c)
+target_compile_definitions(transp-double-naive PRIVATE "-DUSE_DOUBLE_NAIVE")
+
 # Use FFTW library
 if(FFTW_FOUND)
   add_executable(test-transpose-fftw test-transpose.c

@@ -10,11 +10,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <fftw3.h>
-
-#include "transpose-fftw.h"
+#include "transpose.h"
 #include "util.h"
+
+#if defined(USE_FFTW_NAIVE)
+#include <fftw3.h>
+#include "transpose-fftw.h"
 #include "util-fftw.h"
+#endif
 
 #define TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols) \
     datatype *A = fn_malloc(nrows * ncols * sizeof(datatype)); \
@@ -48,10 +51,20 @@ int main(int argc, char **argv)
         fprintf(stderr, "Parameters nrows and ncols must be > 0\n");
         return EINVAL;
     }
-#if defined(USE_FFTW_NAIVE)
+#if defined(USE_FLOAT_NAIVE)
+    TRANSP(float, assert_malloc, free,
+           fill_rand_flt, transpose_flt_naive,
+           nrows, ncols);
+#elif defined(USE_DOUBLE_NAIVE)
+    TRANSP(double, assert_malloc, free,
+           fill_rand_dbl, transpose_dbl_naive,
+           nrows, ncols);
+#elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw_complex, transpose_fftw_complex_naive,
            nrows, ncols);
+#else
+    #error "No matching transpose implementation found!"
 #endif
     return 0;
 }
