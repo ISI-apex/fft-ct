@@ -80,6 +80,7 @@ int main(void)
     int ret = 0;
     int rc;
 
+#if defined(USE_PRIMITIVE)
     printf("transpose_flt_naive:\n");
     TEST_TRANSPOSE(float, fill_rand_flt, matrix_print_flt, transpose_flt_naive,
                    is_eq_flt, rc);
@@ -105,6 +106,7 @@ int main(void)
                            transpose_dbl_blocked, is_eq_dbl, rc);
     ret |= rc;
     printf("%s\n", rc ? "Failed" : "Success");
+#endif
 
 #if defined(USE_FFTW)
     printf("\ntranspose_fftw_complex_naive:\n");

@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS += -Wall -std=c99
+CFLAGS += -Wall -std=c99 -DUSE_PRIMITIVE
 LDFLAGS +=
 
 OBJS = transpose.o util.o
