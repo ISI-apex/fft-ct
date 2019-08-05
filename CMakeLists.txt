@@ -49,10 +49,12 @@ if(FFTW_FOUND)
                         util.c util-fftw.c)
   target_link_libraries(fft-2d ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
 
-  add_executable(transp transp.c
+  add_executable(transp-fftw-naive transp.c
                         transpose-fftw.c
                         util.c util-fftw.c)
-  target_link_libraries(transp ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+  target_compile_definitions(transp-fftw-naive PRIVATE "-DUSE_FFTW_NAIVE")
+  target_link_libraries(transp-fftw-naive ${FFTW_LDFLAGS}
+                                          ${FFTW_STATIC_LIBRARIES})
 endif()
 
 # Use MKL library
@@ -86,8 +88,9 @@ if(MKL_FOUND)
                                  util.c util-fftw.c)
   target_link_libraries(fft-2d-mkl-fftw ${MKL_LDFLAGS})
 
-  add_executable(transp-mkl-fftw transp.c
+  add_executable(transp-mkl-fftw-naive transp.c
                                  transpose-fftw.c
                                  util.c util-fftw.c)
-  target_link_libraries(transp-mkl-fftw ${MKL_LDFLAGS})
+  target_compile_definitions(transp-mkl-fftw-naive PRIVATE "-DUSE_FFTW_NAIVE")
+  target_link_libraries(transp-mkl-fftw-naive ${MKL_LDFLAGS})
 endif()
