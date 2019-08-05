@@ -1,8 +1,5 @@
 # Project-specific
-fft-2d
-fft-ct
-transp
-test-transpose
+build/
 
 # Prerequisites
 *.d
