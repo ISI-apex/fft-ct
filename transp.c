@@ -19,7 +19,8 @@
 #include "util-fftw.h"
 #endif
 
-#if defined(USE_MKL_FLOAT) || defined(USE_MKL_DOUBLE)
+#if defined(USE_MKL_FLOAT) || defined(USE_MKL_DOUBLE) || \
+    defined(USE_MKL_CMPLX8) || defined(USE_MKL_CMPLX16)
 #include <mkl.h>
 #include "transpose-mkl.h"
 #include "util-mkl.h"
@@ -102,6 +103,14 @@ int main(int argc, char **argv)
 #elif defined(USE_MKL_DOUBLE)
     TRANSP(double, assert_malloc, free,
            fill_rand_dbl, transpose_dbl_mkl,
+           nrows, ncols);
+#elif defined(USE_MKL_CMPLX8)
+    TRANSP(MKL_Complex8, assert_malloc, free,
+           fill_rand_cmplx8, transpose_cmplx8_mkl,
+           nrows, ncols);
+#elif defined(USE_MKL_CMPLX16)
+    TRANSP(MKL_Complex16, assert_malloc, free,
+           fill_rand_cmplx16, transpose_cmplx16_mkl,
            nrows, ncols);
 #else
     #error "No matching transpose implementation found!"

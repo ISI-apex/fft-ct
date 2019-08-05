@@ -143,6 +143,22 @@ if(MKL_FOUND)
   target_compile_options(transp-double-mkl PRIVATE ${MKL_CFLAGS}
                                                    ${MKL_CFLAGS_OTHER})
   target_link_libraries(transp-double-mkl ${MKL_LDFLAGS})
+
+  add_executable(transp-cmplx8-mkl transp.c
+                                   transpose-mkl.c
+                                   util.c util-mkl.c)
+  target_compile_definitions(transp-cmplx8-mkl PRIVATE "-DUSE_MKL_CMPLX8")
+  target_compile_options(transp-cmplx8-mkl PRIVATE ${MKL_CFLAGS}
+                                                   ${MKL_CFLAGS_OTHER})
+  target_link_libraries(transp-cmplx8-mkl ${MKL_LDFLAGS})
+
+  add_executable(transp-cmplx16-mkl transp.c
+                                    transpose-mkl.c
+                                    util.c util-mkl.c)
+  target_compile_definitions(transp-cmplx16-mkl PRIVATE "-DUSE_MKL_CMPLX16")
+  target_compile_options(transp-cmplx16-mkl PRIVATE ${MKL_CFLAGS}
+                                                    ${MKL_CFLAGS_OTHER})
+  target_link_libraries(transp-cmplx16-mkl ${MKL_LDFLAGS})
 endif()
 
 # Use MKL library implementations of the FFTW interface
