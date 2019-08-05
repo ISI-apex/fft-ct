@@ -60,6 +60,14 @@ if(FFTW_FOUND)
   target_link_libraries(test-transp-fftw_complex-naive ${FFTW_LDFLAGS}
                                                        ${FFTW_STATIC_LIBRARIES})
 
+  add_executable(transp-fftw_complex-naive transp.c
+                                           transpose-fftw.c
+                                           util.c util-fftw.c)
+  target_compile_definitions(transp-fftw_complex-naive
+                             PRIVATE "-DUSE_FFTW_NAIVE")
+  target_link_libraries(transp-fftw_complex-naive ${FFTW_LDFLAGS}
+                                                  ${FFTW_STATIC_LIBRARIES})
+
   add_executable(fft-ct-fftw_complex-naive fft-ct.c
                                            transpose-fftw.c
                                            util.c util-fftw.c)
@@ -71,14 +79,6 @@ if(FFTW_FOUND)
                                           util.c util-fftw.c)
   target_link_libraries(fft-2d-fftw_complex-fftw ${FFTW_LDFLAGS}
                                                  ${FFTW_STATIC_LIBRARIES})
-
-  add_executable(transp-fftw_complex-naive transp.c
-                                           transpose-fftw.c
-                                           util.c util-fftw.c)
-  target_compile_definitions(transp-fftw_complex-naive
-                             PRIVATE "-DUSE_FFTW_NAIVE")
-  target_link_libraries(transp-fftw_complex-naive ${FFTW_LDFLAGS}
-                                                  ${FFTW_STATIC_LIBRARIES})
 endif()
 
 # Use MKL library
@@ -110,6 +110,13 @@ endif()
 
 # Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
+  add_executable(transp-fftw_complex-naive-mkl-fftw transp.c
+                                                    transpose-fftw.c
+                                                    util.c util-fftw.c)
+  target_compile_definitions(transp-fftw_complex-naive-mkl-fftw
+                             PRIVATE "-DUSE_FFTW_NAIVE")
+  target_link_libraries(transp-fftw_complex-naive-mkl-fftw ${MKL_LDFLAGS})
+
   add_executable(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c
                                                     transpose-fftw.c
                                                     util.c util-fftw.c)
@@ -119,11 +126,4 @@ if(MKL_FOUND)
                                               transpose-fftw.c
                                               util.c util-fftw.c)
   target_link_libraries(fft-2d-fftw_complex-mkl-fftw ${MKL_LDFLAGS})
-
-  add_executable(transp-fftw_complex-naive-mkl-fftw transp.c
-                                                    transpose-fftw.c
-                                                    util.c util-fftw.c)
-  target_compile_definitions(transp-fftw_complex-naive-mkl-fftw
-                             PRIVATE "-DUSE_FFTW_NAIVE")
-  target_link_libraries(transp-fftw_complex-naive-mkl-fftw ${MKL_LDFLAGS})
 endif()
