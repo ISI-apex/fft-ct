@@ -10,6 +10,11 @@
 #include "transpose.h"
 #include "util.h"
 
+#if defined(USE_FLOAT_THREADS_ROW) || defined(USE_DOUBLE_THREADS_ROW) || \
+    defined(USE_FLOAT_THREADS_COL) || defined(USE_DOUBLE_THREADS_COL)
+#include "transpose-threads.h"
+#endif
+
 #if defined(USE_FFTW_NAIVE)
 #include <fftw3.h>
 #include "transpose-fftw.h"
@@ -98,6 +103,22 @@ int main(void)
            (size_t) TEST_BLK_ROWS, (size_t) TEST_BLK_COLS);
     TEST_TRANSPOSE_BLOCKED(double, fill_rand_dbl, matrix_print_dbl,
                            transpose_dbl_blocked, is_eq_dbl, rc);
+#elif defined(USE_FLOAT_THREADS_ROW)
+    printf("transpose_flt_threads_row:\n");
+    // TODO
+    rc = -1;
+#elif defined(USE_DOUBLE_THREADS_ROW)
+    printf("\ntranspose_dbl_threads_row:\n");
+    // TODO
+    rc = -1;
+#elif defined(USE_FLOAT_THREADS_COL)
+    printf("transpose_flt_threads_col:\n");
+    // TODO
+    rc = -1;
+#elif defined(USE_DOUBLE_THREADS_COL)
+    printf("\ntranspose_dbl_threads_col:\n");
+    // TODO
+    rc = -1;
 #elif defined(USE_FFTW_NAIVE)
     printf("\ntranspose_fftw_complex_naive:\n");
     TEST_TRANSPOSE(fftw_complex, fill_rand_fftw_complex,
