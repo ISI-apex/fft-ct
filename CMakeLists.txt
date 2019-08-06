@@ -18,13 +18,13 @@ if(PKG_CONFIG_FOUND)
   pkg_check_modules(FFTW fftw3)
   if(FFTW_FOUND)
     include_directories(${FFTW_INCLUDE_DIRS})
-  endif()
+  endif(FFTW_FOUND)
 
   pkg_check_modules(MKL mkl-static-ilp64-seq)
   if(MKL_FOUND)
     include_directories(${MKL_INCLUDE_DIRS})
-  endif()
-endif()
+  endif(MKL_FOUND)
+endif(PKG_CONFIG_FOUND)
 
 
 # Binaries
@@ -62,7 +62,7 @@ if(FFTW_FOUND)
   add_exec_fftw(transp-fftw_complex-naive transp.c "-DUSE_FFTW_NAIVE")
   add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "")
   add_exec_fftw(fft-2d-fftw_complex-fftw fft-2d.c "")
-endif()
+endif(FFTW_FOUND)
 
 # Use MKL library
 if(MKL_FOUND)
@@ -82,7 +82,7 @@ if(MKL_FOUND)
   add_exec_mkl(transp-double-mkl transp.c "-DUSE_MKL_DOUBLE")
   add_exec_mkl(transp-cmplx8-mkl transp.c "-DUSE_MKL_CMPLX8")
   add_exec_mkl(transp-cmplx16-mkl transp.c "-DUSE_MKL_CMPLX16")
-endif()
+endif(MKL_FOUND)
 
 # Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
@@ -95,4 +95,4 @@ if(MKL_FOUND)
   add_exec_mkl_fftw(transp-fftw_complex-naive-mkl-fftw transp.c "-DUSE_FFTW_NAIVE")
   add_exec_mkl_fftw(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c "")
   add_exec_mkl_fftw(fft-2d-fftw_complex-mkl-fftw fft-2d.c "")
-endif()
+endif(MKL_FOUND)
