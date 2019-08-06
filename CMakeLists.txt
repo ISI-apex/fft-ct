@@ -53,21 +53,20 @@ add_exec_prim(transp-double-blocked transp.c "-DUSE_DOUBLE_BLOCKED")
 # Use threads
 if(Threads_FOUND)
   function(add_exec_threads name main definitions)
-    add_executable(${name} ${main} transpose-threads.c util.c util-threads.c)
+    add_executable(${name} ${main} transpose-threads.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads)
 
-  # TODO
-  # add_exec_threads(test-transp-float-threads-row test-transpose.c "-DUSE_FLOAT_THREADS_ROW")
-  # add_exec_threads(test-transp-double-threads-row test-transpose.c "-DUSE_DOUBLE_THREADS_ROW")
-  # add_exec_threads(test-transp-float-threads-col test-transpose.c "-DUSE_FLOAT_THREADS_COL")
-  # add_exec_threads(test-transp-double-threads-col test-transpose.c "-DUSE_DOUBLE_THREADS_COL")
+  add_exec_threads(test-transp-float-threads-row test-transpose.c "-DUSE_FLOAT_THREADS_ROW")
+  add_exec_threads(test-transp-double-threads-row test-transpose.c "-DUSE_DOUBLE_THREADS_ROW")
+  add_exec_threads(test-transp-float-threads-col test-transpose.c "-DUSE_FLOAT_THREADS_COL")
+  add_exec_threads(test-transp-double-threads-col test-transpose.c "-DUSE_DOUBLE_THREADS_COL")
 
-  # add_exec_threads(transp-float-threads-row transp.c "-DUSE_FLOAT_THREADS_ROW")
-  # add_exec_threads(transp-double-threads-row transp.c "-DUSE_DOUBLE_THREADS_ROW")
-  # add_exec_threads(transp-float-threads-col transp.c "-DUSE_FLOAT_THREADS_COL")
-  # add_exec_threads(transp-double-threads-col transp.c "-DUSE_DOUBLE_THREADS_COL")
+  add_exec_threads(transp-float-threads-row transp.c "-DUSE_FLOAT_THREADS_ROW")
+  add_exec_threads(transp-double-threads-row transp.c "-DUSE_DOUBLE_THREADS_ROW")
+  add_exec_threads(transp-float-threads-col transp.c "-DUSE_FLOAT_THREADS_COL")
+  add_exec_threads(transp-double-threads-col transp.c "-DUSE_DOUBLE_THREADS_COL")
 endif(Threads_FOUND)
 
 # Use FFTW library

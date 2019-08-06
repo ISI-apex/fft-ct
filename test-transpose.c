@@ -44,6 +44,10 @@
 #define TEST_BLK_COLS 3
 #endif
 
+#ifndef TEST_NUM_THREADS
+#define TEST_NUM_THREADS 2
+#endif
+
 #define num2str(x) str(x)
 #define str(x) #x
 
@@ -81,6 +85,12 @@
     TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, rc); \
 }
 
+#define TEST_TRANSPOSE_THREADED(datatype, fn_fill, fn_mat_print, fn_transpose, fn_is_eq, rc) { \
+    TEST_TRANSPOSE_BEG(datatype, fn_fill, fn_mat_print); \
+    fn_transpose(&A[0][0], &B[0][0], TEST_ROWS, TEST_COLS, TEST_NUM_THREADS); \
+    TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, rc); \
+}
+
 int main(void)
 {
     int rc;
@@ -104,21 +114,25 @@ int main(void)
     TEST_TRANSPOSE_BLOCKED(double, fill_rand_dbl, matrix_print_dbl,
                            transpose_dbl_blocked, is_eq_dbl, rc);
 #elif defined(USE_FLOAT_THREADS_ROW)
-    printf("transpose_flt_threads_row:\n");
-    // TODO
-    rc = -1;
+    printf("\ntranspose_flt_threads_row (num threads = %zu):\n",
+	   (size_t) TEST_NUM_THREADS);
+    TEST_TRANSPOSE_THREADED(float, fill_rand_flt, matrix_print_flt,
+			    transpose_flt_threads_row, is_eq_flt, rc);
 #elif defined(USE_DOUBLE_THREADS_ROW)
-    printf("\ntranspose_dbl_threads_row:\n");
-    // TODO
-    rc = -1;
+    printf("\ntranspose_dbl_threads_row (num threads = %zu):\n",
+	   (size_t) TEST_NUM_THREADS);
+    TEST_TRANSPOSE_THREADED(double, fill_rand_dbl, matrix_print_dbl,
+			    transpose_dbl_threads_row, is_eq_flt, rc);
 #elif defined(USE_FLOAT_THREADS_COL)
-    printf("transpose_flt_threads_col:\n");
-    // TODO
-    rc = -1;
+    printf("\ntranspose_flt_threads_col (num threads = %zu):\n",
+	   (size_t) TEST_NUM_THREADS);
+    TEST_TRANSPOSE_THREADED(float, fill_rand_flt, matrix_print_flt,
+			    transpose_flt_threads_col, is_eq_flt, rc);
 #elif defined(USE_DOUBLE_THREADS_COL)
-    printf("\ntranspose_dbl_threads_col:\n");
-    // TODO
-    rc = -1;
+    printf("\ntranspose_dbl_threads_col (num threads = %zu):\n",
+	   (size_t) TEST_NUM_THREADS);
+    TEST_TRANSPOSE_THREADED(double, fill_rand_dbl, matrix_print_dbl,
+			    transpose_dbl_threads_col, is_eq_flt, rc);
 #elif defined(USE_FFTW_NAIVE)
     printf("\ntranspose_fftw_complex_naive:\n");
     TEST_TRANSPOSE(fftw_complex, fill_rand_fftw_complex,
