@@ -40,15 +40,15 @@ function(add_exec_test_transp name definitions)
   target_compile_definitions(${name} PRIVATE ${definitions})
 endfunction(add_exec_test_transp)
 
-function(add_exec_transp name definitions)
-  add_executable(${name} transp.c transpose.c util.c)
-  target_compile_definitions(${name} PRIVATE ${definitions})
-endfunction(add_exec_transp)
-
 add_exec_test_transp(test-transp-float-naive "-DUSE_FLOAT_NAIVE")
 add_exec_test_transp(test-transp-double-naive "-DUSE_DOUBLE_NAIVE")
 add_exec_test_transp(test-transp-float-blocked "-DUSE_FLOAT_BLOCKED")
 add_exec_test_transp(test-transp-double-blocked "-DUSE_DOUBLE_BLOCKED")
+
+function(add_exec_transp name definitions)
+  add_executable(${name} transp.c transpose.c util.c)
+  target_compile_definitions(${name} PRIVATE ${definitions})
+endfunction(add_exec_transp)
 
 add_exec_transp(transp-float-naive "-DUSE_FLOAT_NAIVE")
 add_exec_transp(transp-double-naive "-DUSE_DOUBLE_NAIVE")
@@ -57,33 +57,29 @@ add_exec_transp(transp-double-blocked "-DUSE_DOUBLE_BLOCKED")
 
 # Use FFTW library
 if(FFTW_FOUND)
-  add_executable(test-transp-fftw_complex-naive test-transpose.c
-                                                transpose-fftw.c
-                                                util.c util-fftw.c)
-  target_compile_definitions(test-transp-fftw_complex-naive
-                             PRIVATE "-DUSE_FFTW_NAIVE")
-  target_link_libraries(test-transp-fftw_complex-naive ${FFTW_LDFLAGS}
-                                                       ${FFTW_STATIC_LIBRARIES})
+  function(add_exec_test_transp_fftw name definitions)
+    add_executable(${name} test-transpose.c transpose-fftw.c util.c util-fftw.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+  endfunction(add_exec_test_transp_fftw)
 
-  add_executable(transp-fftw_complex-naive transp.c
-                                           transpose-fftw.c
-                                           util.c util-fftw.c)
-  target_compile_definitions(transp-fftw_complex-naive
-                             PRIVATE "-DUSE_FFTW_NAIVE")
-  target_link_libraries(transp-fftw_complex-naive ${FFTW_LDFLAGS}
-                                                  ${FFTW_STATIC_LIBRARIES})
+  add_exec_test_transp_fftw(test-transp-fftw_complex-naive "-DUSE_FFTW_NAIVE")
 
-  add_executable(fft-ct-fftw_complex-naive fft-ct.c
-                                           transpose-fftw.c
-                                           util.c util-fftw.c)
-  target_link_libraries(fft-ct-fftw_complex-naive ${FFTW_LDFLAGS}
-                                                  ${FFTW_STATIC_LIBRARIES})
+  function(add_exec_transp_fftw name definitions)
+    add_executable(${name} transp.c transpose-fftw.c util.c util-fftw.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+  endfunction(add_exec_transp_fftw)
 
-  add_executable(fft-2d-fftw_complex-fftw fft-2d.c
-                                          transpose-fftw.c
-                                          util.c util-fftw.c)
-  target_link_libraries(fft-2d-fftw_complex-fftw ${FFTW_LDFLAGS}
-                                                 ${FFTW_STATIC_LIBRARIES})
+  add_exec_transp_fftw(transp-fftw_complex-naive "-DUSE_FFTW_NAIVE")
+
+  function(add_exec_fft_fftw name main)
+    add_executable(${name} ${main} transpose-fftw.c util.c util-fftw.c)
+    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+  endfunction(add_exec_fft_fftw)
+
+  add_exec_fft_fftw(fft-ct-fftw_complex-naive fft-ct.c)
+  add_exec_fft_fftw(fft-2d-fftw_complex-fftw fft-2d.c)
 endif()
 
 # Use MKL library
@@ -115,20 +111,19 @@ endif()
 
 # Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
-  add_executable(transp-fftw_complex-naive-mkl-fftw transp.c
-                                                    transpose-fftw.c
-                                                    util.c util-fftw.c)
-  target_compile_definitions(transp-fftw_complex-naive-mkl-fftw
-                             PRIVATE "-DUSE_FFTW_NAIVE")
-  target_link_libraries(transp-fftw_complex-naive-mkl-fftw ${MKL_LDFLAGS})
+  function(add_exec_transp_mkl_fftw name definitions)
+    add_executable(${name} transp.c transpose-fftw.c util.c util-fftw.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${MKL_LDFLAGS})
+  endfunction(add_exec_transp_mkl_fftw)
 
-  add_executable(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c
-                                                    transpose-fftw.c
-                                                    util.c util-fftw.c)
-  target_link_libraries(fft-ct-fftw_complex-naive-mkl-fftw ${MKL_LDFLAGS})
+  add_exec_transp_mkl_fftw(transp-fftw_complex-naive-mkl-fftw "-DUSE_FFTW_NAIVE")
 
-  add_executable(fft-2d-fftw_complex-mkl-fftw fft-2d.c
-                                              transpose-fftw.c
-                                              util.c util-fftw.c)
-  target_link_libraries(fft-2d-fftw_complex-mkl-fftw ${MKL_LDFLAGS})
+  function(add_exec_fft_mkl_fftw name main)
+    add_executable(${name} ${main} transpose-fftw.c util.c util-fftw.c)
+    target_link_libraries(${name} ${MKL_LDFLAGS})
+  endfunction(add_exec_fft_mkl_fftw)
+
+  add_exec_fft_mkl_fftw(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c)
+  add_exec_fft_mkl_fftw(fft-2d-fftw_complex-mkl-fftw fft-2d.c)
 endif()
