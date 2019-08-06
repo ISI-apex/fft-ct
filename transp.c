@@ -7,14 +7,23 @@
  * @date 2019-07-24
  */
 #include <errno.h>
+#include <getopt.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define _USE_TRANSP_BLOCKED defined(USE_FLOAT_BLOCKED) || \
+                            defined(USE_DOUBLE_BLOCKED)
 
 #include "transpose.h"
 #include "util.h"
 
-#if defined(USE_FLOAT_THREADS_ROW) || defined(USE_DOUBLE_THREADS_ROW) || \
-    defined(USE_FLOAT_THREADS_COL) || defined(USE_DOUBLE_THREADS_COL)
+#define _USE_TRANSP_THREADS defined(USE_FLOAT_THREADS_ROW) || \
+                            defined(USE_DOUBLE_THREADS_ROW) || \
+                            defined(USE_FLOAT_THREADS_COL) || \
+                            defined(USE_DOUBLE_THREADS_COL)
+
+#if _USE_TRANSP_THREADS
 #include "transpose-threads.h"
 #endif
 
@@ -52,32 +61,113 @@
     TRANSP_TEARDOWN(A, B, fn_free); \
 }
 
-static void usage(void)
+static void usage(const char *pname, int code)
 {
-    fprintf(stderr, "Usage: transp <nrows> <ncols>\n");
-    exit(EINVAL);
+    fprintf(code ? stderr : stdout,
+            "Usage: %s -r ROWS -c COLS"
+#if _USE_TRANSP_BLOCKED
+            " [-R ROWS] [-C COLS]"
+#endif
+#if _USE_TRANSP_THREADS
+            " [-t THREADS]"
+#endif
+            " [-h]\n"
+            "  -r, --rows=ROWS          Matrix row count, in [1, ULONG_MAX]\n"
+            "  -c, --cols=COLS          Matrix column count, in [1, ULONG_MAX]\n"
+#if _USE_TRANSP_BLOCKED
+            "  -R, --block-rows=ROWS    Rows per block, in [0, ULONG_MAX]\n"
+            "  -C, --block-cols=COLS    Columns per block, in [0, ULONG_MAX]\n"
+            "                           ROWS/COLS must be divisors of the corresponding\n"
+            "                           matrix dimension\n"
+            "                           (default=0, implies no blocking in that dimension)\n"
+#endif
+#if _USE_TRANSP_THREADS
+            "  -t, --threads=THREADS    Number of threads, in (0, ULONG_MAX] (default=1)\n"
+#endif
+            "  -h, --help               Print this message and exit\n",
+            pname);
+    exit(code);
 }
+
+static size_t assert_to_size_t(const char* str, const char* pname)
+{
+    size_t s = strtoul(str, NULL, 0);
+    if (s == ULONG_MAX && errno == ERANGE) {
+        usage(pname, errno);
+    }
+    return s;
+}
+
+static const char opts_short[] = "r:c:R:C:t:h";
+static const struct option opts_long[] = {
+    {"rows",        required_argument,  NULL,   'r'},
+    {"cols",        required_argument,  NULL,   'c'},
+    {"block-rows",  required_argument,  NULL,   'R'},
+    {"block-cols",  required_argument,  NULL,   'C'},
+    {"threads",     required_argument,  NULL,   't'},
+    {"help",        no_argument,        NULL,   'h'},
+    {0, 0, 0, 0}
+};
 
 int main(int argc, char **argv)
 {
-    size_t nrows, ncols;
-    if (argc < 3)
-        usage();
-    nrows = atoi(argv[1]);
-    ncols = atoi(argv[2]);
-    if (!nrows || !ncols) {
-        fprintf(stderr, "Parameters nrows and ncols must be > 0\n");
-        return EINVAL;
-    }
+    size_t nrows = 0;
+    size_t ncols = 0;
+#if _USE_TRANSP_BLOCKED
+    size_t nblkrows = 0;
+    size_t nblkcols = 0;
+#endif
+#if _USE_TRANSP_THREADS
+    size_t nthreads = 1;
+#endif
+    int c;
 
-#if defined(USE_FLOAT_BLOCKED) || defined (USE_DOUBLE_BLOCKED)
-    size_t nblkrows, nblkcols;
-    if (argc > 4) {
-        nblkrows = atoi(argv[3]);
-        nblkrows = atoi(argv[4]);
-    } else {
+    while ((c = getopt_long(argc, argv, opts_short, opts_long, NULL)) != -1) {
+        switch (c) {
+        case 'r':
+            nrows = assert_to_size_t(optarg, argv[0]);
+            break;
+        case 'c':
+            ncols = assert_to_size_t(optarg, argv[0]);
+            break;
+#if _USE_TRANSP_BLOCKED
+        case 'R':
+            nblkrows = assert_to_size_t(optarg, argv[0]);
+            break;
+        case 'C':
+            nblkcols = assert_to_size_t(optarg, argv[0]);
+            break;
+#endif
+#if _USE_TRANSP_THREADS
+        case 't':
+            nthreads = assert_to_size_t(optarg, argv[0]);
+            if (!nthreads) {
+                usage(argv[0], EINVAL);
+            }
+            break;
+#endif
+        case 'h':
+            usage(argv[0], 0);
+            break;
+        default:
+            usage(argv[0], EINVAL);
+            break;
+        }
+    }
+    if (!nrows || !ncols) {
+        usage(argv[0], EINVAL);
+    }
+#if _USE_TRANSP_BLOCKED
+    // fall back to default values
+    if (!nblkrows) {
         nblkrows = nrows;
+    }
+    if (!nblkcols) {
         nblkcols = ncols;
+    }
+    // check divisibility
+    if ((nrows % nblkrows) || (ncols % nblkcols)) {
+        usage(argv[0], EINVAL);
     }
 #endif
 
