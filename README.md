@@ -1,13 +1,12 @@
-FFT Corner Turn Benchmark
-=========================
+FFT Corner Turn Benchmarks
+==========================
 
-This project contains a simple FFT Corner Turn benchmark of the form:
-1-D FFTs -> Matrix Transpose -> 1-D FFTs.
+This project contains benchmarks related to FFT Corner Turns.
 
 Prerequisites
 -------------
 
-The benchmark requires:
+The project requires:
 
 * [FFTW3](http://www.fftw.org/) - tested with version `3.3.8`.
 * [Intel MKL](https://software.intel.com/mkl) - tested with version `2019 Update 4`.
@@ -25,18 +24,27 @@ The project uses CMake:
 	make
 
 If dependencies are installed to a non-standard location `${PREFIX}`, you must
-first configure `PKG_CONFIG_PATH`. E.g., when `FFTW3` was configured with
-`./configure --prefix=${PREFIX}`:
+first configure `PKG_CONFIG_PATH`.
+E.g., if `FFTW3` is configured with `./configure --prefix=${PREFIX}`:
 
 	export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig/
 
 Usage
 -----
 
-The run the benchmark:
+There are a handful benchmark program templates:
 
-	./fft-ct <nrows> <ncols>
+* `transp`: Populate a matrix and perform a transpose.
+* `fft-2d`: Populate a matrix and perform a 2-D FFT.
+Whether a transpose is actually performed depends on the FFT implementation.
+* `fft-ct`: Populate a matrix and perform 1-D FFTs -> transpose -> 1-D FFTs.
+In this benchmark, a transpose is always performed.
 
-E.g., to use a 2048x4096 input matrix (2048 1-D FFTs -> CT -> 4096 1-D FFTs):
+These templates are used to generate benchmarks supporting a variety of data
+types and transpose implementations using different algorithms and library APIs.
+Benchmark names are generally in the form `${prog}-${datatype}-{algo/impl}`.
 
-	./fft-ct 2048 4096
+Benchmarks require specifying, at a minimum, the matrix row and column count.
+E.g., to transpose a 2048x4096 matrix:
+
+	./transp -r 2048 -c 4096
