@@ -61,6 +61,12 @@
     TRANSP_TEARDOWN(A, B, fn_free); \
 }
 
+#define TRANSP_THREADED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, nrows, ncols, nthreads) { \
+    TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
+    fn_transp(A, B, nrows, ncols, nthreads); \
+    TRANSP_TEARDOWN(A, B, fn_free); \
+}
+
 static void usage(const char *pname, int code)
 {
     fprintf(code ? stderr : stdout,
@@ -188,17 +194,21 @@ int main(int argc, char **argv)
                    fill_rand_dbl, transpose_dbl_blocked,
                    nrows, ncols, nblkrows, nblkcols);
 #elif defined(USE_FLOAT_THREADS_ROW)
-    // TODO
-    return ENOTSUP;
+    TRANSP_THREADED(float, assert_malloc, free,
+		    fill_rand_flt, transpose_flt_threads_row,
+		    nrows, ncols, 1);
 #elif defined(USE_DOUBLE_THREADS_ROW)
-    // TODO
-    return ENOTSUP;
+    TRANSP_THREADED(double, assert_malloc, free,
+		    fill_rand_dbl, transpose_dbl_threads_row,
+		    nrows, ncols, 1);
 #elif defined(USE_FLOAT_THREADS_COL)
-    // TODO
-    return ENOTSUP;
+    TRANSP_THREADED(float, assert_malloc, free,
+		    fill_rand_flt, transpose_flt_threads_col,
+		    nrows, ncols, 1);
 #elif defined(USE_DOUBLE_THREADS_COL)
-    // TODO
-    return ENOTSUP;
+    TRANSP_THREADED(double, assert_malloc, free,
+		    fill_rand_dbl, transpose_dbl_threads_col,
+		    nrows, ncols, 1);
 #elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw_complex, transpose_fftw_complex_naive,
