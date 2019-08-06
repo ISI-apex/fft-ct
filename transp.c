@@ -13,6 +13,11 @@
 #include "transpose.h"
 #include "util.h"
 
+#if defined(USE_FLOAT_THREADS_ROW) || defined(USE_DOUBLE_THREADS_ROW) || \
+    defined(USE_FLOAT_THREADS_COL) || defined(USE_DOUBLE_THREADS_COL)
+#include "transpose-threads.h"
+#endif
+
 #if defined(USE_FFTW_NAIVE)
 #include <fftw3.h>
 #include "transpose-fftw.h"
@@ -92,6 +97,18 @@ int main(int argc, char **argv)
     TRANSP_BLOCKED(double, assert_malloc, free,
                    fill_rand_dbl, transpose_dbl_blocked,
                    nrows, ncols, nblkrows, nblkcols);
+#elif defined(USE_FLOAT_THREADS_ROW)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_THREADS_ROW)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_FLOAT_THREADS_COL)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_THREADS_COL)
+    // TODO
+    return ENOTSUP;
 #elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw_complex, transpose_fftw_complex_naive,
