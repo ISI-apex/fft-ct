@@ -7,6 +7,8 @@
  * @date 2019-07-15
  */
 #include <errno.h>
+#include <getopt.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -75,22 +77,58 @@ static void fft_ct_1d(size_t nrows, size_t ncols)
     data_free(mat_fft1_in, mat_fft1_out, p_fft1, nrows);
 }
 
-static void usage(void)
+static void usage(const char *pname, int code)
 {
-    fprintf(stderr, "Usage: fft-ct <nrows> <ncols>\n");
-    exit(EINVAL);
+    fprintf(code ? stderr : stdout,
+            "Usage: %s -r ROWS -c COLS [-h]\n"
+            "  -r, --rows=ROWS          Matrix row count, in [1, ULONG_MAX]\n"
+            "  -c, --cols=COLS          Matrix column count, in [1, ULONG_MAX]\n"
+            "  -h, --help               Print this message and exit\n",
+            pname);
+    exit(code);
 }
+
+static size_t assert_to_size_t(const char* str, const char* pname)
+{
+    size_t s = strtoul(str, NULL, 0);
+    if (s == ULONG_MAX && errno == ERANGE) {
+        usage(pname, errno);
+    }
+    return s;
+}
+
+static const char opts_short[] = "r:c:h";
+static const struct option opts_long[] = {
+    {"rows",        required_argument,  NULL,   'r'},
+    {"cols",        required_argument,  NULL,   'c'},
+    {"help",        no_argument,        NULL,   'h'},
+    {0, 0, 0, 0}
+};
 
 int main(int argc, char **argv)
 {
-    size_t nrows, ncols;
-    if (argc < 3)
-        usage();
-    nrows = atoi(argv[1]);
-    ncols = atoi(argv[2]);
+    size_t nrows = 0;
+    size_t ncols = 0;
+    int c;
+
+    while ((c = getopt_long(argc, argv, opts_short, opts_long, NULL)) != -1) {
+        switch (c) {
+        case 'r':
+            nrows = assert_to_size_t(optarg, argv[0]);
+            break;
+        case 'c':
+            ncols = assert_to_size_t(optarg, argv[0]);
+            break;
+        case 'h':
+            usage(argv[0], 0);
+            break;
+        default:
+            usage(argv[0], EINVAL);
+            break;
+        }
+    }
     if (!nrows || !ncols) {
-        fprintf(stderr, "Parameters nrows and ncols must be > 0\n");
-        return EINVAL;
+        usage(argv[0], EINVAL);
     }
     fft_ct_1d(nrows, ncols);
     return 0;
