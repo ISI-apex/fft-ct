@@ -195,20 +195,20 @@ int main(int argc, char **argv)
                    nrows, ncols, nblkrows, nblkcols);
 #elif defined(USE_FLOAT_THREADS_ROW)
     TRANSP_THREADED(float, assert_malloc, free,
-		    fill_rand_flt, transpose_flt_threads_row,
-		    nrows, ncols, 1);
+                    fill_rand_flt, transpose_flt_threads_row,
+                    nrows, ncols, 1);
 #elif defined(USE_DOUBLE_THREADS_ROW)
     TRANSP_THREADED(double, assert_malloc, free,
-		    fill_rand_dbl, transpose_dbl_threads_row,
-		    nrows, ncols, 1);
+                    fill_rand_dbl, transpose_dbl_threads_row,
+                    nrows, ncols, 1);
 #elif defined(USE_FLOAT_THREADS_COL)
     TRANSP_THREADED(float, assert_malloc, free,
-		    fill_rand_flt, transpose_flt_threads_col,
-		    nrows, ncols, 1);
+                    fill_rand_flt, transpose_flt_threads_col,
+                    nrows, ncols, 1);
 #elif defined(USE_DOUBLE_THREADS_COL)
     TRANSP_THREADED(double, assert_malloc, free,
-		    fill_rand_dbl, transpose_dbl_threads_col,
-		    nrows, ncols, 1);
+                    fill_rand_dbl, transpose_dbl_threads_col,
+                    nrows, ncols, 1);
 #elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw_complex, transpose_fftw_complex_naive,

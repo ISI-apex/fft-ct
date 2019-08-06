@@ -11,27 +11,27 @@
 #include "transpose-threads.h"
 
 typedef struct floatRowArg {
-  const float* restrict A;
-  float* restrict B;
-  size_t A_rows, A_cols, r_min, r_max, thr_num;
+    const float* restrict A;
+    float* restrict B;
+    size_t A_rows, A_cols, r_min, r_max, thr_num;
 } fltRowArg;
 
 typedef struct doubleRowArg {
-  const double* restrict A;
-  double* restrict B;
-  size_t A_rows, A_cols, r_min, r_max, thr_num;
+    const double* restrict A;
+    double* restrict B;
+    size_t A_rows, A_cols, r_min, r_max, thr_num;
 } dblRowArg;
 
 typedef struct floatColArg {
-  const float* restrict A;
-  float* restrict B;
-  size_t A_rows, A_cols, c_min, c_max, thr_num;
+    const float* restrict A;
+    float* restrict B;
+    size_t A_rows, A_cols, c_min, c_max, thr_num;
 } fltColArg;
 
 typedef struct doubleColArg {
-  const double* restrict A;
-  double* restrict B;
-  size_t A_rows, A_cols, c_min, c_max, thr_num;
+    const double* restrict A;
+    double* restrict B;
+    size_t A_rows, A_cols, c_min, c_max, thr_num;
 } dblColArg;
 
 void *transpose_flt_thread_row(void *args) {
@@ -59,8 +59,8 @@ void *transpose_flt_thread_row(void *args) {
 }
 
 void transpose_flt_threads_row(const float* restrict A, float* restrict B,
-			       size_t A_rows, size_t A_cols,
-			       size_t num_thr) {
+                               size_t A_rows, size_t A_cols,
+                               size_t num_thr) {
     pthread_t *threads;
     pthread_attr_t attr;
     fltRowArg *args, *myArg;
@@ -82,29 +82,28 @@ void transpose_flt_threads_row(const float* restrict A, float* restrict B,
     max_rows_per_thread = min_rows_per_thread + 1;
 
     for (thr_num=0; thr_num<num_thr; thr_num++) {
-	if (thr_num < num_thr_with_max_rows) {
-	    r_min = thr_num * max_rows_per_thread;
-	    r_max = r_min + max_rows_per_thread;
-	}
-	else {
-	    r_min = num_thr_with_max_rows * max_rows_per_thread + (thr_num - num_thr_with_max_rows) * min_rows_per_thread;
-	    r_max = r_min + min_rows_per_thread;
-	}
+        if (thr_num < num_thr_with_max_rows) {
+            r_min = thr_num * max_rows_per_thread;
+            r_max = r_min + max_rows_per_thread;
+        } else {
+            r_min = num_thr_with_max_rows * max_rows_per_thread + (thr_num - num_thr_with_max_rows) * min_rows_per_thread;
+            r_max = r_min + min_rows_per_thread;
+        }
 
         myArg = args + thr_num;
         myArg->A = A;
-	myArg->B = B;
-	myArg->A_rows = A_rows;
-	myArg->A_cols = A_cols;
-	myArg->r_min = r_min;
-	myArg->r_max = r_max;
-	myArg->thr_num = thr_num;
+        myArg->B = B;
+        myArg->A_rows = A_rows;
+        myArg->A_cols = A_cols;
+        myArg->r_min = r_min;
+        myArg->r_max = r_max;
+        myArg->thr_num = thr_num;
 
-	rc = pthread_create(&threads[thr_num], &attr, &transpose_flt_thread_row, (void *)myArg);
-	if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
-	    exit(-1);
-	}
+        rc = pthread_create(&threads[thr_num], &attr, &transpose_flt_thread_row, (void *)myArg);
+        if (rc) {
+            fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     // free attribute and wait for the other threads
@@ -112,9 +111,9 @@ void transpose_flt_threads_row(const float* restrict A, float* restrict B,
     for(thr_num=0; thr_num<num_thr; thr_num++) {
         rc = pthread_join(threads[thr_num], &status);
         if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
-	    exit(-1);
-	}
+            fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     free(args);
@@ -146,8 +145,8 @@ void *transpose_dbl_thread_row(void *args) {
 }
 
 void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
-			       size_t A_rows, size_t A_cols,
-			       size_t num_thr) {
+                               size_t A_rows, size_t A_cols,
+                               size_t num_thr) {
     pthread_t *threads;
     pthread_attr_t attr;
     dblRowArg *args, *myArg;
@@ -169,29 +168,28 @@ void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
     max_rows_per_thread = min_rows_per_thread + 1;
 
     for (thr_num=0; thr_num<num_thr; thr_num++) {
-	if (thr_num < num_thr_with_max_rows) {
-	    r_min = thr_num * max_rows_per_thread;
-	    r_max = r_min + max_rows_per_thread;
-	}
-	else {
-	    r_min = num_thr_with_max_rows * max_rows_per_thread + (thr_num - num_thr_with_max_rows) * min_rows_per_thread;
-	    r_max = r_min + min_rows_per_thread;
-	}
+        if (thr_num < num_thr_with_max_rows) {
+            r_min = thr_num * max_rows_per_thread;
+            r_max = r_min + max_rows_per_thread;
+        } else {
+            r_min = num_thr_with_max_rows * max_rows_per_thread + (thr_num - num_thr_with_max_rows) * min_rows_per_thread;
+            r_max = r_min + min_rows_per_thread;
+        }
 
         myArg = args + thr_num;
         myArg->A = A;
-	myArg->B = B;
-	myArg->A_rows = A_rows;
-	myArg->A_cols = A_cols;
-	myArg->r_min = r_min;
-	myArg->r_max = r_max;
-	myArg->thr_num = thr_num;
+        myArg->B = B;
+        myArg->A_rows = A_rows;
+        myArg->A_cols = A_cols;
+        myArg->r_min = r_min;
+        myArg->r_max = r_max;
+        myArg->thr_num = thr_num;
 
-	rc = pthread_create(&threads[thr_num], &attr, &transpose_dbl_thread_row, (void *)myArg);
-	if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
-	    exit(-1);
-	}
+        rc = pthread_create(&threads[thr_num], &attr, &transpose_dbl_thread_row, (void *)myArg);
+        if (rc) {
+            fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     // free attribute and wait for the other threads
@@ -199,9 +197,9 @@ void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
     for(thr_num=0; thr_num<num_thr; thr_num++) {
         rc = pthread_join(threads[thr_num], &status);
         if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
-	    exit(-1);
-	}
+            fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     free(args);
@@ -233,8 +231,8 @@ void *transpose_flt_thread_col(void *args) {
 }
 
 void transpose_flt_threads_col(const float* restrict A, float* restrict B,
-			       size_t A_rows, size_t A_cols,
-			       size_t num_thr) {
+                               size_t A_rows, size_t A_cols,
+                               size_t num_thr) {
     pthread_t *threads;
     pthread_attr_t attr;
     fltColArg *args, *myArg;
@@ -256,29 +254,28 @@ void transpose_flt_threads_col(const float* restrict A, float* restrict B,
     max_cols_per_thread = min_cols_per_thread + 1;
 
     for (thr_num=0; thr_num<num_thr; thr_num++) {
-	if (thr_num < num_thr_with_max_cols) {
-	    c_min = thr_num * max_cols_per_thread;
-	    c_max = c_min + max_cols_per_thread;
-	}
-	else {
-	    c_min = num_thr_with_max_cols * max_cols_per_thread + (thr_num - num_thr_with_max_cols) * min_cols_per_thread;
-	    c_max = c_min + min_cols_per_thread;
-	}
+        if (thr_num < num_thr_with_max_cols) {
+            c_min = thr_num * max_cols_per_thread;
+            c_max = c_min + max_cols_per_thread;
+        } else {
+            c_min = num_thr_with_max_cols * max_cols_per_thread + (thr_num - num_thr_with_max_cols) * min_cols_per_thread;
+            c_max = c_min + min_cols_per_thread;
+        }
 
         myArg = args + thr_num;
         myArg->A = A;
-	myArg->B = B;
-	myArg->A_rows = A_rows;
-	myArg->A_cols = A_cols;
-	myArg->c_min = c_min;
-	myArg->c_max = c_max;
-	myArg->thr_num = thr_num;
+        myArg->B = B;
+        myArg->A_rows = A_rows;
+        myArg->A_cols = A_cols;
+        myArg->c_min = c_min;
+        myArg->c_max = c_max;
+        myArg->thr_num = thr_num;
 
-	rc = pthread_create(&threads[thr_num], &attr, &transpose_flt_thread_col, (void *)myArg);
-	if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
-	    exit(-1);
-	}
+        rc = pthread_create(&threads[thr_num], &attr, &transpose_flt_thread_col, (void *)myArg);
+        if (rc) {
+            fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     // free attribute and wait for the other threads
@@ -286,9 +283,9 @@ void transpose_flt_threads_col(const float* restrict A, float* restrict B,
     for(thr_num=0; thr_num<num_thr; thr_num++) {
         rc = pthread_join(threads[thr_num], &status);
         if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
-	    exit(-1);
-	}
+            fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     free(args);
@@ -320,8 +317,8 @@ void *transpose_dbl_thread_col(void *args) {
 }
 
 void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
-			       size_t A_rows, size_t A_cols,
-			       size_t num_thr) {
+                               size_t A_rows, size_t A_cols,
+                               size_t num_thr) {
     pthread_t *threads;
     pthread_attr_t attr;
     dblColArg *args, *myArg;
@@ -343,29 +340,28 @@ void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
     max_cols_per_thread = min_cols_per_thread + 1;
 
     for (thr_num=0; thr_num<num_thr; thr_num++) {
-	if (thr_num < num_thr_with_max_cols) {
-	    c_min = thr_num * max_cols_per_thread;
-	    c_max = c_min + max_cols_per_thread;
-	}
-	else {
-	    c_min = num_thr_with_max_cols * max_cols_per_thread + (thr_num - num_thr_with_max_cols) * min_cols_per_thread;
-	    c_max = c_min + min_cols_per_thread;
-	}
+        if (thr_num < num_thr_with_max_cols) {
+            c_min = thr_num * max_cols_per_thread;
+            c_max = c_min + max_cols_per_thread;
+        } else {
+            c_min = num_thr_with_max_cols * max_cols_per_thread + (thr_num - num_thr_with_max_cols) * min_cols_per_thread;
+            c_max = c_min + min_cols_per_thread;
+        }
 
         myArg = args + thr_num;
         myArg->A = A;
-	myArg->B = B;
-	myArg->A_rows = A_rows;
-	myArg->A_cols = A_cols;
-	myArg->c_min = c_min;
-	myArg->c_max = c_max;
-	myArg->thr_num = thr_num;
+        myArg->B = B;
+        myArg->A_rows = A_rows;
+        myArg->A_cols = A_cols;
+        myArg->c_min = c_min;
+        myArg->c_max = c_max;
+        myArg->thr_num = thr_num;
 
-	rc = pthread_create(&threads[thr_num], &attr, &transpose_dbl_thread_col, (void *)myArg);
-	if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
-	    exit(-1);
-	}
+        rc = pthread_create(&threads[thr_num], &attr, &transpose_dbl_thread_col, (void *)myArg);
+        if (rc) {
+            fprintf(stderr, "ERROR: return code from pthread_create() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     // free attribute and wait for the other threads
@@ -373,9 +369,9 @@ void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
     for(thr_num=0; thr_num<num_thr; thr_num++) {
         rc = pthread_join(threads[thr_num], &status);
         if (rc) {
-	    fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
-	    exit(-1);
-	}
+            fprintf(stderr, "ERROR: return code from pthread_join() is %d\n", rc);
+            exit(-1);
+        }
     }
 
     free(args);
