@@ -75,9 +75,19 @@ int is_eq_dbl(double a, double b)
 
 void *assert_malloc(size_t sz)
 {
-    void *ptr = malloc(sz);
+    size_t align;
+    void *ptr;
+    if (sz % 64 == 0) {
+        align = 64;
+    } else if (sz % 32 == 0) {
+        align = 32;
+    } else {
+        fprintf(stderr, "assert_malloc: sz must be a multiple of 64 or 32\n");
+        exit(EINVAL);
+    }
+    ptr = aligned_alloc(align, sz);
     if (!ptr) {
-        perror("malloc");
+        perror("aligned_alloc");
         exit(ENOMEM);
     }
     return ptr;
