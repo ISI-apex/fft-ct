@@ -40,6 +40,10 @@
 #include "util-mkl.h"
 #endif
 
+#if defined(USE_FLOAT_AVX_INTR_8X8) || defined(USE_DOUBLE_AVX_INTR_8X8)
+#include "transpose-avx.h"
+#endif
+
 #define TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols) \
     datatype *A = fn_malloc(nrows * ncols * sizeof(datatype)); \
     datatype *B = fn_malloc(nrows * ncols * sizeof(datatype)); \
@@ -228,6 +232,13 @@ int main(int argc, char **argv)
 #elif defined(USE_MKL_CMPLX16)
     TRANSP(MKL_Complex16, assert_malloc, free,
            fill_rand_cmplx16, transpose_cmplx16_mkl,
+           nrows, ncols);
+#elif defined(USE_FLOAT_AVX_INTR_8X8)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_AVX_INTR_8X8)
+    TRANSP(double, assert_malloc, free,
+           fill_rand_dbl, transpose_dbl_avx_intr_8x8,
            nrows, ncols);
 #else
     #error "No matching transpose implementation found!"
