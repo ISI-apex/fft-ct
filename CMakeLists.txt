@@ -8,6 +8,8 @@ set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c11")
 
+option(ENABLE_AVX "Enable Skylake AVX-512 binaries" ON)
+
 
 # Dependencies
 
@@ -115,3 +117,67 @@ if(MKL_FOUND)
   add_exec_mkl_fftw(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c "")
   add_exec_mkl_fftw(fft-2d-fftw_complex-mkl-fftw fft-2d.c "")
 endif(MKL_FOUND)
+
+# A primitive approach for setting user-specified or default AVX compile flags
+# Note: Complete auto-detection for architectures and compilers would require
+#       checking target CPUIDs; the list would also get outdated with new CPUs.
+#       Maybe another project maintains such a CMake capability we can use.
+set(C_FLAGS_AVX CACHE STRING "C compiler AVX flags (implies ENABLE_AVX)")
+if(C_FLAGS_AVX)
+  message("-- Checking for C_FLAGS_AVX - found")
+  set(ENABLE_AVX ON)
+else(C_FLAGS_AVX)
+  message("-- Checking for C_FLAGS_AVX - not found")
+endif(C_FLAGS_AVX)
+if(ENABLE_AVX AND NOT C_FLAGS_AVX)
+  message("--   Defaulting to AVX-512 for Skylake...")
+  # TODO: Does specifying optimization level conflict with CMAKE_BUILD_TYPE?
+  #       Certain per-compiler levels are needed for automatic vectorization.
+  if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
+    if(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
+      message(FATAL_ERROR "GNU C compiler version is too old for AVX-512: "
+                          "${CMAKE_C_COMPILER_VERSION} < 5.0\n"
+                          "Set option: ENABLE_AVX=OFF")
+    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
+    set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
+  elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Intel")
+    if(CMAKE_C_COMPILER_VERSION VERSION_LESS 15.0.1)
+      message(FATAL_ERROR "Intel C compiler version is too old for AVX-512: "
+                          "${CMAKE_C_COMPILER_VERSION} < 15.0.1\n"
+                          "Set option: ENABLE_AVX=OFF")
+    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 15.0.1)
+    set(C_FLAGS_AVX "-xCORE-AVX512 -qopt-zmm-usage=high -O3")
+  else()
+    message(FATAL_ERROR "No default AVX-512 flags for C compiler: "
+                        "${CMAKE_C_COMPILER_ID}\n"
+                        "Set option: ENABLE_AVX=OFF")
+  endif()
+endif(ENABLE_AVX AND NOT C_FLAGS_AVX)
+
+# Use automatic and intrinsic AVX
+if(ENABLE_AVX)
+  message("--   C_FLAGS_AVX: ${C_FLAGS_AVX}")
+  function(add_exec_avx name main definitions)
+    add_executable(${name} ${main} transpose.c transpose-avx.c util.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
+    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+  endfunction(add_exec_avx)
+
+  # Trust the compiler - don't need test-transpose to check correctness again
+  # add_exec_avx(test-transp-float-avx-auto test-transpose.c "-DUSE_FLOAT_NAIVE")
+  # add_exec_avx(test-transp-double-avx-auto test-transpose.c "-DUSE_DOUBLE_NAIVE")
+  # add_exec_avx(test-transp-float-blocked-avx-auto test-transpose.c "-DUSE_FLOAT_BLOCKED")
+  # add_exec_avx(test-transp-double-blocked-avx-auto test-transpose.c "-DUSE_DOUBLE_BLOCKED")
+
+  add_exec_avx(transp-float-avx-auto transp.c "-DUSE_FLOAT_NAIVE")
+  add_exec_avx(transp-double-avx-auto transp.c "-DUSE_DOUBLE_NAIVE")
+  add_exec_avx(transp-float-blocked-avx-auto transp.c "-DUSE_FLOAT_BLOCKED")
+  add_exec_avx(transp-double-blocked-avx-auto transp.c "-DUSE_DOUBLE_BLOCKED")
+
+  # add_exec_avx(test-transp-float-avx-intr-8x8 test-transpose.c "-DUSE_FLOAT_AVX_INTR_8X8")
+  add_exec_avx(test-transp-double-avx-intr-8x8 test-transpose.c "-DUSE_DOUBLE_AVX_INTR_8X8")
+
+  # add_exec_avx(transp-float-avx-intr-8x8 transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
+  add_exec_avx(transp-double-avx-intr-8x8 transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
+endif(ENABLE_AVX)
