@@ -29,11 +29,11 @@
 #endif
 
 #ifndef TEST_ROWS
-#define TEST_ROWS 3
+#define TEST_ROWS 8
 #endif
 
 #ifndef TEST_COLS
-#define TEST_COLS 5
+#define TEST_COLS 16
 #endif
 
 #ifndef TEST_BLK_ROWS
@@ -41,7 +41,7 @@
 #endif
 
 #ifndef TEST_BLK_COLS
-#define TEST_BLK_COLS 3
+#define TEST_BLK_COLS 4
 #endif
 
 #ifndef TEST_NUM_THREADS
