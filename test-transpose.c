@@ -28,6 +28,10 @@
 #include "util-mkl.h"
 #endif
 
+#if defined(USE_FLOAT_AVX_INTR_8X8) || defined(USE_DOUBLE_AVX_INTR_8X8)
+#include "transpose-avx.h"
+#endif
+
 #ifndef TEST_ROWS
 #define TEST_ROWS 8
 #endif
@@ -154,6 +158,13 @@ int main(void)
     printf("\ntranspose_cmplx16_mkl:\n");
     TEST_TRANSPOSE(MKL_Complex16, fill_rand_cmplx16, matrix_print_cmplx16,
                    transpose_cmplx16_mkl, is_eq_cmplx16, rc);
+#elif defined(USE_FLOAT_AVX_INTR_8X8)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_AVX_INTR_8X8)
+    printf("\ntranspose_dbl_avx_intr_8x8:\n");
+    TEST_TRANSPOSE(double, fill_rand_dbl, matrix_print_dbl,
+                   transpose_dbl_avx_intr_8x8, is_eq_dbl, rc);
 #else
     #error "No matching transpose implementation found!"
 #endif
