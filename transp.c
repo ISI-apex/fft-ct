@@ -53,19 +53,22 @@
     fn_free(B); \
     fn_free(A);
 
-#define TRANSP(datatype, fn_malloc, fn_free, fn_fill, fn_transp, nrows, ncols) { \
+#define TRANSP(datatype, fn_malloc, fn_free, fn_fill, fn_transp, \
+               nrows, ncols) { \
     TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
     fn_transp(A, B, nrows, ncols); \
     TRANSP_TEARDOWN(A, B, fn_free); \
 }
 
-#define TRANSP_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, nrows, ncols, nblkrows, nblkcols) { \
+#define TRANSP_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, \
+                       nrows, ncols, nblkrows, nblkcols) { \
     TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
     fn_transp(A, B, nrows, ncols, nblkrows, nblkcols); \
     TRANSP_TEARDOWN(A, B, fn_free); \
 }
 
-#define TRANSP_THREADED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, nrows, ncols, nthreads) { \
+#define TRANSP_THREADED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, \
+                        nrows, ncols, nthreads) { \
     TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
     fn_transp(A, B, nrows, ncols, nthreads); \
     TRANSP_TEARDOWN(A, B, fn_free); \
