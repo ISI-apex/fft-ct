@@ -29,6 +29,11 @@ E.g., if `FFTW3` is configured with `./configure --prefix=${PREFIX}`:
 
 	export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig/
 
+To use a different C compiler than your environment's `cc`, configure CMake's
+`CMAKE_C_COMPILER` variable, e.g.:
+
+	cmake .. -DCMAKE_C_COMPILER=/path/to/cc
+
 Usage
 -----
 
