@@ -76,19 +76,22 @@
     fn_free(B); \
     fn_free(A);
 
-#define TEST_TRANSPOSE(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, fn_transp, fn_is_eq, rc) { \
+#define TEST_TRANSPOSE(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, \
+                       fn_transp, fn_is_eq, rc) { \
     TEST_TRANSPOSE_BEG(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, TEST_ROWS, TEST_COLS); \
     TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, fn_free, rc); \
 }
 
-#define TEST_TRANSPOSE_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, fn_transp, fn_is_eq, rc) { \
+#define TEST_TRANSPOSE_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, \
+                               fn_mat_print, fn_transp, fn_is_eq, rc) { \
     TEST_TRANSPOSE_BEG(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, TEST_ROWS, TEST_COLS, TEST_BLK_ROWS, TEST_BLK_COLS); \
     TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, fn_free, rc); \
 }
 
-#define TEST_TRANSPOSE_THREADED(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, fn_transp, fn_is_eq, rc) { \
+#define TEST_TRANSPOSE_THREADED(datatype, fn_malloc, fn_free, fn_fill, \
+                                fn_mat_print, fn_transp, fn_is_eq, rc) { \
     TEST_TRANSPOSE_BEG(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, TEST_ROWS, TEST_COLS, TEST_NUM_THREADS); \
     TEST_TRANSPOSE_END(A, B, fn_mat_print, fn_is_eq, fn_free, rc); \
