@@ -21,21 +21,25 @@
 #include "transpose-threads-avx.h"
 #include "util.h"
 
-#define _USE_TRANSP_BLOCKED defined(USE_FLOAT_BLOCKED) || \
-                            defined(USE_DOUBLE_BLOCKED) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+#if defined(USE_FLOAT_BLOCKED) || \
+    defined(USE_DOUBLE_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+#define _USE_TRANSP_BLOCKED 1
+#endif
 
-#define _USE_TRANSP_THREADS defined(USE_FLOAT_THREADS_ROW) || \
-                            defined(USE_DOUBLE_THREADS_ROW) || \
-                            defined(USE_FLOAT_THREADS_COL) || \
-                            defined(USE_DOUBLE_THREADS_COL) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
-                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+#if defined(USE_FLOAT_THREADS_ROW) || \
+    defined(USE_DOUBLE_THREADS_ROW) || \
+    defined(USE_FLOAT_THREADS_COL) || \
+    defined(USE_DOUBLE_THREADS_COL) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+#define _USE_TRANSP_THREADS 1
+#endif
 
 #if defined(USE_FFTW_NAIVE)
 #include <fftw3.h>
