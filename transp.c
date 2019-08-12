@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,34 +45,70 @@
 #include "transpose-avx.h"
 #endif
 
-#define TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols) \
+static size_t nrows = 0;
+static size_t ncols = 0;
+
+#if _USE_TRANSP_BLOCKED
+static size_t nblkrows = 0;
+static size_t nblkcols = 0;
+#endif
+
+#if _USE_TRANSP_THREADS
+static size_t nthreads = 1;
+#endif
+
+static bool do_print = false;
+static bool do_verify = false;
+static int rc = 0;
+
+#define CHECK_TRANSPOSE(A, B, fn_is_eq) { \
+    size_t r, c; \
+    for (r = 0; r < nrows && !rc; r++) { \
+        for (c = 0; c < ncols && !rc; c++) { \
+            rc = !fn_is_eq(A[r * ncols + c], B[c * nrows + r]); \
+        } \
+    } \
+}
+
+#define TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print) \
     datatype *A = fn_malloc(nrows * ncols * sizeof(datatype)); \
     datatype *B = fn_malloc(nrows * ncols * sizeof(datatype)); \
-    fn_fill(A, nrows * ncols);
+    fn_fill(A, nrows * ncols); \
+    if (do_print) { \
+        printf("In:\n"); \
+        fn_mat_print(A, nrows, ncols); \
+    }
 
-#define TRANSP_TEARDOWN(A, B, fn_free) \
+#define TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free) \
+    if (do_print) { \
+        printf("Out:\n"); \
+        fn_mat_print(B, ncols, nrows); \
+    } \
+    if (do_verify) { \
+        CHECK_TRANSPOSE(A, B, fn_is_eq); \
+    } \
     fn_free(B); \
     fn_free(A);
 
-#define TRANSP(datatype, fn_malloc, fn_free, fn_fill, fn_transp, \
-               nrows, ncols) { \
-    TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
+#define TRANSP(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, fn_transp, \
+               fn_is_eq) { \
+    TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, nrows, ncols); \
-    TRANSP_TEARDOWN(A, B, fn_free); \
+    TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free); \
 }
 
-#define TRANSP_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, \
-                       nrows, ncols, nblkrows, nblkcols) { \
-    TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
+#define TRANSP_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, \
+                       fn_transp, fn_is_eq) { \
+    TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, nrows, ncols, nblkrows, nblkcols); \
-    TRANSP_TEARDOWN(A, B, fn_free); \
+    TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free); \
 }
 
-#define TRANSP_THREADED(datatype, fn_malloc, fn_free, fn_fill, fn_transp, \
-                        nrows, ncols, nthreads) { \
-    TRANSP_SETUP(datatype, fn_malloc, fn_fill, nrows, ncols); \
+#define TRANSP_THREADED(datatype, fn_malloc, fn_free, fn_fill, fn_mat_print, \
+                        fn_transp, fn_is_eq) { \
+    TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, nrows, ncols, nthreads); \
-    TRANSP_TEARDOWN(A, B, fn_free); \
+    TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free); \
 }
 
 static void usage(const char *pname, int code)
@@ -97,6 +134,8 @@ static void usage(const char *pname, int code)
 #if _USE_TRANSP_THREADS
             "  -t, --threads=THREADS    Number of threads, in (0, ULONG_MAX] (default=1)\n"
 #endif
+            "  -p, --print              Print matrices\n"
+            "  -v, --verify             Verify transpose\n"
             "  -h, --help               Print this message and exit\n",
             pname);
     exit(code);
@@ -111,28 +150,21 @@ static size_t assert_to_size_t(const char* str, const char* pname)
     return s;
 }
 
-static const char opts_short[] = "r:c:R:C:t:h";
+static const char opts_short[] = "r:c:R:C:t:pvh";
 static const struct option opts_long[] = {
     {"rows",        required_argument,  NULL,   'r'},
     {"cols",        required_argument,  NULL,   'c'},
     {"block-rows",  required_argument,  NULL,   'R'},
     {"block-cols",  required_argument,  NULL,   'C'},
     {"threads",     required_argument,  NULL,   't'},
+    {"print",       no_argument,        NULL,   'p'},
+    {"verify",      no_argument,        NULL,   'v'},
     {"help",        no_argument,        NULL,   'h'},
     {0, 0, 0, 0}
 };
 
 int main(int argc, char **argv)
 {
-    size_t nrows = 0;
-    size_t ncols = 0;
-#if _USE_TRANSP_BLOCKED
-    size_t nblkrows = 0;
-    size_t nblkcols = 0;
-#endif
-#if _USE_TRANSP_THREADS
-    size_t nthreads = 1;
-#endif
     int c;
 
     while ((c = getopt_long(argc, argv, opts_short, opts_long, NULL)) != -1) {
@@ -159,6 +191,12 @@ int main(int argc, char **argv)
             }
             break;
 #endif
+        case 'p':
+            do_print = true;
+            break;
+        case 'v':
+            do_verify = true;
+            break;
         case 'h':
             usage(argv[0], 0);
             break;
@@ -186,65 +224,61 @@ int main(int argc, char **argv)
 
 #if defined(USE_FLOAT_NAIVE)
     TRANSP(float, assert_malloc, free,
-           fill_rand_flt, transpose_flt_naive,
-           nrows, ncols);
+           fill_rand_flt, matrix_print_flt, transpose_flt_naive, is_eq_flt);
 #elif defined(USE_DOUBLE_NAIVE)
     TRANSP(double, assert_malloc, free,
-           fill_rand_dbl, transpose_dbl_naive,
-           nrows, ncols);
+           fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive, is_eq_dbl);
 #elif defined(USE_FLOAT_BLOCKED)
     TRANSP_BLOCKED(float, assert_malloc, free,
-                   fill_rand_flt, transpose_flt_blocked,
-                   nrows, ncols, nblkrows, nblkcols);
+                   fill_rand_flt, matrix_print_flt, transpose_flt_blocked,
+                   is_eq_flt);
 #elif defined(USE_DOUBLE_BLOCKED)
     TRANSP_BLOCKED(double, assert_malloc, free,
-                   fill_rand_dbl, transpose_dbl_blocked,
-                   nrows, ncols, nblkrows, nblkcols);
+                   fill_rand_dbl, matrix_print_dbl, transpose_dbl_blocked,
+                   is_eq_dbl);
 #elif defined(USE_FLOAT_THREADS_ROW)
     TRANSP_THREADED(float, assert_malloc, free,
-                    fill_rand_flt, transpose_flt_threads_row,
-                    nrows, ncols, 1);
+                    fill_rand_flt, matrix_print_flt, transpose_flt_threads_row,
+                    is_eq_flt);
 #elif defined(USE_DOUBLE_THREADS_ROW)
     TRANSP_THREADED(double, assert_malloc, free,
-                    fill_rand_dbl, transpose_dbl_threads_row,
-                    nrows, ncols, 1);
+                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_row,
+                    is_eq_dbl);
 #elif defined(USE_FLOAT_THREADS_COL)
     TRANSP_THREADED(float, assert_malloc, free,
-                    fill_rand_flt, transpose_flt_threads_col,
-                    nrows, ncols, 1);
+                    fill_rand_flt, matrix_print_flt, transpose_flt_threads_col,
+                    is_eq_flt);
 #elif defined(USE_DOUBLE_THREADS_COL)
     TRANSP_THREADED(double, assert_malloc, free,
-                    fill_rand_dbl, transpose_dbl_threads_col,
-                    nrows, ncols, 1);
+                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_col,
+                    is_eq_dbl);
 #elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
-           fill_rand_fftw_complex, transpose_fftw_complex_naive,
-           nrows, ncols);
+           fill_rand_fftw_complex, matrix_print_fftw_complex,
+           transpose_fftw_complex_naive, is_eq_fftw_complex);
 #elif defined(USE_MKL_FLOAT)
     TRANSP(float, assert_malloc, free,
-           fill_rand_flt, transpose_flt_mkl,
-           nrows, ncols);
+           fill_rand_flt, matrix_print_flt, transpose_flt_mkl, is_eq_flt);
 #elif defined(USE_MKL_DOUBLE)
     TRANSP(double, assert_malloc, free,
-           fill_rand_dbl, transpose_dbl_mkl,
-           nrows, ncols);
+           fill_rand_dbl, matrix_print_dbl, transpose_dbl_mkl, is_eq_dbl);
 #elif defined(USE_MKL_CMPLX8)
     TRANSP(MKL_Complex8, assert_malloc, free,
-           fill_rand_cmplx8, transpose_cmplx8_mkl,
-           nrows, ncols);
+           fill_rand_cmplx8, matrix_print_cmplx8, transpose_cmplx8_mkl,
+           is_eq_cmplx8);
 #elif defined(USE_MKL_CMPLX16)
     TRANSP(MKL_Complex16, assert_malloc, free,
-           fill_rand_cmplx16, transpose_cmplx16_mkl,
-           nrows, ncols);
+           fill_rand_cmplx16, matrix_print_cmplx16, transpose_cmplx16_mkl,
+           is_eq_cmplx16);
 #elif defined(USE_FLOAT_AVX_INTR_8X8)
     // TODO
     return ENOTSUP;
 #elif defined(USE_DOUBLE_AVX_INTR_8X8)
     TRANSP(double, assert_malloc, free,
-           fill_rand_dbl, transpose_dbl_avx_intr_8x8,
-           nrows, ncols);
+           fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx_intr_8x8,
+           is_eq_dbl);
 #else
     #error "No matching transpose implementation found!"
 #endif
-    return 0;
+    return rc;
 }
