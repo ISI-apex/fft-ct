@@ -121,7 +121,7 @@ static void usage(const char *pname, int code)
 #if _USE_TRANSP_THREADS
             " [-t THREADS]"
 #endif
-            " [-h]\n"
+            " [-p] [-v] [-h]\n"
             "  -r, --rows=ROWS          Matrix row count, in [1, ULONG_MAX]\n"
             "  -c, --cols=COLS          Matrix column count, in [1, ULONG_MAX]\n"
 #if _USE_TRANSP_BLOCKED
