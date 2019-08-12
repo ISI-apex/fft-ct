@@ -42,11 +42,6 @@ function(add_exec_prim name main definitions)
   target_compile_definitions(${name} PRIVATE ${definitions})
 endfunction(add_exec_prim)
 
-add_exec_prim(test-transp-float-naive test-transpose.c "-DUSE_FLOAT_NAIVE")
-add_exec_prim(test-transp-double-naive test-transpose.c "-DUSE_DOUBLE_NAIVE")
-add_exec_prim(test-transp-float-blocked test-transpose.c "-DUSE_FLOAT_BLOCKED")
-add_exec_prim(test-transp-double-blocked test-transpose.c "-DUSE_DOUBLE_BLOCKED")
-
 add_exec_prim(transp-float-naive transp.c "-DUSE_FLOAT_NAIVE")
 add_exec_prim(transp-double-naive transp.c "-DUSE_DOUBLE_NAIVE")
 add_exec_prim(transp-float-blocked transp.c "-DUSE_FLOAT_BLOCKED")
@@ -59,11 +54,6 @@ if(Threads_FOUND)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads)
-
-  add_exec_threads(test-transp-float-threads-row test-transpose.c "-DUSE_FLOAT_THREADS_ROW")
-  add_exec_threads(test-transp-double-threads-row test-transpose.c "-DUSE_DOUBLE_THREADS_ROW")
-  add_exec_threads(test-transp-float-threads-col test-transpose.c "-DUSE_FLOAT_THREADS_COL")
-  add_exec_threads(test-transp-double-threads-col test-transpose.c "-DUSE_DOUBLE_THREADS_COL")
 
   add_exec_threads(transp-float-threads-row transp.c "-DUSE_FLOAT_THREADS_ROW")
   add_exec_threads(transp-double-threads-row transp.c "-DUSE_DOUBLE_THREADS_ROW")
@@ -79,7 +69,6 @@ if(FFTW_FOUND)
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
   endfunction(add_exec_fftw)
 
-  add_exec_fftw(test-transp-fftw_complex-naive test-transpose.c "-DUSE_FFTW_NAIVE")
   add_exec_fftw(transp-fftw_complex-naive transp.c "-DUSE_FFTW_NAIVE")
   add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "")
   add_exec_fftw(fft-2d-fftw_complex-fftw fft-2d.c "")
@@ -93,11 +82,6 @@ if(MKL_FOUND)
     target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
     target_link_libraries(${name} ${MKL_LDFLAGS})
   endfunction(add_exec_mkl)
-
-  add_exec_mkl(test-transp-float-mkl test-transpose.c "-DUSE_MKL_FLOAT")
-  add_exec_mkl(test-transp-double-mkl test-transpose.c "-DUSE_MKL_DOUBLE")
-  add_exec_mkl(test-transp-cmplx8-mkl test-transpose.c "-DUSE_MKL_CMPLX8")
-  add_exec_mkl(test-transp-cmplx16-mkl test-transpose.c "-DUSE_MKL_CMPLX16")
 
   add_exec_mkl(transp-float-mkl transp.c "-DUSE_MKL_FLOAT")
   add_exec_mkl(transp-double-mkl transp.c "-DUSE_MKL_DOUBLE")
@@ -164,19 +148,10 @@ if(ENABLE_AVX)
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
   endfunction(add_exec_avx)
 
-  # Trust the compiler - don't need test-transpose to check correctness again
-  # add_exec_avx(test-transp-float-avx-auto test-transpose.c "-DUSE_FLOAT_NAIVE")
-  # add_exec_avx(test-transp-double-avx-auto test-transpose.c "-DUSE_DOUBLE_NAIVE")
-  # add_exec_avx(test-transp-float-blocked-avx-auto test-transpose.c "-DUSE_FLOAT_BLOCKED")
-  # add_exec_avx(test-transp-double-blocked-avx-auto test-transpose.c "-DUSE_DOUBLE_BLOCKED")
-
   add_exec_avx(transp-float-avx-auto transp.c "-DUSE_FLOAT_NAIVE")
   add_exec_avx(transp-double-avx-auto transp.c "-DUSE_DOUBLE_NAIVE")
   add_exec_avx(transp-float-blocked-avx-auto transp.c "-DUSE_FLOAT_BLOCKED")
   add_exec_avx(transp-double-blocked-avx-auto transp.c "-DUSE_DOUBLE_BLOCKED")
-
-  # add_exec_avx(test-transp-float-avx-intr-8x8 test-transpose.c "-DUSE_FLOAT_AVX_INTR_8X8")
-  add_exec_avx(test-transp-double-avx-intr-8x8 test-transpose.c "-DUSE_DOUBLE_AVX_INTR_8X8")
 
   # add_exec_avx(transp-float-avx-intr-8x8 transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
   add_exec_avx(transp-double-avx-intr-8x8 transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
