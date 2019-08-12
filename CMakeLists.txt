@@ -117,7 +117,8 @@ if(ENABLE_AVX AND NOT C_FLAGS_AVX)
   message("--   Defaulting to AVX-512 for Skylake...")
   # TODO: Does specifying optimization level conflict with CMAKE_BUILD_TYPE?
   #       Certain per-compiler levels are needed for automatic vectorization.
-  if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
+  if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU" OR
+     "${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
     if(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
       message(FATAL_ERROR "GNU C compiler version is too old for AVX-512: "
                           "${CMAKE_C_COMPILER_VERSION} < 5.0\n"
