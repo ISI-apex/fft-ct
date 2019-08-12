@@ -14,19 +14,26 @@
 #include <stdlib.h>
 
 #define _USE_TRANSP_BLOCKED defined(USE_FLOAT_BLOCKED) || \
-                            defined(USE_DOUBLE_BLOCKED)
+                            defined(USE_DOUBLE_BLOCKED) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
 
 #include "transpose.h"
+#include "transpose-avx.h"
+#include "transpose-threads.h"
+#include "transpose-threads-avx.h"
 #include "util.h"
 
 #define _USE_TRANSP_THREADS defined(USE_FLOAT_THREADS_ROW) || \
                             defined(USE_DOUBLE_THREADS_ROW) || \
                             defined(USE_FLOAT_THREADS_COL) || \
-                            defined(USE_DOUBLE_THREADS_COL)
-
-#if _USE_TRANSP_THREADS
-#include "transpose-threads.h"
-#endif
+                            defined(USE_DOUBLE_THREADS_COL) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
+                            defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
 
 #if defined(USE_FFTW_NAIVE)
 #include <fftw3.h>
@@ -39,10 +46,6 @@
 #include <mkl.h>
 #include "transpose-mkl.h"
 #include "util-mkl.h"
-#endif
-
-#if defined(USE_FLOAT_AVX_INTR_8X8) || defined(USE_DOUBLE_AVX_INTR_8X8)
-#include "transpose-avx.h"
 #endif
 
 static size_t nrows = 0;
@@ -277,6 +280,18 @@ int main(int argc, char **argv)
     TRANSP(double, assert_malloc, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx_intr_8x8,
            is_eq_dbl);
+#elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED)
+    // TODO
+    return ENOTSUP;
+#elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+    // TODO
+    return ENOTSUP;
 #else
     #error "No matching transpose implementation found!"
 #endif

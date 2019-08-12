@@ -156,3 +156,23 @@ if(ENABLE_AVX)
   # add_exec_avx(transp-float-avx-intr-8x8 transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
   add_exec_avx(transp-double-avx-intr-8x8 transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
 endif(ENABLE_AVX)
+
+# Use threads with intrinsic AVX
+if(Threads_FOUND AND ENABLE_AVX)
+  function(add_exec_threads_avx name main definitions)
+    add_executable(${name} ${main} transpose.c transpose-avx.c util.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
+    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
+  endfunction(add_exec_threads_avx)
+
+  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-row transp.c
+                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW")
+  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-col transp.c
+                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL")
+  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-row-blocked transp.c
+                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED")
+  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-col-blocked transp.c
+                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED")
+endif(ENABLE_AVX)
