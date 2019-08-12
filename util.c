@@ -85,10 +85,18 @@ void *assert_malloc(size_t sz)
         fprintf(stderr, "assert_malloc: sz must be a multiple of 64 or 32\n");
         exit(EINVAL);
     }
+#if defined(HAVE_ALIGNED_ALLOC)
     ptr = aligned_alloc(align, sz);
     if (!ptr) {
         perror("aligned_alloc");
         exit(ENOMEM);
     }
+#else
+    errno = posix_memalign(&ptr, align, sz);
+    if (errno) {
+        perror("posix_memalign");
+        exit(ENOMEM);
+    }
+#endif
     return ptr;
 }
