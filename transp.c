@@ -12,6 +12,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#include "ptime.h"
+#include "transpose.h"
+#include "transpose-avx.h"
+#include "transpose-threads.h"
+#include "transpose-threads-avx.h"
+#include "util.h"
 
 #define _USE_TRANSP_BLOCKED defined(USE_FLOAT_BLOCKED) || \
                             defined(USE_DOUBLE_BLOCKED) || \
@@ -19,12 +27,6 @@
                             defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
                             defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
                             defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
-
-#include "transpose.h"
-#include "transpose-avx.h"
-#include "transpose-threads.h"
-#include "transpose-threads-avx.h"
-#include "util.h"
 
 #define _USE_TRANSP_THREADS defined(USE_FLOAT_THREADS_ROW) || \
                             defined(USE_DOUBLE_THREADS_ROW) || \
@@ -50,6 +52,8 @@
 
 static size_t nrows = 0;
 static size_t ncols = 0;
+static struct timespec t1;
+static struct timespec t2;
 
 #if _USE_TRANSP_BLOCKED
 static size_t nblkrows = 0;
@@ -64,7 +68,13 @@ static bool do_print = false;
 static bool do_verify = false;
 static int rc = 0;
 
-#define CHECK_TRANSPOSE(A, B, fn_is_eq) { \
+#define PRINT_ELAPSED_MS(prefix) { \
+    double elapsed_ms = (t2.tv_sec - t1.tv_sec) * 1000.0 + \
+                        (t2.tv_nsec - t1.tv_nsec) / 1000000.0; \
+    printf("%s (ms): %f\n", prefix, elapsed_ms); \
+}
+
+#define VERIFY_TRANSPOSE(A, B, fn_is_eq) { \
     size_t r, c; \
     for (r = 0; r < nrows && !rc; r++) { \
         for (c = 0; c < ncols && !rc; c++) { \
@@ -76,19 +86,31 @@ static int rc = 0;
 #define TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print) \
     datatype *A = fn_malloc(nrows * ncols * sizeof(datatype)); \
     datatype *B = fn_malloc(nrows * ncols * sizeof(datatype)); \
+    ptime_gettime_monotonic(&t1); \
     fn_fill(A, nrows * ncols); \
+    ptime_gettime_monotonic(&t2); \
+    PRINT_ELAPSED_MS("fill"); \
     if (do_print) { \
+        ptime_gettime_monotonic(&t1); \
         printf("In:\n"); \
         fn_mat_print(A, nrows, ncols); \
-    }
+        ptime_gettime_monotonic(&t2); \
+        PRINT_ELAPSED_MS("print"); \
+    } \
+    ptime_gettime_monotonic(&t1);
 
 #define TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free) \
+    ptime_gettime_monotonic(&t2); \
+    PRINT_ELAPSED_MS("transpose"); \
     if (do_print) { \
         printf("Out:\n"); \
         fn_mat_print(B, ncols, nrows); \
     } \
     if (do_verify) { \
-        CHECK_TRANSPOSE(A, B, fn_is_eq); \
+        ptime_gettime_monotonic(&t1); \
+        VERIFY_TRANSPOSE(A, B, fn_is_eq); \
+        ptime_gettime_monotonic(&t2); \
+        PRINT_ELAPSED_MS("verify"); \
     } \
     fn_free(B); \
     fn_free(A);
