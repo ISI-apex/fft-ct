@@ -28,6 +28,14 @@ if(PKG_CONFIG_FOUND)
   endif(MKL_FOUND)
 endif(PKG_CONFIG_FOUND)
 
+include(CheckSymbolExists)
+
+# Some C11 implementations are incomplete, e.g., on OSX with clang
+CHECK_SYMBOL_EXISTS(aligned_alloc stdlib.h HAVE_ALIGNED_ALLOC)
+if(HAVE_ALIGNED_ALLOC)
+  add_definitions(-DHAVE_ALIGNED_ALLOC)
+endif(HAVE_ALIGNED_ALLOC)
+
 
 # Binaries
 
