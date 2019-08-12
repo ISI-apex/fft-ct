@@ -175,4 +175,4 @@ if(Threads_FOUND AND ENABLE_AVX)
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED")
   add_exec_threads_avx(transp-double-threads-avx-intr-8x8-col-blocked transp.c
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED")
-endif(ENABLE_AVX)
+endif(Threads_FOUND AND ENABLE_AVX)
