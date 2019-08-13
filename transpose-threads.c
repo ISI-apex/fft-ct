@@ -16,31 +16,49 @@
 struct tr_thread_arg {
     const void* restrict A;
     void* restrict B;
-    size_t A_rows, A_cols, min, max, thr_num;
+    size_t A_rows, A_cols, r_min, r_max, c_min, c_max, thr_num;
 };
 
 static void tt_arg_init(struct tr_thread_arg *tt_arg,
                         const void* restrict A, void* restrict B,
                         size_t A_rows, size_t A_cols,
-                        size_t min, size_t max, size_t thr_num)
+                        size_t r_min, size_t r_max, size_t c_min, size_t c_max,
+                        size_t thr_num)
 {
     tt_arg->A = A;
     tt_arg->B = B;
     tt_arg->A_rows = A_rows;
     tt_arg->A_cols = A_cols;
-    tt_arg->min = min;
-    tt_arg->max = max;
+    tt_arg->r_min = r_min;
+    tt_arg->r_max = r_max;
+    tt_arg->c_min = c_min;
+    tt_arg->c_max = c_max;
     tt_arg->thr_num = thr_num;
 }
 
-static void *transpose_flt_thread_row(void *args) {
+static void *transpose_thread_flt(void *args) {
     struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
     const float* restrict A = (float *)tt_arg->A;
     float* restrict B = (float *)tt_arg->B;
     size_t r, c;
 
-    for (r = tt_arg->min; r < tt_arg->max; r++) {
-        for (c = 0; c < tt_arg->A_cols; c++) {
+    for (r = tt_arg->r_min; r < tt_arg->r_max; r++) {
+        for (c = tt_arg->c_min; c < tt_arg->c_max; c++) {
+            B[c * tt_arg->A_rows + r] = A[r * tt_arg->A_cols + c];
+        }
+    }
+
+    pthread_exit((void *)tt_arg->thr_num);
+}
+
+static void *transpose_thread_dbl(void *args) {
+    struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
+    const double* restrict A = (double *)tt_arg->A;
+    double* restrict B = (double *)tt_arg->B;
+    size_t r, c;
+
+    for (r = tt_arg->r_min; r < tt_arg->r_max; r++) {
+        for (c = tt_arg->c_min; c < tt_arg->c_max; c++) {
             B[c * tt_arg->A_rows + r] = A[r * tt_arg->A_cols + c];
         }
     }
@@ -76,8 +94,10 @@ void transpose_flt_threads_row(const float* restrict A, float* restrict B,
             r_max = r_min + min_rows_per_thread;
         }
 
-        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols, r_min, r_max, thr_num);
-        errno = pthread_create(&threads[thr_num], &attr, &transpose_flt_thread_row, &args[thr_num]);
+        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols,
+                    r_min, r_max, 0, A_cols, thr_num);
+        errno = pthread_create(&threads[thr_num], &attr, &transpose_thread_flt,
+                               &args[thr_num]);
         if (errno) {
             perror("pthread_create");
             exit(errno);
@@ -96,21 +116,6 @@ void transpose_flt_threads_row(const float* restrict A, float* restrict B,
 
     free(args);
     free(threads);
-}
-
-static void *transpose_dbl_thread_row(void *args) {
-    struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    const double* restrict A = (double *)tt_arg->A;
-    double* restrict B = (double *)tt_arg->B;
-    size_t r, c;
-
-    for (r = tt_arg->min; r < tt_arg->max; r++) {
-        for (c = 0; c < tt_arg->A_cols; c++) {
-            B[c * tt_arg->A_rows + r] = A[r * tt_arg->A_cols + c];
-        }
-    }
-
-    pthread_exit((void *)tt_arg->thr_num);
 }
 
 void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
@@ -141,8 +146,10 @@ void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
             r_max = r_min + min_rows_per_thread;
         }
 
-        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols, r_min, r_max, thr_num);
-        errno = pthread_create(&threads[thr_num], &attr, &transpose_dbl_thread_row, &args[thr_num]);
+        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols,
+                    r_min, r_max, 0, A_cols, thr_num);
+        errno = pthread_create(&threads[thr_num], &attr, &transpose_thread_dbl,
+                               &args[thr_num]);
         if (errno) {
             perror("pthread_create");
             exit(errno);
@@ -161,21 +168,6 @@ void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
 
     free(args);
     free(threads);
-}
-
-static void *transpose_flt_thread_col(void *args) {
-    struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    const float* restrict A = (float *)tt_arg->A;
-    float* restrict B = (float *)tt_arg->B;
-    size_t r, c;
-
-    for (r = 0; r < tt_arg->A_rows; r++) {
-        for (c = tt_arg->min; c < tt_arg->max; c++) {
-            B[c * tt_arg->A_rows + r] = A[r * tt_arg->A_cols + c];
-        }
-    }
-
-    pthread_exit((void *)tt_arg->thr_num);
 }
 
 void transpose_flt_threads_col(const float* restrict A, float* restrict B,
@@ -206,8 +198,10 @@ void transpose_flt_threads_col(const float* restrict A, float* restrict B,
             c_max = c_min + min_cols_per_thread;
         }
 
-        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols, c_min, c_max, thr_num);
-        errno = pthread_create(&threads[thr_num], &attr, &transpose_flt_thread_col, &args[thr_num]);
+        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols,
+                    0, A_rows, c_min, c_max, thr_num);
+        errno = pthread_create(&threads[thr_num], &attr, &transpose_thread_flt,
+                               &args[thr_num]);
         if (errno) {
             perror("pthread_create");
             exit(errno);
@@ -226,21 +220,6 @@ void transpose_flt_threads_col(const float* restrict A, float* restrict B,
 
     free(args);
     free(threads);
-}
-
-static void *transpose_dbl_thread_col(void *args) {
-    struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    const double* restrict A = (double *)tt_arg->A;
-    double* restrict B = (double *)tt_arg->B;
-    size_t r, c;
-
-    for (r = 0; r < tt_arg->A_rows; r++) {
-        for (c = tt_arg->min; c < tt_arg->max; c++) {
-            B[c * tt_arg->A_rows + r] = A[r * tt_arg->A_cols + c];
-        }
-    }
-
-    pthread_exit((void *)tt_arg->thr_num);
 }
 
 void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
@@ -271,8 +250,10 @@ void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
             c_max = c_min + min_cols_per_thread;
         }
 
-        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols, c_min, c_max, thr_num);
-        errno = pthread_create(&threads[thr_num], &attr, &transpose_dbl_thread_col, &args[thr_num]);
+        tt_arg_init(&args[thr_num], A, B, A_rows, A_cols,
+                    0, A_rows, c_min, c_max, thr_num);
+        errno = pthread_create(&threads[thr_num], &attr, &transpose_thread_dbl,
+                               &args[thr_num]);
         if (errno) {
             perror("pthread_create");
             exit(errno);
