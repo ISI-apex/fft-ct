@@ -5,6 +5,7 @@
  * @author Kaushik Datta <kdatta@isi.edu>
  * @date 2019-07-15
  */
+#include <complex.h>
 #include <stdlib.h>
 
 #include "transpose.h"
@@ -23,6 +24,31 @@ typedef void (fn_transpose_blk)(const void* restrict A, void* restrict B,
                                 size_t r_min, size_t c_min,
                                 size_t r_max, size_t c_max);
 
+void transpose_flt_naive(const float* restrict A, float* restrict B,
+                         size_t A_rows, size_t A_cols)
+{
+    TRANSPOSE_BLK(A, B, A_rows, A_cols, 0, 0, A_rows, A_cols);
+}
+
+void transpose_dbl_naive(const double* restrict A, double* restrict B,
+                         size_t A_rows, size_t A_cols)
+{
+    TRANSPOSE_BLK(A, B, A_rows, A_cols, 0, 0, A_rows, A_cols);
+}
+
+void transpose_cmplx_naive(const complex* restrict A, complex* restrict B,
+                           size_t A_rows, size_t A_cols)
+{
+    TRANSPOSE_BLK(A, B, A_rows, A_cols, 0, 0, A_rows, A_cols);
+}
+
+void transpose_dbl_cmplx_naive(const double complex* restrict A,
+                               double complex* restrict B,
+                               size_t A_rows, size_t A_cols)
+{
+    TRANSPOSE_BLK(A, B, A_rows, A_cols, 0, 0, A_rows, A_cols);
+}
+
 static void transpose_blk_flt(const void* restrict A, void* restrict B,
                               size_t A_rows, size_t A_cols,
                               size_t r_min, size_t c_min,
@@ -39,6 +65,24 @@ static void transpose_blk_dbl(const void* restrict A, void* restrict B,
 {
     TRANSPOSE_BLK((const double* restrict)A, (double* restrict)B, A_rows, A_cols,
                   r_min, c_min, r_max, c_max);
+}
+
+static void transpose_blk_cmplx(const void* restrict A, void* restrict B,
+                                size_t A_rows, size_t A_cols,
+                                size_t r_min, size_t c_min,
+                                size_t r_max, size_t c_max)
+{
+    TRANSPOSE_BLK((const complex* restrict)A, (complex* restrict)B,
+                  A_rows, A_cols, r_min, c_min, r_max, c_max);
+}
+
+static void transpose_blk_dbl_cmplx(const void* restrict A, void* restrict B,
+                                    size_t A_rows, size_t A_cols,
+                                    size_t r_min, size_t c_min,
+                                    size_t r_max, size_t c_max)
+{
+    TRANSPOSE_BLK((const double complex* restrict)A, (double complex* restrict)B,
+                  A_rows, A_cols, r_min, c_min, r_max, c_max);
 }
 
 static void transpose_blocked(const void* restrict A, void* restrict B,
@@ -84,11 +128,6 @@ static void transpose_blocked(const void* restrict A, void* restrict B,
     }
 }
 
-void transpose_flt_naive(const float* restrict A, float* restrict B,
-                         size_t A_rows, size_t A_cols)
-{
-    TRANSPOSE_BLK(A, B, A_rows, A_cols, 0, 0, A_rows, A_cols);
-}
 
 void transpose_flt_blocked(const float* restrict A, float* restrict B,
                            size_t A_rows, size_t A_cols,
@@ -98,16 +137,27 @@ void transpose_flt_blocked(const float* restrict A, float* restrict B,
                       blk_rows, blk_cols, transpose_blk_flt);
 }
 
-void transpose_dbl_naive(const double* restrict A, double* restrict B,
-                         size_t A_rows, size_t A_cols)
-{
-    TRANSPOSE_BLK(A, B, A_rows, A_cols, 0, 0, A_rows, A_cols);
-}
-
 void transpose_dbl_blocked(const double* restrict A, double* restrict B,
                            size_t A_rows, size_t A_cols,
                            size_t blk_rows, size_t blk_cols)
 {
     transpose_blocked(A, B, A_rows, A_cols,
                       blk_rows, blk_cols, transpose_blk_dbl);
+}
+
+void transpose_cmplx_blocked(const complex* restrict A, complex* restrict B,
+                             size_t A_rows, size_t A_cols,
+                             size_t blk_rows, size_t blk_cols)
+{
+    transpose_blocked(A, B, A_rows, A_cols,
+                      blk_rows, blk_cols, transpose_blk_cmplx);
+}
+
+void transpose_dbl_cmplx_blocked(const double complex* restrict A,
+                                 double complex* restrict B,
+                                 size_t A_rows, size_t A_cols,
+                                 size_t blk_rows, size_t blk_cols)
+{
+    transpose_blocked(A, B, A_rows, A_cols,
+                      blk_rows, blk_cols, transpose_blk_dbl_cmplx);
 }
