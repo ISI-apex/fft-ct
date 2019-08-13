@@ -2,7 +2,8 @@
  * Transpose functions.
  *
  * @author Connor Imes <cimes@isi.edu>
- * @date 2019-07-15 
+ * @author Kaushik Datta <kdatta@isi.edu>
+ * @date 2019-07-15
  */
 #ifndef TRANSPOSE_H
 #define TRANSPOSE_H
