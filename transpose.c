@@ -28,7 +28,7 @@ static void transpose_blk_flt(const void* restrict A, void* restrict B,
                               size_t r_min, size_t c_min,
                               size_t r_max, size_t c_max)
 {
-    TRANSPOSE_BLK((float *)A, (float *)B, A_rows, A_cols,
+    TRANSPOSE_BLK((const float* restrict)A, (float* restrict)B, A_rows, A_cols,
                   r_min, c_min, r_max, c_max);
 }
 
@@ -37,7 +37,7 @@ static void transpose_blk_dbl(const void* restrict A, void* restrict B,
                               size_t r_min, size_t c_min,
                               size_t r_max, size_t c_max)
 {
-    TRANSPOSE_BLK((double *)A, (double *)B, A_rows, A_cols,
+    TRANSPOSE_BLK((const double* restrict)A, (double* restrict)B, A_rows, A_cols,
                   r_min, c_min, r_max, c_max);
 }
 
