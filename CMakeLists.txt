@@ -77,7 +77,9 @@ if(FFTW_FOUND)
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
   endfunction(add_exec_fftw)
 
+  add_exec_fftw(transp-fftwf_complex-naive transp.c "-DUSE_FFTWF_NAIVE")
   add_exec_fftw(transp-fftw_complex-naive transp.c "-DUSE_FFTW_NAIVE")
+
   add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "")
   add_exec_fftw(fft-2d-fftw_complex-fftw fft-2d.c "")
 endif(FFTW_FOUND)
