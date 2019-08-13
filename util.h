@@ -22,5 +22,6 @@ int is_eq_flt(float a, float b);
 int is_eq_dbl(double a, double b);
 
 void *assert_malloc(size_t sz);
+void *assert_malloc_al(size_t sz);
 
 #endif /* UTIL_H */

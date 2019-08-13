@@ -252,33 +252,33 @@ int main(int argc, char **argv)
 #endif
 
 #if defined(USE_FLOAT_NAIVE)
-    TRANSP(float, assert_malloc, free,
+    TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_naive, is_eq_flt);
 #elif defined(USE_DOUBLE_NAIVE)
-    TRANSP(double, assert_malloc, free,
+    TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive, is_eq_dbl);
 #elif defined(USE_FLOAT_BLOCKED)
-    TRANSP_BLOCKED(float, assert_malloc, free,
+    TRANSP_BLOCKED(float, assert_malloc_al, free,
                    fill_rand_flt, matrix_print_flt, transpose_flt_blocked,
                    is_eq_flt);
 #elif defined(USE_DOUBLE_BLOCKED)
-    TRANSP_BLOCKED(double, assert_malloc, free,
+    TRANSP_BLOCKED(double, assert_malloc_al, free,
                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_blocked,
                    is_eq_dbl);
 #elif defined(USE_FLOAT_THREADS_ROW)
-    TRANSP_THREADED(float, assert_malloc, free,
+    TRANSP_THREADED(float, assert_malloc_al, free,
                     fill_rand_flt, matrix_print_flt, transpose_flt_threads_row,
                     is_eq_flt);
 #elif defined(USE_DOUBLE_THREADS_ROW)
-    TRANSP_THREADED(double, assert_malloc, free,
+    TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_row,
                     is_eq_dbl);
 #elif defined(USE_FLOAT_THREADS_COL)
-    TRANSP_THREADED(float, assert_malloc, free,
+    TRANSP_THREADED(float, assert_malloc_al, free,
                     fill_rand_flt, matrix_print_flt, transpose_flt_threads_col,
                     is_eq_flt);
 #elif defined(USE_DOUBLE_THREADS_COL)
-    TRANSP_THREADED(double, assert_malloc, free,
+    TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_col,
                     is_eq_dbl);
 #elif defined(USE_FFTW_NAIVE)
@@ -286,24 +286,24 @@ int main(int argc, char **argv)
            fill_rand_fftw_complex, matrix_print_fftw_complex,
            transpose_fftw_complex_naive, is_eq_fftw_complex);
 #elif defined(USE_MKL_FLOAT)
-    TRANSP(float, assert_malloc, free,
+    TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_mkl, is_eq_flt);
 #elif defined(USE_MKL_DOUBLE)
-    TRANSP(double, assert_malloc, free,
+    TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_mkl, is_eq_dbl);
 #elif defined(USE_MKL_CMPLX8)
-    TRANSP(MKL_Complex8, assert_malloc, free,
+    TRANSP(MKL_Complex8, assert_malloc_al, free,
            fill_rand_cmplx8, matrix_print_cmplx8, transpose_cmplx8_mkl,
            is_eq_cmplx8);
 #elif defined(USE_MKL_CMPLX16)
-    TRANSP(MKL_Complex16, assert_malloc, free,
+    TRANSP(MKL_Complex16, assert_malloc_al, free,
            fill_rand_cmplx16, matrix_print_cmplx16, transpose_cmplx16_mkl,
            is_eq_cmplx16);
 #elif defined(USE_FLOAT_AVX_INTR_8X8)
     // TODO
     return ENOTSUP;
 #elif defined(USE_DOUBLE_AVX_INTR_8X8)
-    TRANSP(double, assert_malloc, free,
+    TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx_intr_8x8,
            is_eq_dbl);
 #elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW)
