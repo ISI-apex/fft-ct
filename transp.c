@@ -318,12 +318,12 @@ int main(int argc, char **argv)
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_mkl, is_eq_dbl);
 #elif defined(USE_MKL_CMPLX8)
     TRANSP(MKL_Complex8, assert_malloc_al, free,
-           fill_rand_flt_cmplx8, matrix_print_flt_cmplx8, transpose_cmplx8_mkl,
-           is_eq_flt_cmplx8);
+           fill_rand_cmplx8, matrix_print_cmplx8, transpose_cmplx8_mkl,
+           is_eq_cmplx8);
 #elif defined(USE_MKL_CMPLX16)
     TRANSP(MKL_Complex16, assert_malloc_al, free,
-           fill_rand_flt_cmplx16, matrix_print_flt_cmplx16, transpose_cmplx16_mkl,
-           is_eq_flt_cmplx16);
+           fill_rand_cmplx16, matrix_print_cmplx16, transpose_cmplx16_mkl,
+           is_eq_cmplx16);
 #elif defined(USE_FLOAT_AVX_INTR_8X8)
     // TODO
     return ENOTSUP;
