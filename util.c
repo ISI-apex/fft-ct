@@ -4,6 +4,7 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-07-15 
  */
+#include <complex.h>
 #include <errno.h>
 #include <float.h>
 #include <stdio.h>
@@ -25,40 +26,85 @@ double rand_dbl(void)
     return (d / (double) RAND_MAX) - 0.5;
 }
 
+complex rand_cmplx(void)
+{
+    return rand_flt() + (rand_flt() * I);
+}
+
+double complex rand_dbl_cmplx(void)
+{
+    return rand_dbl() + (rand_dbl() * I);
+}
+
+#define FILL_RAND(a, len, fn_rand) \
+{ \
+    size_t i; \
+    for (i = 0; i < len; i++) \
+        a[i] = fn_rand(); \
+}
+
 void fill_rand_flt(float *a, size_t len)
 {
-    size_t i;
-    for (i = 0; i < len; i++)
-        a[i] = rand_flt();
+    FILL_RAND(a, len, rand_flt);
 }
 
 void fill_rand_dbl(double *a, size_t len)
 {
-    size_t i;
-    for (i = 0; i < len; i++)
-        a[i] = rand_dbl();
+    FILL_RAND(a, len, rand_dbl);
+}
+
+void fill_rand_cmplx(complex *a, size_t len)
+{
+    FILL_RAND(a, len, rand_cmplx);
+}
+
+void fill_rand_dbl_cmplx(double complex *a, size_t len)
+{
+    FILL_RAND(a, len, rand_dbl_cmplx);
+}
+
+#define MATRIX_PRINT(A, nrows, ncols) \
+{ \
+    size_t r, c; \
+    for (r = 0; r < nrows; r++) { \
+        for (c = 0; c < ncols; c++) { \
+            printf("%s%f", (c > 0 ? ", " : ""), A[r * ncols + c]); \
+        } \
+        printf("\n"); \
+    } \
+}
+
+#define MATRIX_PRINT_CMPLX(A, nrows, ncols) \
+{ \
+    size_t r, c, i; \
+    for (r = 0; r < nrows; r++) { \
+        for (c = 0; c < ncols; c++) { \
+            i = r * ncols + c; \
+            /* TODO: should be crealf and cimagf for complex */ \
+            printf("%s(%f, %f)", (c > 0 ? ", " : ""), creal(A[i]), cimag(A[i])); \
+        } \
+        printf("\n"); \
+    } \
 }
 
 void matrix_print_flt(const float *A, size_t nrows, size_t ncols)
 {
-    size_t r, c;
-    for (r = 0; r < nrows; r++) {
-        for (c = 0; c < ncols; c++) {
-            printf("%s%f", (c > 0 ? ", " : ""), A[r * ncols + c]);
-        }
-        printf("\n");
-    }
+    MATRIX_PRINT(A, nrows, ncols);
 }
 
 void matrix_print_dbl(const double *A, size_t nrows, size_t ncols)
 {
-    size_t r, c;
-    for (r = 0; r < nrows; r++) {
-        for (c = 0; c < ncols; c++) {
-            printf("%s%f", (c > 0 ? ", " : ""), A[r * ncols + c]);
-        }
-        printf("\n");
-    }
+    MATRIX_PRINT(A, nrows, ncols);
+}
+
+void matrix_print_cmplx(const complex *A, size_t nrows, size_t ncols)
+{
+    MATRIX_PRINT_CMPLX(A, nrows, ncols);
+}
+
+void matrix_print_dbl_cmplx(const double complex *A, size_t nrows, size_t ncols)
+{
+    MATRIX_PRINT_CMPLX(A, nrows, ncols);
 }
 
 int is_eq_flt(float a, float b)
@@ -71,6 +117,16 @@ int is_eq_dbl(double a, double b)
 {
     double v = a - b;
     return v >= 0.0 ? (v < DBL_EPSILON) : (v > -DBL_EPSILON);
+}
+
+int is_eq_cmplx(complex a, complex b)
+{
+    return is_eq_flt(crealf(a), crealf(b)) && is_eq_flt(cimagf(a), cimagf(b));
+}
+
+int is_eq_dbl_cmplx(double complex a, double complex b)
+{
+    return is_eq_dbl(creal(a), creal(b)) && is_eq_dbl(cimag(a), cimag(b));
 }
 
 void *assert_malloc(size_t sz)
