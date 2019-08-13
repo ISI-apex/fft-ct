@@ -23,6 +23,8 @@
 
 #if defined(USE_FLOAT_BLOCKED) || \
     defined(USE_DOUBLE_BLOCKED) || \
+    defined(USE_COMPLEX_BLOCKED) || \
+    defined(USE_DOUBLE_COMPLEX_BLOCKED) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
@@ -257,6 +259,14 @@ int main(int argc, char **argv)
 #elif defined(USE_DOUBLE_NAIVE)
     TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive, is_eq_dbl);
+#elif defined(USE_COMPLEX_NAIVE)
+    TRANSP(complex, assert_malloc_al, free,
+           fill_rand_cmplx, matrix_print_cmplx, transpose_cmplx_naive,
+           is_eq_cmplx);
+#elif defined(USE_DOUBLE_COMPLEX_NAIVE)
+    TRANSP(double complex, assert_malloc_al, free,
+           fill_rand_dbl_cmplx, matrix_print_dbl_cmplx,
+           transpose_dbl_cmplx_naive, is_eq_dbl_cmplx);
 #elif defined(USE_FLOAT_BLOCKED)
     TRANSP_BLOCKED(float, assert_malloc_al, free,
                    fill_rand_flt, matrix_print_flt, transpose_flt_blocked,
@@ -265,6 +275,14 @@ int main(int argc, char **argv)
     TRANSP_BLOCKED(double, assert_malloc_al, free,
                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_blocked,
                    is_eq_dbl);
+#elif defined(USE_COMPLEX_BLOCKED)
+    TRANSP_BLOCKED(complex, assert_malloc_al, free,
+                   fill_rand_cmplx, matrix_print_cmplx, transpose_cmplx_blocked,
+                   is_eq_cmplx);
+#elif defined(USE_DOUBLE_COMPLEX_BLOCKED)
+    TRANSP_BLOCKED(double complex, assert_malloc_al, free,
+                   fill_rand_dbl_cmplx, matrix_print_dbl_cmplx,
+                   transpose_dbl_cmplx_blocked, is_eq_dbl_cmplx);
 #elif defined(USE_FLOAT_THREADS_ROW)
     TRANSP_THREADED(float, assert_malloc_al, free,
                     fill_rand_flt, matrix_print_flt, transpose_flt_threads_row,
