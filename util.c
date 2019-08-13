@@ -26,7 +26,7 @@ double rand_dbl(void)
     return (d / (double) RAND_MAX) - 0.5;
 }
 
-complex rand_cmplx(void)
+float complex rand_flt_cmplx(void)
 {
     return rand_flt() + (rand_flt() * I);
 }
@@ -53,9 +53,9 @@ void fill_rand_dbl(double *a, size_t len)
     FILL_RAND(a, len, rand_dbl);
 }
 
-void fill_rand_cmplx(complex *a, size_t len)
+void fill_rand_flt_cmplx(float complex *a, size_t len)
 {
-    FILL_RAND(a, len, rand_cmplx);
+    FILL_RAND(a, len, rand_flt_cmplx);
 }
 
 void fill_rand_dbl_cmplx(double complex *a, size_t len)
@@ -97,7 +97,7 @@ void matrix_print_dbl(const double *A, size_t nrows, size_t ncols)
     MATRIX_PRINT(A, nrows, ncols);
 }
 
-void matrix_print_cmplx(const complex *A, size_t nrows, size_t ncols)
+void matrix_print_flt_cmplx(const float complex *A, size_t nrows, size_t ncols)
 {
     MATRIX_PRINT_CMPLX(A, nrows, ncols);
 }
@@ -119,7 +119,7 @@ int is_eq_dbl(double a, double b)
     return v >= 0.0 ? (v < DBL_EPSILON) : (v > -DBL_EPSILON);
 }
 
-int is_eq_cmplx(complex a, complex b)
+int is_eq_flt_cmplx(float complex a, float complex b)
 {
     return is_eq_flt(crealf(a), crealf(b)) && is_eq_flt(cimagf(a), cimagf(b));
 }

@@ -52,11 +52,11 @@ endfunction(add_exec_prim)
 
 add_exec_prim(transp-float-naive transp.c "-DUSE_FLOAT_NAIVE")
 add_exec_prim(transp-double-naive transp.c "-DUSE_DOUBLE_NAIVE")
-add_exec_prim(transp-complex-naive transp.c "-DUSE_COMPLEX_NAIVE")
+add_exec_prim(transp-complex-naive transp.c "-DUSE_FLOAT_COMPLEX_NAIVE")
 add_exec_prim(transp-double-complex-naive transp.c "-DUSE_DOUBLE_COMPLEX_NAIVE")
 add_exec_prim(transp-float-blocked transp.c "-DUSE_FLOAT_BLOCKED")
 add_exec_prim(transp-double-blocked transp.c "-DUSE_DOUBLE_BLOCKED")
-add_exec_prim(transp-complex-blocked transp.c "-DUSE_COMPLEX_BLOCKED")
+add_exec_prim(transp-complex-blocked transp.c "-DUSE_FLOAT_COMPLEX_BLOCKED")
 add_exec_prim(transp-double-complex-blocked transp.c "-DUSE_DOUBLE_COMPLEX_BLOCKED")
 
 # Use threads
