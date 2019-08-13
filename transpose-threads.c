@@ -9,6 +9,7 @@
 #include <pthread.h>
 
 #include "transpose-threads.h"
+#include "util.h"
 
 typedef struct floatRowArg {
     const float* restrict A;
@@ -69,12 +70,12 @@ void transpose_flt_threads_row(const float* restrict A, float* restrict B,
     int rc;
     void *status;
 
-    threads = malloc(num_thr * sizeof(pthread_t));
+    threads = assert_malloc(num_thr * sizeof(pthread_t));
     // initialize and set thread detached attribute
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    args = malloc(num_thr * sizeof(fltRowArg));
+    args = assert_malloc(num_thr * sizeof(fltRowArg));
 
     // divide the rows as evenly as possible among the threads
     num_thr_with_max_rows = A_rows % num_thr;
@@ -155,12 +156,12 @@ void transpose_dbl_threads_row(const double* restrict A, double* restrict B,
     int rc;
     void *status;
 
-    threads = malloc(num_thr * sizeof(pthread_t));
+    threads = assert_malloc(num_thr * sizeof(pthread_t));
     // initialize and set thread detached attribute
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    args = malloc(num_thr * sizeof(dblRowArg));
+    args = assert_malloc(num_thr * sizeof(dblRowArg));
 
     // divide the rows as evenly as possible among the threads
     num_thr_with_max_rows = A_rows % num_thr;
@@ -241,12 +242,12 @@ void transpose_flt_threads_col(const float* restrict A, float* restrict B,
     int rc;
     void *status;
 
-    threads = malloc(num_thr * sizeof(pthread_t));
+    threads = assert_malloc(num_thr * sizeof(pthread_t));
     // initialize and set thread detached attribute
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    args = malloc(num_thr * sizeof(fltColArg));
+    args = assert_malloc(num_thr * sizeof(fltColArg));
 
     // divide the columns as evenly as possible among the threads
     num_thr_with_max_cols = A_cols % num_thr;
@@ -327,12 +328,12 @@ void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
     int rc;
     void *status;
 
-    threads = malloc(num_thr * sizeof(pthread_t));
+    threads = assert_malloc(num_thr * sizeof(pthread_t));
     // initialize and set thread detached attribute
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    args = malloc(num_thr * sizeof(dblColArg));
+    args = assert_malloc(num_thr * sizeof(dblColArg));
 
     // divide the columns as evenly as possible among the threads
     num_thr_with_max_cols = A_cols % num_thr;
