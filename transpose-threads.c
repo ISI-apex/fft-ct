@@ -38,8 +38,8 @@ static void tt_arg_init(struct tr_thread_arg *tt_arg,
 
 static void *transpose_thread_flt(void *args) {
     struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    const float* restrict A = (float *)tt_arg->A;
-    float* restrict B = (float *)tt_arg->B;
+    const float* restrict A = tt_arg->A;
+    float* restrict B = tt_arg->B;
     size_t r, c;
 
     for (r = tt_arg->r_min; r < tt_arg->r_max; r++) {
@@ -53,8 +53,8 @@ static void *transpose_thread_flt(void *args) {
 
 static void *transpose_thread_dbl(void *args) {
     struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    const double* restrict A = (double *)tt_arg->A;
-    double* restrict B = (double *)tt_arg->B;
+    const double* restrict A = tt_arg->A;
+    double* restrict B = tt_arg->B;
     size_t r, c;
 
     for (r = tt_arg->r_min; r < tt_arg->r_max; r++) {
