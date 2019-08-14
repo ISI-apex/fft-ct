@@ -26,6 +26,8 @@
     defined(USE_DOUBLE_BLOCKED) || \
     defined(USE_FLOAT_COMPLEX_BLOCKED) || \
     defined(USE_DOUBLE_COMPLEX_BLOCKED) || \
+    defined(USE_FFTWF_BLOCKED) || \
+    defined(USE_FFTW_BLOCKED) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
@@ -44,12 +46,12 @@
 #define _USE_TRANSP_THREADS 1
 #endif
 
-#if defined(USE_FFTWF_NAIVE)
+#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTWF_BLOCKED)
 #include <fftw3.h>
 #include "transpose-fftwf.h"
 #include "util-fftwf.h"
 #endif
-#if defined(USE_FFTW_NAIVE)
+#if defined(USE_FFTW_NAIVE) || defined(USE_FFTW_BLOCKED)
 #include <fftw3.h>
 #include "transpose-fftw.h"
 #include "util-fftw.h"
@@ -316,6 +318,14 @@ int main(int argc, char **argv)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw_complex, matrix_print_fftw_complex,
            transpose_fftw_complex_naive, is_eq_fftw_complex);
+#elif defined(USE_FFTWF_BLOCKED)
+    TRANSP_BLOCKED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
+                   fill_rand_fftwf_complex, matrix_print_fftwf_complex,
+                   transpose_fftwf_complex_blocked, is_eq_fftwf_complex);
+#elif defined(USE_FFTW_BLOCKED)
+    TRANSP_BLOCKED(fftw_complex, assert_fftw_malloc, fftw_free,
+                   fill_rand_fftw_complex, matrix_print_fftw_complex,
+                   transpose_fftw_complex_blocked, is_eq_fftw_complex);
 #elif defined(USE_MKL_FLOAT)
     TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_mkl, is_eq_flt);
