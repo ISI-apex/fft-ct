@@ -92,6 +92,9 @@ if(FFTWF_FOUND)
 
   add_exec_fftwf(transp-fftwf_complex-naive transp.c "-DUSE_FFTWF_NAIVE")
   add_exec_fftwf(transp-fftwf_complex-blocked transp.c "-DUSE_FFTWF_BLOCKED")
+
+  add_exec_fftwf(fft-ct-fftwf_complex-naive fft-ct.c "-DUSE_FFTWF_NAIVE")
+  add_exec_fftwf(fft-ct-fftwf_complex-blocked fft-ct.c "-DUSE_FFTWF_BLOCKED")
 endif(FFTWF_FOUND)
 
 # Use FFTW library

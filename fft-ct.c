@@ -15,11 +15,31 @@
 
 #include <fftw3.h>
 
+#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTWF_BLOCKED)
+#include "transpose-fftwf.h"
+#include "util-fftwf.h"
+typedef fftwf_complex       FFTW_COMPLEX_T;
+typedef fftwf_plan          FFTW_PLAN_T;
+#define ASSERT_FFTW_MALLOC  assert_fftwf_malloc
+#define FFTW_FREE           fftwf_free
+#define FFTW_PLAN_1D        fftwf_plan_dft_1d
+#define FFTW_PLAN_DESTROY   fftwf_destroy_plan
+#define FFTW_EXECUTE        fftwf_execute
+#define FILL_RAND           fill_rand_fftwf_complex
+#else
 #include "transpose-fftw.h"
-#include "util.h"
 #include "util-fftw.h"
+typedef fftw_complex        FFTW_COMPLEX_T;
+typedef fftw_plan           FFTW_PLAN_T;
+#define ASSERT_FFTW_MALLOC  assert_fftw_malloc
+#define FFTW_FREE           fftw_free
+#define FFTW_PLAN_1D        fftw_plan_dft_1d
+#define FFTW_PLAN_DESTROY   fftw_destroy_plan
+#define FFTW_EXECUTE        fftw_execute
+#define FILL_RAND           fill_rand_fftw_complex
+#endif
 
-#if defined(USE_FFTW_BLOCKED)
+#if defined(USE_FFTWF_BLOCKED) || defined(USE_FFTW_BLOCKED)
 #define _USE_TRANSP_BLOCKED 1
 #endif
 
@@ -31,38 +51,47 @@ static size_t nblkrows = 0;
 static size_t nblkcols = 0;
 #endif
 
-static void data_alloc(fftw_complex **A, fftw_complex **B, fftw_plan **p,
+static void data_alloc(FFTW_COMPLEX_T **A, FFTW_COMPLEX_T **B, FFTW_PLAN_T **p,
                        size_t r, size_t c)
 {
     size_t i;
-    *A = assert_fftw_malloc(r * c * sizeof(fftw_complex));
-    *B = assert_fftw_malloc(r * c * sizeof(fftw_complex));
-    *p = assert_fftw_malloc(r * sizeof(fftw_plan));
-    for (i = 0; i < r; i++)
-        (*p)[i] = fftw_plan_dft_1d(c, &(*A)[i * c], &(*B)[i * c],
-                                   FFTW_FORWARD, FFTW_ESTIMATE);
+    *A = ASSERT_FFTW_MALLOC(r * c * sizeof(**A));
+    *B = ASSERT_FFTW_MALLOC(r * c * sizeof(**B));
+    *p = ASSERT_FFTW_MALLOC(r * sizeof(**p));
+    for (i = 0; i < r; i++) {
+        (*p)[i] = FFTW_PLAN_1D(c, &(*A)[i * c], &(*B)[i * c],
+                               FFTW_FORWARD, FFTW_ESTIMATE);
+    }
 }
 
-static void data_free(fftw_complex *A, fftw_complex *B, fftw_plan *p,
+static void data_free(FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B, FFTW_PLAN_T *p,
                       size_t r)
 {
     size_t i;
-    for (i = 0; i < r; i++)
-        fftw_destroy_plan(p[i]);
-    fftw_free(p);
-    fftw_free(B);
-    fftw_free(A);
+    for (i = 0; i < r; i++) {
+        FFTW_PLAN_DESTROY(p[i]);
+    }
+    FFTW_FREE(p);
+    FFTW_FREE(B);
+    FFTW_FREE(A);
 }
 
-static void fft_tr_fft_1d(const fftw_plan *p1, const fftw_plan *p2,
-                          fftw_complex *fft1_out, fftw_complex *fft2_in)
+static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
+                          FFTW_COMPLEX_T *fft1_out, FFTW_COMPLEX_T *fft2_in)
 {
     size_t i;
     // Perform first set of 1D FFTs
-    for (i = 0; i < nrows; i++)
-        fftw_execute(p1[i]);
+    for (i = 0; i < nrows; i++) {
+        FFTW_EXECUTE(p1[i]);
+    }
+
     // Matrix transpose
-#if defined(USE_FFTW_NAIVE)
+#if defined(USE_FFTWF_NAIVE)
+    transpose_fftwf_complex_naive(fft1_out, fft2_in, nrows, ncols);
+#elif defined(USE_FFTWF_BLOCKED)
+    transpose_fftwf_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
+                                    nblkcols);
+#elif defined(USE_FFTW_NAIVE)
     transpose_fftw_complex_naive(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTW_BLOCKED)
     transpose_fftw_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
@@ -70,22 +99,24 @@ static void fft_tr_fft_1d(const fftw_plan *p1, const fftw_plan *p2,
 #else
     #error "No matching transpose implementation found!"
 #endif
+
     // Perform second set of 1D FFTs
-    for (i = 0; i < ncols; i++)
-        fftw_execute(p2[i]);
+    for (i = 0; i < ncols; i++) {
+        FFTW_EXECUTE(p2[i]);
+    }
 }
 
 static void fft_ct_1d(void)
 {
-    fftw_complex *mat_fft1_in, *mat_fft1_out, *mat_fft2_in, *mat_fft2_out;
-    fftw_plan *p_fft1, *p_fft2;
+    FFTW_COMPLEX_T *mat_fft1_in, *mat_fft1_out, *mat_fft2_in, *mat_fft2_out;
+    FFTW_PLAN_T *p_fft1, *p_fft2;
 
     // Setup FFT 1 (before transpose) and FFT 2 (after transpose)
     data_alloc(&mat_fft1_in, &mat_fft1_out, &p_fft1, nrows, ncols);
     data_alloc(&mat_fft2_in, &mat_fft2_out, &p_fft2, ncols, nrows);
 
     // Populate input with random data
-    fill_rand_fftw_complex(mat_fft1_in, nrows * ncols);
+    FILL_RAND(mat_fft1_in, nrows * ncols);
 
     // Execute FFT 1 -> Transpose -> FFT2
     fft_tr_fft_1d(p_fft1, p_fft2, mat_fft1_out, mat_fft2_in);
