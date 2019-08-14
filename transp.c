@@ -67,12 +67,12 @@ static size_t ncols = 0;
 static struct timespec t1;
 static struct timespec t2;
 
-#if _USE_TRANSP_BLOCKED
+#if defined(_USE_TRANSP_BLOCKED)
 static size_t nblkrows = 0;
 static size_t nblkcols = 0;
 #endif
 
-#if _USE_TRANSP_THREADS
+#if defined(_USE_TRANSP_THREADS)
 static size_t nthreads = 1;
 #endif
 
@@ -152,23 +152,23 @@ static void usage(const char *pname, int code)
 {
     fprintf(code ? stderr : stdout,
             "Usage: %s -r ROWS -c COLS"
-#if _USE_TRANSP_BLOCKED
+#if defined(_USE_TRANSP_BLOCKED)
             " [-R ROWS] [-C COLS]"
 #endif
-#if _USE_TRANSP_THREADS
+#if defined(_USE_TRANSP_THREADS)
             " [-t THREADS]"
 #endif
             " [-p] [-v] [-h]\n"
             "  -r, --rows=ROWS          Matrix row count, in [1, ULONG_MAX]\n"
             "  -c, --cols=COLS          Matrix column count, in [1, ULONG_MAX]\n"
-#if _USE_TRANSP_BLOCKED
+#if defined(_USE_TRANSP_BLOCKED)
             "  -R, --block-rows=ROWS    Rows per block, in [0, ULONG_MAX]\n"
             "  -C, --block-cols=COLS    Columns per block, in [0, ULONG_MAX]\n"
             "                           ROWS/COLS must be divisors of the corresponding\n"
             "                           matrix dimension\n"
             "                           (default=0, implies no blocking in that dimension)\n"
 #endif
-#if _USE_TRANSP_THREADS
+#if defined(_USE_TRANSP_THREADS)
             "  -t, --threads=THREADS    Number of threads, in (0, ULONG_MAX] (default=1)\n"
 #endif
             "  -p, --print              Print matrices\n"
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
         case 'c':
             ncols = assert_to_size_t(optarg, argv[0]);
             break;
-#if _USE_TRANSP_BLOCKED
+#if defined(_USE_TRANSP_BLOCKED)
         case 'R':
             nblkrows = assert_to_size_t(optarg, argv[0]);
             break;
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
             nblkcols = assert_to_size_t(optarg, argv[0]);
             break;
 #endif
-#if _USE_TRANSP_THREADS
+#if defined(_USE_TRANSP_THREADS)
         case 't':
             nthreads = assert_to_size_t(optarg, argv[0]);
             if (!nthreads) {
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
     if (!nrows || !ncols) {
         usage(argv[0], EINVAL);
     }
-#if _USE_TRANSP_BLOCKED
+#if defined(_USE_TRANSP_BLOCKED)
     // fall back to default values
     if (!nblkrows) {
         nblkrows = nrows;
