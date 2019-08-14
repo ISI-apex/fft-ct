@@ -12,6 +12,8 @@
 // intrinsics
 #include <immintrin.h>
 
+#include "transpose-avx.h"
+
 /*
  * This function uses intrinsics to transpose an 8x8 block of doubles
  * using a recursive transpose algorithm.  It will not work correctly
