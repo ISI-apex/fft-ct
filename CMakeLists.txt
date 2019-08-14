@@ -106,7 +106,9 @@ if(FFTW_FOUND)
   add_exec_fftw(transp-fftw_complex-naive transp.c "-DUSE_FFTW_NAIVE")
   add_exec_fftw(transp-fftw_complex-blocked transp.c "-DUSE_FFTW_BLOCKED")
 
-  add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "")
+  add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "-DUSE_FFTW_NAIVE")
+  add_exec_fftw(fft-ct-fftw_complex-blocked fft-ct.c "-DUSE_FFTW_BLOCKED")
+
   add_exec_fftw(fft-2d-fftw_complex-fftw fft-2d.c "")
 endif(FFTW_FOUND)
 
@@ -145,7 +147,11 @@ if(MKL_FOUND)
   endfunction(add_exec_mkl_fftw)
 
   add_exec_mkl_fftw(transp-fftw_complex-naive-mkl-fftw transp.c "-DUSE_FFTW_NAIVE")
-  add_exec_mkl_fftw(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c "")
+  add_exec_mkl_fftw(transp-fftw_complex-blocked-mkl-fftw transp.c "-DUSE_FFTW_BLOCKED")
+
+  add_exec_mkl_fftw(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c "-DUSE_FFTW_NAIVE")
+  add_exec_mkl_fftw(fft-ct-fftw_complex-blocked-mkl-fftw fft-ct.c "-DUSE_FFTW_BLOCKED")
+
   add_exec_mkl_fftw(fft-2d-fftw_complex-mkl-fftw fft-2d.c "")
 endif(MKL_FOUND)
 
