@@ -15,31 +15,51 @@
 
 #include <fftw3.h>
 
+#if defined(USE_FFTWF)
+#include "util-fftwf.h"
+typedef fftwf_complex       FFTW_COMPLEX_T;
+typedef fftwf_plan          FFTW_PLAN_T;
+#define ASSERT_FFTW_MALLOC  assert_fftwf_malloc
+#define FFTW_FREE           fftwf_free
+#define FFTW_PLAN_2D        fftwf_plan_dft_2d
+#define FFTW_PLAN_DESTROY   fftwf_destroy_plan
+#define FFTW_EXECUTE        fftwf_execute
+#define FILL_RAND           fill_rand_fftwf_complex
+#else
 #include "util-fftw.h"
+typedef fftw_complex        FFTW_COMPLEX_T;
+typedef fftw_plan           FFTW_PLAN_T;
+#define ASSERT_FFTW_MALLOC  assert_fftw_malloc
+#define FFTW_FREE           fftw_free
+#define FFTW_PLAN_2D        fftw_plan_dft_2d
+#define FFTW_PLAN_DESTROY   fftw_destroy_plan
+#define FFTW_EXECUTE        fftw_execute
+#define FILL_RAND           fill_rand_fftw_complex
+#endif
 
-static void data_alloc(fftw_complex **A, fftw_complex **B, fftw_plan *p,
+static void data_alloc(FFTW_COMPLEX_T **A, FFTW_COMPLEX_T **B, FFTW_PLAN_T *p,
                        size_t nrows, size_t ncols)
 {
-    *A = assert_fftw_malloc(nrows * ncols * sizeof(fftw_complex));
-    *B = assert_fftw_malloc(nrows * ncols * sizeof(fftw_complex));
-    *p = fftw_plan_dft_2d(nrows, ncols, *A, *B, FFTW_FORWARD, FFTW_ESTIMATE);
+    *A = ASSERT_FFTW_MALLOC(nrows * ncols * sizeof(**A));
+    *B = ASSERT_FFTW_MALLOC(nrows * ncols * sizeof(**B));
+    *p = FFTW_PLAN_2D(nrows, ncols, *A, *B, FFTW_FORWARD, FFTW_ESTIMATE);
 }
 
-static void data_free(fftw_complex *A, fftw_complex *B, fftw_plan p)
+static void data_free(FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B, FFTW_PLAN_T p)
 {
-    fftw_destroy_plan(p);
-    fftw_free(B);
-    fftw_free(A);
+    FFTW_PLAN_DESTROY(p);
+    FFTW_FREE(B);
+    FFTW_FREE(A);
 }
 
 static void fft_2d(size_t nrows, size_t ncols)
 {
-    fftw_complex *mat_in, *mat_out;
-    fftw_plan p;
+    FFTW_COMPLEX_T *mat_in, *mat_out;
+    FFTW_PLAN_T p;
     data_alloc(&mat_in, &mat_out, &p, nrows, ncols);
     // Populate input with random data
-    fill_rand_fftw_complex(mat_in, nrows * ncols);
-    fftw_execute(p);
+    FILL_RAND(mat_in, nrows * ncols);
+    FFTW_EXECUTE(p);
     data_free(mat_in, mat_out, p);
 }
 

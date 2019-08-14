@@ -95,6 +95,8 @@ if(FFTWF_FOUND)
 
   add_exec_fftwf(fft-ct-fftwf_complex-naive fft-ct.c "-DUSE_FFTWF_NAIVE")
   add_exec_fftwf(fft-ct-fftwf_complex-blocked fft-ct.c "-DUSE_FFTWF_BLOCKED")
+
+  add_exec_fftwf(fft-2d-fftwf_complex-fftw fft-2d.c "-DUSE_FFTWF")
 endif(FFTWF_FOUND)
 
 # Use FFTW library
@@ -140,6 +142,8 @@ if(MKL_FOUND)
   endfunction(add_exec_mkl_fftwf)
 
   add_exec_mkl_fftwf(transp-fftwf_complex-naive-mkl-fftw transp.c "-DUSE_FFTWF_NAIVE")
+
+  add_exec_mkl_fftwf(fft-2d-fftwf_complex-mkl-fftw fft-2d.c "-DUSE_FFTWF")
 endif(MKL_FOUND)
 if(MKL_FOUND)
   function(add_exec_mkl_fftw name main definitions)
