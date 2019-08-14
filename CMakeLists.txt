@@ -17,11 +17,19 @@ find_package(Threads)
 
 find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
+  # FFTW3 single precision
+  pkg_check_modules(FFTWF fftw3f)
+  if(FFTWF_FOUND)
+    include_directories(${FFTWF_INCLUDE_DIRS})
+  endif(FFTWF_FOUND)
+
+  # FFTW3 double precision
   pkg_check_modules(FFTW fftw3)
   if(FFTW_FOUND)
     include_directories(${FFTW_INCLUDE_DIRS})
   endif(FFTW_FOUND)
 
+  # Intel MKL
   pkg_check_modules(MKL mkl-static-ilp64-seq)
   if(MKL_FOUND)
     include_directories(${MKL_INCLUDE_DIRS})
@@ -73,6 +81,18 @@ if(Threads_FOUND)
   add_exec_threads(transp-double-threads-col transp.c "-DUSE_DOUBLE_THREADS_COL")
 endif(Threads_FOUND)
 
+# Use FFTWF library
+if(FFTWF_FOUND)
+  function(add_exec_fftwf name main definitions)
+    add_executable(${name} ${main} ptime.c transpose.c transpose-fftwf.c
+                                   util.c util-fftwf.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+  endfunction(add_exec_fftwf)
+
+  add_exec_fftwf(transp-fftwf_complex-naive transp.c "-DUSE_FFTWF_NAIVE")
+endif(FFTWF_FOUND)
+
 # Use FFTW library
 if(FFTW_FOUND)
   function(add_exec_fftw name main definitions)
@@ -82,7 +102,6 @@ if(FFTW_FOUND)
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
   endfunction(add_exec_fftw)
 
-  add_exec_fftw(transp-fftwf_complex-naive transp.c "-DUSE_FFTWF_NAIVE")
   add_exec_fftw(transp-fftw_complex-naive transp.c "-DUSE_FFTW_NAIVE")
 
   add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "")
@@ -105,6 +124,16 @@ if(MKL_FOUND)
 endif(MKL_FOUND)
 
 # Use MKL library implementations of the FFTW interface
+if(MKL_FOUND)
+  function(add_exec_mkl_fftwf name main definitions)
+    add_executable(${name} ${main} ptime.c transpose.c transpose-fftwf.c
+                                   util.c util-fftwf.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${MKL_LDFLAGS})
+  endfunction(add_exec_mkl_fftwf)
+
+  add_exec_mkl_fftwf(transp-fftwf_complex-naive-mkl-fftw transp.c "-DUSE_FFTWF_NAIVE")
+endif(MKL_FOUND)
 if(MKL_FOUND)
   function(add_exec_mkl_fftw name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c

@@ -44,7 +44,12 @@
 #define _USE_TRANSP_THREADS 1
 #endif
 
-#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTW_NAIVE)
+#if defined(USE_FFTWF_NAIVE)
+#include <fftw3.h>
+#include "transpose-fftwf.h"
+#include "util-fftwf.h"
+#endif
+#if defined(USE_FFTW_NAIVE)
 #include <fftw3.h>
 #include "transpose-fftw.h"
 #include "util-fftw.h"
@@ -301,7 +306,7 @@ int main(int argc, char **argv)
                     fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_col,
                     is_eq_dbl);
 #elif defined(USE_FFTWF_NAIVE)
-    TRANSP(fftwf_complex, assert_fftw_malloc, fftw_free,
+    TRANSP(fftwf_complex, assert_fftwf_malloc, fftwf_free,
            fill_rand_fftwf_complex, matrix_print_fftwf_complex,
            transpose_fftwf_complex_naive, is_eq_fftwf_complex);
 #elif defined(USE_FFTW_NAIVE)
