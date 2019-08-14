@@ -76,7 +76,8 @@ endif(Threads_FOUND)
 # Use FFTW library
 if(FFTW_FOUND)
   function(add_exec_fftw name main definitions)
-    add_executable(${name} ${main} ptime.c transpose-fftw.c util.c util-fftw.c)
+    add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c
+                                   util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
   endfunction(add_exec_fftw)
@@ -106,7 +107,8 @@ endif(MKL_FOUND)
 # Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
   function(add_exec_mkl_fftw name main definitions)
-    add_executable(${name} ${main} ptime.c transpose-fftw.c util.c util-fftw.c)
+    add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c
+                                   util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${MKL_LDFLAGS})
   endfunction(add_exec_mkl_fftw)

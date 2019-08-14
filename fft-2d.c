@@ -6,6 +6,7 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-07-24
  */
+#include <complex.h>
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>

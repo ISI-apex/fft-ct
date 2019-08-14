@@ -7,15 +7,16 @@
 #ifndef TRANSPOSE_FFTW_H
 #define TRANSPOSE_FFTW_H
 
+#include <complex.h>
 #include <stdlib.h>
 
 #include <fftw3.h>
 
-void transpose_fftwf_complex_naive(fftwf_complex* restrict A,
+void transpose_fftwf_complex_naive(const fftwf_complex* restrict A,
                                    fftwf_complex* restrict B,
                                    size_t A_rows, size_t A_cols);
 
-void transpose_fftw_complex_naive(fftw_complex* restrict A,
+void transpose_fftw_complex_naive(const fftw_complex* restrict A,
                                   fftw_complex* restrict B,
                                   size_t A_rows, size_t A_cols);
 

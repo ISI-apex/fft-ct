@@ -6,14 +6,6 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-07-24
  */
-
-// fftw3.h _must_ be included before complex.h (at least for now)
-#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTW_NAIVE)
-#include <fftw3.h>
-#include "transpose-fftw.h"
-#include "util-fftw.h"
-#endif
-
 #include <complex.h>
 #include <errno.h>
 #include <getopt.h>
@@ -50,6 +42,12 @@
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
 #define _USE_TRANSP_THREADS 1
+#endif
+
+#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTW_NAIVE)
+#include <fftw3.h>
+#include "transpose-fftw.h"
+#include "util-fftw.h"
 #endif
 
 #if defined(USE_MKL_FLOAT) || defined(USE_MKL_DOUBLE) || \
