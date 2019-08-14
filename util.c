@@ -28,12 +28,12 @@ double rand_dbl(void)
 
 float complex rand_flt_cmplx(void)
 {
-    return rand_flt() + (rand_flt() * I);
+    return CMPLXF(rand_flt(), rand_flt());
 }
 
 double complex rand_dbl_cmplx(void)
 {
-    return rand_dbl() + (rand_dbl() * I);
+    return CMPLX(rand_dbl(), rand_dbl());
 }
 
 #define FILL_RAND(a, len, fn_rand) \
