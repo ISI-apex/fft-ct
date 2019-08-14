@@ -200,10 +200,9 @@ static const struct option opts_long[] = {
     {0, 0, 0, 0}
 };
 
-int main(int argc, char **argv)
+static void parse_args(int argc, char **argv)
 {
     int c;
-
     while ((c = getopt_long(argc, argv, opts_short, opts_long, NULL)) != -1) {
         switch (c) {
         case 'r':
@@ -258,7 +257,11 @@ int main(int argc, char **argv)
         usage(argv[0], EINVAL);
     }
 #endif
+}
 
+int main(int argc, char **argv)
+{
+    parse_args(argc, argv);
 #if defined(USE_FLOAT_NAIVE)
     TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_naive, is_eq_flt);
