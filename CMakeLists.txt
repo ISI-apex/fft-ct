@@ -220,6 +220,8 @@ if(ENABLE_AVX)
 
   # add_exec_avx(transp-float-avx-intr-8x8 transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
   add_exec_avx(transp-double-avx-intr-8x8 transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
+  add_exec_avx(transp-double-avx-intr-8x8-ss transp.c
+               "-DUSE_DOUBLE_AVX_INTR_8X8;-DUSE_AVX_STREAMING_STORES")
 endif(ENABLE_AVX)
 
 # Use threads with intrinsic AVX
