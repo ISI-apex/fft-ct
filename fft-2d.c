@@ -15,6 +15,8 @@
 
 #include <fftw3.h>
 
+#include "ptime.h"
+
 #if defined(USE_FFTWF)
 #include "util-fftwf.h"
 typedef fftwf_complex       FFTW_COMPLEX_T;
@@ -37,6 +39,12 @@ typedef fftw_plan           FFTW_PLAN_T;
 #define FILL_RAND           fill_rand_fftw_complex
 #endif
 
+static struct timespec t1;
+static struct timespec t2;
+
+#define PRINT_ELAPSED_TIME(prefix, t1, t2) \
+    printf("%s (ms): %f\n", prefix, ptime_elapsed_ns(t1, t2) / 1000000.0);
+
 static void data_alloc(FFTW_COMPLEX_T **A, FFTW_COMPLEX_T **B, FFTW_PLAN_T *p,
                        size_t nrows, size_t ncols)
 {
@@ -57,9 +65,18 @@ static void fft_2d(size_t nrows, size_t ncols)
     FFTW_COMPLEX_T *mat_in, *mat_out;
     FFTW_PLAN_T p;
     data_alloc(&mat_in, &mat_out, &p, nrows, ncols);
+
     // Populate input with random data
+    ptime_gettime_monotonic(&t1);
     FILL_RAND(mat_in, nrows * ncols);
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("fill", &t1, &t2);
+
+    ptime_gettime_monotonic(&t1);
     FFTW_EXECUTE(p);
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("fft-2d", &t1, &t2);
+
     data_free(mat_in, mat_out, p);
 }
 
