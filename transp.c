@@ -26,12 +26,12 @@
     defined(USE_DOUBLE_BLOCKED) || \
     defined(USE_FLOAT_COMPLEX_BLOCKED) || \
     defined(USE_DOUBLE_COMPLEX_BLOCKED) || \
+    defined(USE_FLOAT_THREADS_ROW_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_ROW_BLOCKED) || \
+    defined(USE_FLOAT_THREADS_COL_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_COL_BLOCKED) || \
     defined(USE_FFTWF_BLOCKED) || \
-    defined(USE_FFTW_BLOCKED) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+    defined(USE_FFTW_BLOCKED)
 #define _USE_TRANSP_BLOCKED 1
 #endif
 
@@ -39,10 +39,12 @@
     defined(USE_DOUBLE_THREADS_ROW) || \
     defined(USE_FLOAT_THREADS_COL) || \
     defined(USE_DOUBLE_THREADS_COL) || \
+    defined(USE_FLOAT_THREADS_ROW_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_ROW_BLOCKED) || \
+    defined(USE_FLOAT_THREADS_COL_BLOCKED) || \
+    defined(USE_DOUBLE_THREADS_COL_BLOCKED) || \
     defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED) || \
-    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
+    defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL)
 #define _USE_TRANSP_THREADS 1
 #endif
 
@@ -144,6 +146,13 @@ static int rc = 0;
                         fn_transp, fn_is_eq) { \
     TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print); \
     fn_transp(A, B, nrows, ncols, nthreads); \
+    TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free); \
+}
+
+#define TRANSP_THREADED_BLOCKED(datatype, fn_malloc, fn_free, fn_fill, \
+                                fn_mat_print, fn_transp, fn_is_eq) { \
+    TRANSP_SETUP(datatype, fn_malloc, fn_fill, fn_mat_print); \
+    fn_transp(A, B, nrows, ncols, nthreads, nblkrows, nblkcols); \
     TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free); \
 }
 
@@ -307,6 +316,22 @@ int main(int argc, char **argv)
     TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_col,
                     is_eq_dbl);
+#elif defined(USE_FLOAT_THREADS_ROW_BLOCKED)
+    TRANSP_THREADED_BLOCKED(float, assert_malloc_al, free,
+                            fill_rand_flt, matrix_print_flt,
+                            transpose_flt_threads_row_blocked, is_eq_flt);
+#elif defined(USE_DOUBLE_THREADS_ROW_BLOCKED)
+    TRANSP_THREADED_BLOCKED(double, assert_malloc_al, free,
+                            fill_rand_dbl, matrix_print_dbl,
+                            transpose_dbl_threads_row_blocked, is_eq_dbl);
+#elif defined(USE_FLOAT_THREADS_COL_BLOCKED)
+    TRANSP_THREADED_BLOCKED(float, assert_malloc_al, free,
+                            fill_rand_flt, matrix_print_flt,
+                            transpose_flt_threads_col_blocked, is_eq_flt);
+#elif defined(USE_DOUBLE_THREADS_COL_BLOCKED)
+    TRANSP_THREADED_BLOCKED(double, assert_malloc_al, free,
+                            fill_rand_dbl, matrix_print_dbl,
+                            transpose_dbl_threads_col_blocked, is_eq_dbl);
 #elif defined(USE_FFTWF_NAIVE)
     TRANSP(fftwf_complex, assert_fftwf_malloc, fftwf_free,
            fill_rand_fftwf_complex, matrix_print_fftwf_complex,
@@ -345,17 +370,13 @@ int main(int argc, char **argv)
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx_intr_8x8,
            is_eq_dbl);
 #elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW)
-    // TODO
-    return ENOTSUP;
+    TRANSP_THREADED(double, assert_malloc_al, free,
+                    fill_rand_dbl, matrix_print_dbl,
+                    transpose_dbl_threads_avx_intr_8x8_row, is_eq_dbl);
 #elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL)
-    // TODO
-    return ENOTSUP;
-#elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED)
-    // TODO
-    return ENOTSUP;
-#elif defined(USE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED)
-    // TODO
-    return ENOTSUP;
+    TRANSP_THREADED(double, assert_malloc_al, free,
+                    fill_rand_dbl, matrix_print_dbl,
+                    transpose_dbl_threads_avx_intr_8x8_col, is_eq_dbl);
 #else
     #error "No matching transpose implementation found!"
 #endif

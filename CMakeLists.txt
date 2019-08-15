@@ -91,6 +91,15 @@ if(Threads_FOUND)
   add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DOUBLE_THREADS_ROW")
   add_exec_threads(transp-flt-thrcol transp.c "-DUSE_FLOAT_THREADS_COL")
   add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DOUBLE_THREADS_COL")
+
+  add_exec_threads(transp-flt-thrrow-blocked transp.c
+                   "-DUSE_FLOAT_THREADS_ROW_BLOCKED")
+  add_exec_threads(transp-dbl-thrrow-blocked transp.c
+                   "-DUSE_DOUBLE_THREADS_ROW_BLOCKED")
+  add_exec_threads(transp-flt-thrcol-blocked transp.c
+                   "-DUSE_FLOAT_THREADS_COL_BLOCKED")
+  add_exec_threads(transp-dbl-thrcol-blocked transp.c
+                   "-DUSE_DOUBLE_THREADS_COL_BLOCKED")
 endif(Threads_FOUND)
 
 # Use FFTWF library
@@ -241,7 +250,8 @@ endif(ENABLE_AVX)
 # Use threads with intrinsic AVX
 if(Threads_FOUND AND ENABLE_AVX)
   function(add_exec_threads_avx name main definitions)
-    add_executable(${name} ${main} ptime.c transpose.c transpose-avx.c util.c)
+    add_executable(${name} ${main} ptime.c transpose.c transpose-threads-avx.c
+                                   util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
@@ -252,8 +262,4 @@ if(Threads_FOUND AND ENABLE_AVX)
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW")
   add_exec_threads_avx(transp-dbl-thrcol-avx-intr transp.c
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL")
-  add_exec_threads_avx(transp-dbl-thrrow-blocked-avx-intr transp.c
-                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED")
-  add_exec_threads_avx(transp-dbl-thrcol-blocked-avx-intr transp.c
-                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED")
 endif(Threads_FOUND AND ENABLE_AVX)
