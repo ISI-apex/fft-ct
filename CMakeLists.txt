@@ -47,25 +47,37 @@ endif(HAVE_ALIGNED_ALLOC)
 
 # Binaries
 
-# Name format: ${prog}-${datatype}-{impl}
-# datatype is probably one of:
-# [float, double, fftw_complex, MKL_Complex8, MKL_Complex16]
-# impl is probably one or more of:
-# [naive, blocked, mkl, mkl-fftw, pthread]
+# Name format: ${prog}-${datatype}-{algo}[-{lib}]
+# 'prog' is probably one of:
+#   transp, fft-ct, fft-2d
+# 'datatype' is probably one of:
+#   flt (float), dbl (double), fcmplx (float complex), dcmplx (double complex),
+#   fftw (fftw_complex), fftwf (fftwf_complex),
+#   cmplx8 (MKL_Complex8), cmplx16 (MKL_Complex16)
+# 'algo' is probably one of:
+#   naive, blocked,
+#   thr{row,col} (thread-by-{row,column})
+#   lib (library-defined),
+#   avx-auto (AVX-512 automatic), blocked-avx-auto (blocked AVX-512 automatic),
+#   avx-intr[-ss] (AVX-512 intrinsics [with streaming stores]),
+#   thr{row,col}[-blocked]-avx-intr (threaded-by-{row,column} [blocked] AVX-512 intrinsics)
+# 'lib' is probably one of:
+#   lfftw, lmkl
 
 function(add_exec_prim name main definitions)
   add_executable(${name} ${main} ptime.c transpose.c util.c)
   target_compile_definitions(${name} PRIVATE ${definitions})
 endfunction(add_exec_prim)
 
-add_exec_prim(transp-float-naive transp.c "-DUSE_FLOAT_NAIVE")
-add_exec_prim(transp-double-naive transp.c "-DUSE_DOUBLE_NAIVE")
-add_exec_prim(transp-complex-naive transp.c "-DUSE_FLOAT_COMPLEX_NAIVE")
-add_exec_prim(transp-double-complex-naive transp.c "-DUSE_DOUBLE_COMPLEX_NAIVE")
-add_exec_prim(transp-float-blocked transp.c "-DUSE_FLOAT_BLOCKED")
-add_exec_prim(transp-double-blocked transp.c "-DUSE_DOUBLE_BLOCKED")
-add_exec_prim(transp-complex-blocked transp.c "-DUSE_FLOAT_COMPLEX_BLOCKED")
-add_exec_prim(transp-double-complex-blocked transp.c "-DUSE_DOUBLE_COMPLEX_BLOCKED")
+add_exec_prim(transp-flt-naive transp.c "-DUSE_FLOAT_NAIVE")
+add_exec_prim(transp-dbl-naive transp.c "-DUSE_DOUBLE_NAIVE")
+add_exec_prim(transp-fcmplx-naive transp.c "-DUSE_FLOAT_COMPLEX_NAIVE")
+add_exec_prim(transp-dcmplx-naive transp.c "-DUSE_DOUBLE_COMPLEX_NAIVE")
+
+add_exec_prim(transp-flt-blocked transp.c "-DUSE_FLOAT_BLOCKED")
+add_exec_prim(transp-dbl-blocked transp.c "-DUSE_DOUBLE_BLOCKED")
+add_exec_prim(transp-fcmplx-blocked transp.c "-DUSE_FLOAT_COMPLEX_BLOCKED")
+add_exec_prim(transp-dcmplx-blocked transp.c "-DUSE_DOUBLE_COMPLEX_BLOCKED")
 
 # Use threads
 if(Threads_FOUND)
@@ -75,10 +87,10 @@ if(Threads_FOUND)
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads)
 
-  add_exec_threads(transp-float-threads-row transp.c "-DUSE_FLOAT_THREADS_ROW")
-  add_exec_threads(transp-double-threads-row transp.c "-DUSE_DOUBLE_THREADS_ROW")
-  add_exec_threads(transp-float-threads-col transp.c "-DUSE_FLOAT_THREADS_COL")
-  add_exec_threads(transp-double-threads-col transp.c "-DUSE_DOUBLE_THREADS_COL")
+  add_exec_threads(transp-flt-thrrow transp.c "-DUSE_FLOAT_THREADS_ROW")
+  add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DOUBLE_THREADS_ROW")
+  add_exec_threads(transp-flt-thrcol transp.c "-DUSE_FLOAT_THREADS_COL")
+  add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DOUBLE_THREADS_COL")
 endif(Threads_FOUND)
 
 # Use FFTWF library
@@ -90,13 +102,13 @@ if(FFTWF_FOUND)
     target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
   endfunction(add_exec_fftwf)
 
-  add_exec_fftwf(transp-fftwf_complex-naive transp.c "-DUSE_FFTWF_NAIVE")
-  add_exec_fftwf(transp-fftwf_complex-blocked transp.c "-DUSE_FFTWF_BLOCKED")
+  add_exec_fftwf(transp-fftwf-naive transp.c "-DUSE_FFTWF_NAIVE")
+  add_exec_fftwf(transp-fftwf-blocked transp.c "-DUSE_FFTWF_BLOCKED")
 
-  add_exec_fftwf(fft-ct-fftwf_complex-naive fft-ct.c "-DUSE_FFTWF_NAIVE")
-  add_exec_fftwf(fft-ct-fftwf_complex-blocked fft-ct.c "-DUSE_FFTWF_BLOCKED")
+  add_exec_fftwf(fft-ct-fftwf-naive fft-ct.c "-DUSE_FFTWF_NAIVE")
+  add_exec_fftwf(fft-ct-fftwf-blocked fft-ct.c "-DUSE_FFTWF_BLOCKED")
 
-  add_exec_fftwf(fft-2d-fftwf_complex-fftw fft-2d.c "-DUSE_FFTWF")
+  add_exec_fftwf(fft-2d-fftwf-lib-lfftw fft-2d.c "-DUSE_FFTWF")
 endif(FFTWF_FOUND)
 
 # Use FFTW library
@@ -108,13 +120,13 @@ if(FFTW_FOUND)
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
   endfunction(add_exec_fftw)
 
-  add_exec_fftw(transp-fftw_complex-naive transp.c "-DUSE_FFTW_NAIVE")
-  add_exec_fftw(transp-fftw_complex-blocked transp.c "-DUSE_FFTW_BLOCKED")
+  add_exec_fftw(transp-fftw-naive transp.c "-DUSE_FFTW_NAIVE")
+  add_exec_fftw(transp-fftw-blocked transp.c "-DUSE_FFTW_BLOCKED")
 
-  add_exec_fftw(fft-ct-fftw_complex-naive fft-ct.c "-DUSE_FFTW_NAIVE")
-  add_exec_fftw(fft-ct-fftw_complex-blocked fft-ct.c "-DUSE_FFTW_BLOCKED")
+  add_exec_fftw(fft-ct-fftw-naive fft-ct.c "-DUSE_FFTW_NAIVE")
+  add_exec_fftw(fft-ct-fftw-blocked fft-ct.c "-DUSE_FFTW_BLOCKED")
 
-  add_exec_fftw(fft-2d-fftw_complex-fftw fft-2d.c "")
+  add_exec_fftw(fft-2d-fftw-lib-lfftw fft-2d.c "")
 endif(FFTW_FOUND)
 
 # Use MKL library
@@ -126,13 +138,13 @@ if(MKL_FOUND)
     target_link_libraries(${name} ${MKL_LDFLAGS})
   endfunction(add_exec_mkl)
 
-  add_exec_mkl(transp-float-mkl transp.c "-DUSE_MKL_FLOAT")
-  add_exec_mkl(transp-double-mkl transp.c "-DUSE_MKL_DOUBLE")
-  add_exec_mkl(transp-cmplx8-mkl transp.c "-DUSE_MKL_CMPLX8")
-  add_exec_mkl(transp-cmplx16-mkl transp.c "-DUSE_MKL_CMPLX16")
+  add_exec_mkl(transp-flt-lib-lmkl transp.c "-DUSE_MKL_FLOAT")
+  add_exec_mkl(transp-dbl-lib-lmkl transp.c "-DUSE_MKL_DOUBLE")
+  add_exec_mkl(transp-cmplx8-lib-lmkl transp.c "-DUSE_MKL_CMPLX8")
+  add_exec_mkl(transp-cmplx16-lib-lmkl transp.c "-DUSE_MKL_CMPLX16")
 endif(MKL_FOUND)
 
-# Use MKL library implementations of the FFTW interface
+# Use MKL library implementations of the FFTWF interface
 if(MKL_FOUND)
   function(add_exec_mkl_fftwf name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftwf.c
@@ -141,14 +153,16 @@ if(MKL_FOUND)
     target_link_libraries(${name} ${MKL_LDFLAGS})
   endfunction(add_exec_mkl_fftwf)
 
-  add_exec_mkl_fftwf(transp-fftwf_complex-naive-mkl-fftw transp.c "-DUSE_FFTWF_NAIVE")
-  add_exec_mkl_fftwf(transp-fftwf_complex-blocked-mkl-fftw transp.c "-DUSE_FFTWF_BLOCKED")
+  add_exec_mkl_fftwf(transp-fftwf-naive-lmkl transp.c "-DUSE_FFTWF_NAIVE")
+  add_exec_mkl_fftwf(transp-fftwf-blocked-lmkl transp.c "-DUSE_FFTWF_BLOCKED")
 
-  add_exec_mkl_fftwf(fft-ct-fftwf_complex-naive-mkl-fftw fft-ct.c "-DUSE_FFTWF_NAIVE")
-  add_exec_mkl_fftwf(fft-ct-fftwf_complex-blocked-mkl-fftw fft-ct.c "-DUSE_FFTWF_BLOCKED")
+  add_exec_mkl_fftwf(fft-ct-fftwf-naive-lmkl fft-ct.c "-DUSE_FFTWF_NAIVE")
+  add_exec_mkl_fftwf(fft-ct-fftwf-blocked-lmkl fft-ct.c "-DUSE_FFTWF_BLOCKED")
 
-  add_exec_mkl_fftwf(fft-2d-fftwf_complex-mkl-fftw fft-2d.c "-DUSE_FFTWF")
+  add_exec_mkl_fftwf(fft-2d-fftwf-lib-lmkl fft-2d.c "-DUSE_FFTWF")
 endif(MKL_FOUND)
+
+# Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
   function(add_exec_mkl_fftw name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c
@@ -157,13 +171,13 @@ if(MKL_FOUND)
     target_link_libraries(${name} ${MKL_LDFLAGS})
   endfunction(add_exec_mkl_fftw)
 
-  add_exec_mkl_fftw(transp-fftw_complex-naive-mkl-fftw transp.c "-DUSE_FFTW_NAIVE")
-  add_exec_mkl_fftw(transp-fftw_complex-blocked-mkl-fftw transp.c "-DUSE_FFTW_BLOCKED")
+  add_exec_mkl_fftw(transp-fftw-naive-lmkl transp.c "-DUSE_FFTW_NAIVE")
+  add_exec_mkl_fftw(transp-fftw-blocked-lmkl transp.c "-DUSE_FFTW_BLOCKED")
 
-  add_exec_mkl_fftw(fft-ct-fftw_complex-naive-mkl-fftw fft-ct.c "-DUSE_FFTW_NAIVE")
-  add_exec_mkl_fftw(fft-ct-fftw_complex-blocked-mkl-fftw fft-ct.c "-DUSE_FFTW_BLOCKED")
+  add_exec_mkl_fftw(fft-ct-fftw-naive-lmkl fft-ct.c "-DUSE_FFTW_NAIVE")
+  add_exec_mkl_fftw(fft-ct-fftw-blocked-lmkl fft-ct.c "-DUSE_FFTW_BLOCKED")
 
-  add_exec_mkl_fftw(fft-2d-fftw_complex-mkl-fftw fft-2d.c "")
+  add_exec_mkl_fftw(fft-2d-fftw-lib-lmkl fft-2d.c "")
 endif(MKL_FOUND)
 
 # A primitive approach for setting user-specified or default AVX compile flags
@@ -213,14 +227,14 @@ if(ENABLE_AVX)
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
   endfunction(add_exec_avx)
 
-  add_exec_avx(transp-float-avx-auto transp.c "-DUSE_FLOAT_NAIVE")
-  add_exec_avx(transp-double-avx-auto transp.c "-DUSE_DOUBLE_NAIVE")
-  add_exec_avx(transp-float-blocked-avx-auto transp.c "-DUSE_FLOAT_BLOCKED")
-  add_exec_avx(transp-double-blocked-avx-auto transp.c "-DUSE_DOUBLE_BLOCKED")
+  add_exec_avx(transp-flt-avx-auto transp.c "-DUSE_FLOAT_NAIVE")
+  add_exec_avx(transp-dbl-avx-auto transp.c "-DUSE_DOUBLE_NAIVE")
+  add_exec_avx(transp-flt-blocked-avx-auto transp.c "-DUSE_FLOAT_BLOCKED")
+  add_exec_avx(transp-dbl-blocked-avx-auto transp.c "-DUSE_DOUBLE_BLOCKED")
 
-  # add_exec_avx(transp-float-avx-intr-8x8 transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
-  add_exec_avx(transp-double-avx-intr-8x8 transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
-  add_exec_avx(transp-double-avx-intr-8x8-ss transp.c
+  # add_exec_avx(transp-flt-avx-intr transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
+  add_exec_avx(transp-dbl-avx-intr transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
+  add_exec_avx(transp-dbl-avx-intr-ss transp.c
                "-DUSE_DOUBLE_AVX_INTR_8X8;-DUSE_AVX_STREAMING_STORES")
 endif(ENABLE_AVX)
 
@@ -234,12 +248,12 @@ if(Threads_FOUND AND ENABLE_AVX)
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads_avx)
 
-  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-row transp.c
+  add_exec_threads_avx(transp-dbl-thrrow-avx-intr transp.c
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW")
-  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-col transp.c
+  add_exec_threads_avx(transp-dbl-thrcol-avx-intr transp.c
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL")
-  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-row-blocked transp.c
+  add_exec_threads_avx(transp-dbl-thrrow-blocked-avx-intr transp.c
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW_BLOCKED")
-  add_exec_threads_avx(transp-double-threads-avx-intr-8x8-col-blocked transp.c
+  add_exec_threads_avx(transp-dbl-thrcol-blocked-avx-intr transp.c
                        "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL_BLOCKED")
 endif(Threads_FOUND AND ENABLE_AVX)

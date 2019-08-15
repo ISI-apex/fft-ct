@@ -47,7 +47,7 @@ In this benchmark, a transpose is always performed.
 
 These templates are used to generate benchmarks supporting a variety of data
 types and transpose implementations using different algorithms and library APIs.
-Benchmark names are generally in the form `${prog}-${datatype}-{algo/impl}`.
+Benchmark names are generally in the form `${prog}-${datatype}-{algo}[-{lib}]`.
 
 Benchmarks require specifying, at a minimum, the matrix row and column count.
 E.g., to transpose a 2048x4096 matrix:
