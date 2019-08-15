@@ -82,11 +82,8 @@ static bool do_print = false;
 static bool do_verify = false;
 static int rc = 0;
 
-#define PRINT_ELAPSED_MS(prefix) { \
-    double elapsed_ms = (t2.tv_sec - t1.tv_sec) * 1000.0 + \
-                        (t2.tv_nsec - t1.tv_nsec) / 1000000.0; \
-    printf("%s (ms): %f\n", prefix, elapsed_ms); \
-}
+#define PRINT_ELAPSED_TIME(prefix, t1, t2) \
+    printf("%s (ms): %f\n", prefix, ptime_elapsed_ns(t1, t2) / 1000000.0);
 
 #define VERIFY_TRANSPOSE(A, B, fn_is_eq) { \
     size_t r, c; \
@@ -103,19 +100,19 @@ static int rc = 0;
     ptime_gettime_monotonic(&t1); \
     fn_fill(A, nrows * ncols); \
     ptime_gettime_monotonic(&t2); \
-    PRINT_ELAPSED_MS("fill"); \
+    PRINT_ELAPSED_TIME("fill", &t1, &t2); \
     if (do_print) { \
         ptime_gettime_monotonic(&t1); \
         printf("In:\n"); \
         fn_mat_print(A, nrows, ncols); \
         ptime_gettime_monotonic(&t2); \
-        PRINT_ELAPSED_MS("print"); \
+        PRINT_ELAPSED_TIME("print", &t1, &t2); \
     } \
     ptime_gettime_monotonic(&t1);
 
 #define TRANSP_TEARDOWN(A, B, fn_mat_print, fn_is_eq, fn_free) \
     ptime_gettime_monotonic(&t2); \
-    PRINT_ELAPSED_MS("transpose"); \
+    PRINT_ELAPSED_TIME("transpose", &t1, &t2); \
     if (do_print) { \
         printf("Out:\n"); \
         fn_mat_print(B, ncols, nrows); \
@@ -124,7 +121,7 @@ static int rc = 0;
         ptime_gettime_monotonic(&t1); \
         VERIFY_TRANSPOSE(A, B, fn_is_eq); \
         ptime_gettime_monotonic(&t2); \
-        PRINT_ELAPSED_MS("verify"); \
+        PRINT_ELAPSED_TIME("verify", &t1, &t2); \
     } \
     fn_free(B); \
     fn_free(A);
