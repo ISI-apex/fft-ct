@@ -133,7 +133,7 @@ void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
             s7 = _mm512_permutex2var_pd(r7, idx_4x4_1, r3);
 
             // write back 8x8 block of write array
-#ifdef USE_AVX_STREAMING_STORES
+#if defined(USE_AVX_STREAMING_STORES)
             _mm512_stream_pd(&B_block[0], s0);
             _mm512_stream_pd(&B_block[A_rows], s1);
             _mm512_stream_pd(&B_block[2*A_rows], s2);
