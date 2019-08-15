@@ -56,11 +56,11 @@ endif(HAVE_ALIGNED_ALLOC)
 #   cmplx8 (MKL_Complex8), cmplx16 (MKL_Complex16)
 # 'algo' is probably one of:
 #   naive, blocked,
-#   thr{row,col} (thread-by-{row,column})
+#   thr{row,col}[-blocked] (thread-by-{row,column} [and blocked]),
 #   lib (library-defined),
-#   avx-auto (AVX-512 automatic), blocked-avx-auto (blocked AVX-512 automatic),
+#   [blocked-]avx-auto ([blocked] AVX-512 automatic),
 #   avx-intr[-ss] (AVX-512 intrinsics [with streaming stores]),
-#   thr{row,col}[-blocked]-avx-intr (threaded-by-{row,column} [blocked] AVX-512 intrinsics)
+#   thr{row,col}-avx-intr (threaded-by-{row,column} AVX-512 intrinsics)
 # 'lib' is probably one of:
 #   lfftw, lmkl
 
