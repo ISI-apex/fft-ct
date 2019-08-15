@@ -104,3 +104,16 @@ int ptime_gettime_monotonic(struct timespec *ts) {
   return clock_gettime(PTIME_CLOCKID_T_MONOTONIC, ts);
 #endif
 }
+
+int64_t ptime_elapsed_ns(const struct timespec *t1, const struct timespec *t2) {
+  return ((t2->tv_sec - t1->tv_sec) * (int64_t) 1000000000) +
+         (t2->tv_nsec - t1->tv_nsec);
+}
+
+int64_t ptime_elapsed_us(const struct timespec *t1, const struct timespec *t2) {
+  return ptime_elapsed_ns(t1, t2) / 1000;
+}
+
+int64_t ptime_elapsed_ms(const struct timespec *t1, const struct timespec *t2) {
+  return ptime_elapsed_ns(t1, t2) / 1000000;
+}
