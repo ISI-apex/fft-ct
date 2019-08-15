@@ -15,6 +15,8 @@
 
 #include <fftw3.h>
 
+#include "ptime.h"
+
 #if defined(USE_FFTWF_NAIVE) || defined(USE_FFTWF_BLOCKED)
 #include "transpose-fftwf.h"
 #include "util-fftwf.h"
@@ -45,11 +47,16 @@ typedef fftw_plan           FFTW_PLAN_T;
 
 static size_t nrows = 0;
 static size_t ncols = 0;
+static struct timespec t1;
+static struct timespec t2;
 
 #if defined(_USE_TRANSP_BLOCKED)
 static size_t nblkrows = 0;
 static size_t nblkcols = 0;
 #endif
+
+#define PRINT_ELAPSED_TIME(prefix, t1, t2) \
+    printf("%s (ms): %f\n", prefix, ptime_elapsed_ns(t1, t2) / 1000000.0);
 
 static void data_alloc(FFTW_COMPLEX_T **A, FFTW_COMPLEX_T **B, FFTW_PLAN_T **p,
                        size_t r, size_t c)
@@ -80,12 +87,17 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
                           FFTW_COMPLEX_T *fft1_out, FFTW_COMPLEX_T *fft2_in)
 {
     size_t i;
+
     // Perform first set of 1D FFTs
+    ptime_gettime_monotonic(&t1);
     for (i = 0; i < nrows; i++) {
         FFTW_EXECUTE(p1[i]);
     }
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("fft-1d-1", &t1, &t2);
 
     // Matrix transpose
+    ptime_gettime_monotonic(&t1);
 #if defined(USE_FFTWF_NAIVE)
     transpose_fftwf_complex_naive(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTWF_BLOCKED)
@@ -99,11 +111,16 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
 #else
     #error "No matching transpose implementation found!"
 #endif
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("transpose", &t1, &t2);
 
+    ptime_gettime_monotonic(&t1);
     // Perform second set of 1D FFTs
     for (i = 0; i < ncols; i++) {
         FFTW_EXECUTE(p2[i]);
     }
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("fft-1d-2", &t1, &t2);
 }
 
 static void fft_ct_1d(void)
@@ -116,7 +133,10 @@ static void fft_ct_1d(void)
     data_alloc(&mat_fft2_in, &mat_fft2_out, &p_fft2, ncols, nrows);
 
     // Populate input with random data
+    ptime_gettime_monotonic(&t1);
     FILL_RAND(mat_fft1_in, nrows * ncols);
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("fill", &t1, &t2);
 
     // Execute FFT 1 -> Transpose -> FFT2
     fft_tr_fft_1d(p_fft1, p_fft2, mat_fft1_out, mat_fft2_in);
