@@ -47,7 +47,7 @@ endif(HAVE_ALIGNED_ALLOC)
 
 # Binaries
 
-# Name format: ${prog}-${datatype}-{algo}[-{lib}]
+# Name format: ${prog}-${datatype}-${algo}[-${lib}]
 # 'prog' is probably one of:
 #   transp, fft-ct, fft-2d
 # 'datatype' is probably one of:
@@ -204,13 +204,19 @@ if(ENABLE_AVX AND NOT C_FLAGS_AVX)
   message("--   Defaulting to AVX-512 for Skylake...")
   # TODO: Does specifying optimization level conflict with CMAKE_BUILD_TYPE?
   #       Certain per-compiler levels are needed for automatic vectorization.
-  if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU" OR
-     "${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+  if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
     if(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
       message(FATAL_ERROR "GNU C compiler version is too old for AVX-512: "
                           "${CMAKE_C_COMPILER_VERSION} < 5.0\n"
                           "Set option: ENABLE_AVX=OFF")
     endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
+    set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
+  elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+    if(CMAKE_C_COMPILER_VERSION VERSION_LESS 3.9.1)
+      message(FATAL_ERROR "Clang compiler version is too old for AVX-512: "
+                          "${CMAKE_C_COMPILER_VERSION} < 3.9.1\n"
+                          "Set option: ENABLE_AVX=OFF")
+    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 3.9.1)
     set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
   elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Intel")
     if(CMAKE_C_COMPILER_VERSION VERSION_LESS 15.0.1)
