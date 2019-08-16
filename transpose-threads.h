@@ -28,34 +28,26 @@ void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
 
 void transpose_flt_threads_row_blocked(const float* restrict A,
                                        float* restrict B,
-                                       size_t A_rows,
-                                       size_t A_cols,
+                                       size_t A_rows, size_t A_cols,
                                        size_t num_thr,
-                                       size_t blk_rows,
-                                       size_t blk_cols);
+                                       size_t blk_rows, size_t blk_cols);
 
 void transpose_dbl_threads_row_blocked(const double* restrict A,
                                        double* restrict B,
-                                       size_t A_rows,
-                                       size_t A_cols,
+                                       size_t A_rows, size_t A_cols,
                                        size_t num_thr,
-                                       size_t blk_rows,
-                                       size_t blk_cols);
+                                       size_t blk_rows, size_t blk_cols);
 
 void transpose_flt_threads_col_blocked(const float* restrict A,
                                        float* restrict B,
-                                       size_t A_rows,
-                                       size_t A_cols,
+                                       size_t A_rows, size_t A_cols,
                                        size_t num_thr,
-                                       size_t blk_rows,
-                                       size_t blk_cols);
+                                       size_t blk_rows, size_t blk_cols);
 
 void transpose_dbl_threads_col_blocked(const double* restrict A,
                                        double* restrict B,
-                                       size_t A_rows,
-                                       size_t A_cols,
+                                       size_t A_rows, size_t A_cols,
                                        size_t num_thr,
-                                       size_t blk_rows,
-                                       size_t blk_cols);
+                                       size_t blk_rows, size_t blk_cols);
 
 #endif /* TRANSPOSE_THREADS_H */
