@@ -22,6 +22,20 @@
 void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
                                 size_t A_rows, size_t A_cols)
 {
+    // used for swapping 2x2 blocks using _mm512_permutex2var_pd()
+    static const __m512i idx_2x2_0 = {
+        0x0000, 0x0001, 0x0008, 0x0009, 0x0004, 0x0005, 0x000c, 0x000d
+    };
+    static const __m512i idx_2x2_1 = {
+        0x000a, 0x000b, 0x0002, 0x0003, 0x000e, 0x000f, 0x0006, 0x0007
+    };
+    // used for swapping 4x4 blocks using _mm512_permutex2var_pd()
+    static const __m512i idx_4x4_0 = {
+        0x0000, 0x0001, 0x0002, 0x0003, 0x0008, 0x0009, 0x000a, 0x000b
+    };
+    static const __m512i idx_4x4_1 = {
+        0x000c, 0x000d, 0x000e, 0x000f, 0x0004, 0x0005, 0x0006, 0x0007
+    };
     const double *A_block;
     double *B_block;
     size_t i_min, j_min;
@@ -31,57 +45,12 @@ void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
     // of which hold matrix rows
     __m512d r0, r1, r2, r3, r4, r5, r6, r7;
     __m512d s0, s1, s2, s3, s4, s5, s6, s7;
-    // the following are used to send the "idx" parameter to _mm512_permutex2var_pd
-    uint64_t idx_arr[8];
-    __m512i idx_2x2_0, idx_2x2_1, idx_4x4_0, idx_4x4_1;
 
     assert(A_rows % 8 == 0);
     assert(A_cols % 8 == 0);
 
     num_row_blocks = A_rows / 8;
     num_col_blocks = A_cols / 8;
-
-    // used for swapping 2x2 blocks using _mm512_permutex2var_pd()
-    idx_arr[0] = 0x0000;
-    idx_arr[1] = 0x0001;
-    idx_arr[2] = 0x0008;
-    idx_arr[3] = 0x0009;
-    idx_arr[4] = 0x0004;
-    idx_arr[5] = 0x0005;
-    idx_arr[6] = 0x000c;
-    idx_arr[7] = 0x000d;
-    idx_2x2_0 = _mm512_loadu_si512(&idx_arr);
-
-    idx_arr[0] = 0x000a;
-    idx_arr[1] = 0x000b;
-    idx_arr[2] = 0x0002;
-    idx_arr[3] = 0x0003;
-    idx_arr[4] = 0x000e;
-    idx_arr[5] = 0x000f;
-    idx_arr[6] = 0x0006;
-    idx_arr[7] = 0x0007;
-    idx_2x2_1 = _mm512_loadu_si512(&idx_arr);
-
-    // used for swapping 4x4 blocks using _mm512_permutex2var_pd()
-    idx_arr[0] = 0x0000;
-    idx_arr[1] = 0x0001;
-    idx_arr[2] = 0x0002;
-    idx_arr[3] = 0x0003;
-    idx_arr[4] = 0x0008;
-    idx_arr[5] = 0x0009;
-    idx_arr[6] = 0x000a;
-    idx_arr[7] = 0x000b;
-    idx_4x4_0 = _mm512_loadu_si512(&idx_arr);
-    
-    idx_arr[0] = 0x000c;
-    idx_arr[1] = 0x000d;
-    idx_arr[2] = 0x000e;
-    idx_arr[3] = 0x000f;
-    idx_arr[4] = 0x0004;
-    idx_arr[5] = 0x0005;
-    idx_arr[6] = 0x0006;
-    idx_arr[7] = 0x0007;
-    idx_4x4_1 = _mm512_loadu_si512(&idx_arr);
 
     // perform transpose over all blocks
     for (rblk_num = 0; rblk_num < num_row_blocks; rblk_num++) {
