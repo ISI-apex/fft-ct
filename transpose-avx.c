@@ -43,8 +43,7 @@ void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
     size_t rblk_num, cblk_num;
     // alternate the reads and writes between the r and s vector registers, all
     // of which hold matrix rows
-    __m512d r0, r1, r2, r3, r4, r5, r6, r7;
-    __m512d s0, s1, s2, s3, s4, s5, s6, s7;
+    __m512d r[8], s[8];
 
     assert(A_rows % 8 == 0);
     assert(A_cols % 8 == 0);
@@ -62,64 +61,64 @@ void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
             B_block = &B[j_min * A_rows + i_min];
 
             // read 8x8 block of read array
-            r0 = _mm512_load_pd(&A_block[0]);
-            r1 = _mm512_load_pd(&A_block[A_cols]);
-            r2 = _mm512_load_pd(&A_block[2*A_cols]);
-            r3 = _mm512_load_pd(&A_block[3*A_cols]);
-            r4 = _mm512_load_pd(&A_block[4*A_cols]);
-            r5 = _mm512_load_pd(&A_block[5*A_cols]);
-            r6 = _mm512_load_pd(&A_block[6*A_cols]);
-            r7 = _mm512_load_pd(&A_block[7*A_cols]);
+            r[0] = _mm512_load_pd(&A_block[0]);
+            r[1] = _mm512_load_pd(&A_block[A_cols]);
+            r[2] = _mm512_load_pd(&A_block[2*A_cols]);
+            r[3] = _mm512_load_pd(&A_block[3*A_cols]);
+            r[4] = _mm512_load_pd(&A_block[4*A_cols]);
+            r[5] = _mm512_load_pd(&A_block[5*A_cols]);
+            r[6] = _mm512_load_pd(&A_block[6*A_cols]);
+            r[7] = _mm512_load_pd(&A_block[7*A_cols]);
 
             // shuffle doubles within 128-bit lanes
-            s0 = _mm512_unpacklo_pd(r0, r1);
-            s1 = _mm512_unpackhi_pd(r0, r1);
-            s2 = _mm512_unpacklo_pd(r2, r3);
-            s3 = _mm512_unpackhi_pd(r2, r3);
-            s4 = _mm512_unpacklo_pd(r4, r5);
-            s5 = _mm512_unpackhi_pd(r4, r5);
-            s6 = _mm512_unpacklo_pd(r6, r7);
-            s7 = _mm512_unpackhi_pd(r6, r7);
+            s[0] = _mm512_unpacklo_pd(r[0], r[1]);
+            s[1] = _mm512_unpackhi_pd(r[0], r[1]);
+            s[2] = _mm512_unpacklo_pd(r[2], r[3]);
+            s[3] = _mm512_unpackhi_pd(r[2], r[3]);
+            s[4] = _mm512_unpacklo_pd(r[4], r[5]);
+            s[5] = _mm512_unpackhi_pd(r[4], r[5]);
+            s[6] = _mm512_unpacklo_pd(r[6], r[7]);
+            s[7] = _mm512_unpackhi_pd(r[6], r[7]);
 
             // shuffle 2x2 blocks of doubles
-            r0 = _mm512_permutex2var_pd(s0, idx_2x2_0, s2);
-            r1 = _mm512_permutex2var_pd(s1, idx_2x2_0, s3);
-            r2 = _mm512_permutex2var_pd(s2, idx_2x2_1, s0);
-            r3 = _mm512_permutex2var_pd(s3, idx_2x2_1, s1);
-            r4 = _mm512_permutex2var_pd(s4, idx_2x2_0, s6);
-            r5 = _mm512_permutex2var_pd(s5, idx_2x2_0, s7);
-            r6 = _mm512_permutex2var_pd(s6, idx_2x2_1, s4);
-            r7 = _mm512_permutex2var_pd(s7, idx_2x2_1, s5);
+            r[0] = _mm512_permutex2var_pd(s[0], idx_2x2_0, s[2]);
+            r[1] = _mm512_permutex2var_pd(s[1], idx_2x2_0, s[3]);
+            r[2] = _mm512_permutex2var_pd(s[2], idx_2x2_1, s[0]);
+            r[3] = _mm512_permutex2var_pd(s[3], idx_2x2_1, s[1]);
+            r[4] = _mm512_permutex2var_pd(s[4], idx_2x2_0, s[6]);
+            r[5] = _mm512_permutex2var_pd(s[5], idx_2x2_0, s[7]);
+            r[6] = _mm512_permutex2var_pd(s[6], idx_2x2_1, s[4]);
+            r[7] = _mm512_permutex2var_pd(s[7], idx_2x2_1, s[5]);
 
             // shuffle 4x4 blocks of doubles
-            s0 = _mm512_permutex2var_pd(r0, idx_4x4_0, r4);
-            s1 = _mm512_permutex2var_pd(r1, idx_4x4_0, r5);
-            s2 = _mm512_permutex2var_pd(r2, idx_4x4_0, r6);
-            s3 = _mm512_permutex2var_pd(r3, idx_4x4_0, r7);
-            s4 = _mm512_permutex2var_pd(r4, idx_4x4_1, r0);
-            s5 = _mm512_permutex2var_pd(r5, idx_4x4_1, r1);
-            s6 = _mm512_permutex2var_pd(r6, idx_4x4_1, r2);
-            s7 = _mm512_permutex2var_pd(r7, idx_4x4_1, r3);
+            s[0] = _mm512_permutex2var_pd(r[0], idx_4x4_0, r[4]);
+            s[1] = _mm512_permutex2var_pd(r[1], idx_4x4_0, r[5]);
+            s[2] = _mm512_permutex2var_pd(r[2], idx_4x4_0, r[6]);
+            s[3] = _mm512_permutex2var_pd(r[3], idx_4x4_0, r[7]);
+            s[4] = _mm512_permutex2var_pd(r[4], idx_4x4_1, r[0]);
+            s[5] = _mm512_permutex2var_pd(r[5], idx_4x4_1, r[1]);
+            s[6] = _mm512_permutex2var_pd(r[6], idx_4x4_1, r[2]);
+            s[7] = _mm512_permutex2var_pd(r[7], idx_4x4_1, r[3]);
 
             // write back 8x8 block of write array
 #if defined(USE_AVX_STREAMING_STORES)
-            _mm512_stream_pd(&B_block[0], s0);
-            _mm512_stream_pd(&B_block[A_rows], s1);
-            _mm512_stream_pd(&B_block[2*A_rows], s2);
-            _mm512_stream_pd(&B_block[3*A_rows], s3);
-            _mm512_stream_pd(&B_block[4*A_rows], s4);
-            _mm512_stream_pd(&B_block[5*A_rows], s5);
-            _mm512_stream_pd(&B_block[6*A_rows], s6);
-            _mm512_stream_pd(&B_block[7*A_rows], s7);
+            _mm512_stream_pd(&B_block[0], s[0]);
+            _mm512_stream_pd(&B_block[A_rows], s[1]);
+            _mm512_stream_pd(&B_block[2*A_rows], s[2]);
+            _mm512_stream_pd(&B_block[3*A_rows], s[3]);
+            _mm512_stream_pd(&B_block[4*A_rows], s[4]);
+            _mm512_stream_pd(&B_block[5*A_rows], s[5]);
+            _mm512_stream_pd(&B_block[6*A_rows], s[6]);
+            _mm512_stream_pd(&B_block[7*A_rows], s[7]);
 #else
-            _mm512_store_pd(&B_block[0], s0);
-            _mm512_store_pd(&B_block[A_rows], s1);
-            _mm512_store_pd(&B_block[2*A_rows], s2);
-            _mm512_store_pd(&B_block[3*A_rows], s3);
-            _mm512_store_pd(&B_block[4*A_rows], s4);
-            _mm512_store_pd(&B_block[5*A_rows], s5);
-            _mm512_store_pd(&B_block[6*A_rows], s6);
-            _mm512_store_pd(&B_block[7*A_rows], s7);
+            _mm512_store_pd(&B_block[0], s[0]);
+            _mm512_store_pd(&B_block[A_rows], s[1]);
+            _mm512_store_pd(&B_block[2*A_rows], s[2]);
+            _mm512_store_pd(&B_block[3*A_rows], s[3]);
+            _mm512_store_pd(&B_block[4*A_rows], s[4]);
+            _mm512_store_pd(&B_block[5*A_rows], s[5]);
+            _mm512_store_pd(&B_block[6*A_rows], s[6]);
+            _mm512_store_pd(&B_block[7*A_rows], s[7]);
 #endif
         }
     }
