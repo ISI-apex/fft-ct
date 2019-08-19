@@ -228,7 +228,7 @@ if(ENABLE_AVX AND NOT C_FLAGS_AVX)
   else()
     message(FATAL_ERROR "No default AVX-512 flags for C compiler: "
                         "${CMAKE_C_COMPILER_ID}\n"
-                        "Set option: ENABLE_AVX=OFF")
+                        "Set C_FLAGS_AVX explicitly or set ENABLE_AVX=OFF")
   endif()
 endif(ENABLE_AVX AND NOT C_FLAGS_AVX)
 
