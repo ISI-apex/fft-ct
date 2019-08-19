@@ -4,8 +4,8 @@
  * @author Kaushik Datta <kdatta@isi.edu>
  * @date 2019-08-15
  */
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -40,18 +40,6 @@ static void tt_arg_init(struct tr_thread_arg *tt_arg,
 }
 
 static void *transpose_thread_blocked_dbl(void *args) {
-    struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    const double* restrict A = tt_arg->A;
-    double* restrict B = tt_arg->B;
-    const double *A_block;
-    double *B_block;
-    size_t start_row_block_num, end_row_block_num, row_block_num;
-    size_t start_col_block_num, end_col_block_num, col_block_num;
-    size_t r_min, c_min;
-    // alternate the reads and writes between the r and s vector registers, all
-    // of which hold matrix rows
-    __m512d r[8], s[8];
-
     // used for swapping 2x2 blocks using _mm512_permutex2var_pd()
     static const __m512i idx_2x2_0 = {
         0x0000, 0x0001, 0x0008, 0x0009, 0x0004, 0x0005, 0x000c, 0x000d
@@ -66,19 +54,31 @@ static void *transpose_thread_blocked_dbl(void *args) {
     static const __m512i idx_4x4_1 = {
         0x000c, 0x000d, 0x000e, 0x000f, 0x0004, 0x0005, 0x0006, 0x0007
     };
+    const struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
+    const double* restrict A = tt_arg->A;
+    double* restrict B = tt_arg->B;
+    const size_t start_rblk_num = tt_arg->r_min / 8;
+    const size_t end_rblk_num = tt_arg->r_max / 8;
+    const size_t start_cblk_num = tt_arg->c_min / 8;
+    const size_t end_cblk_num = tt_arg->c_max / 8;
+    const double *A_block;
+    double *B_block;
+    size_t rblk_num, cblk_num, r_min, c_min;
+    // alternate the reads and writes between the r and s vector registers, all
+    // of which hold matrix rows
+    __m512d r[8], s[8];
 
     assert(tt_arg->A_rows % 8 == 0);
     assert(tt_arg->A_cols % 8 == 0);
+    assert(tt_arg->r_min % 8 == 0);
+    assert(tt_arg->r_max % 8 == 0);
+    assert(tt_arg->c_min % 8 == 0);
+    assert(tt_arg->c_max % 8 == 0);
 
-    start_row_block_num = tt_arg->r_min / 8;
-    end_row_block_num = tt_arg->r_max / 8;
-    start_col_block_num = tt_arg->c_min / 8;
-    end_col_block_num = tt_arg->c_max / 8;
-
-    for (row_block_num = start_row_block_num; row_block_num < end_row_block_num; row_block_num++) {
-        r_min = row_block_num * 8;
-        for (col_block_num = start_col_block_num; col_block_num < end_col_block_num; col_block_num++) {
-            c_min = col_block_num * 8;
+    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
+        r_min = rblk_num * 8;
+        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
+            c_min = cblk_num * 8;
 
             A_block = &A[r_min * tt_arg->A_cols + c_min];
             B_block = &B[c_min * tt_arg->A_rows + r_min];
@@ -154,36 +154,29 @@ void transpose_dbl_threads_avx_intr_8x8_row(const double* restrict A,
                                             size_t A_rows, size_t A_cols,
                                             size_t num_thr)
 {
-    pthread_attr_t attr;
-    size_t r_min, r_max, c_min, c_max, thr_num, rows_per_thr;
+    size_t r_min, r_max, thr_num;
+    const size_t rows_per_thr = A_rows / num_thr;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
 
-    // initialize and set thread detached attribute
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    assert(rows_per_thr % num_thr == 0);
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
-        rows_per_thr = A_rows / num_thr;
         r_min = thr_num * rows_per_thr;
         r_max = r_min + rows_per_thr;
 
-        c_min = 0;
-        c_max = A_cols;
-
         tt_arg_init(&args[thr_num], A, B, A_rows, A_cols,
-                    r_min, r_max, c_min, c_max, thr_num);
-        errno = pthread_create(&threads[thr_num], &attr, &transpose_thread_blocked_dbl,
+                    r_min, r_max, 0, A_cols, thr_num);
+        errno = pthread_create(&threads[thr_num], NULL, &transpose_thread_blocked_dbl,
                                &args[thr_num]);
         if (errno) {
-                perror("pthread_create");
-                exit(errno);
+            perror("pthread_create");
+            exit(errno);
         }
     }
 
-    // free attribute and wait for the other threads
-    pthread_attr_destroy(&attr);
-    for(thr_num = 0; thr_num < num_thr; thr_num++) {
+    // wait for the other threads
+    for (thr_num = 0; thr_num < num_thr; thr_num++) {
         errno = pthread_join(threads[thr_num], NULL);
         if (errno) {
             perror("pthread_join");
@@ -200,37 +193,29 @@ void transpose_dbl_threads_avx_intr_8x8_col(const double* restrict A,
                                             size_t A_rows, size_t A_cols,
                                             size_t num_thr)
 {
-    pthread_attr_t attr;
-    size_t r_min, r_max, c_min, c_max, thr_num, cols_per_thr;
+    size_t c_min, c_max, thr_num;
+    const size_t cols_per_thr = A_cols / num_thr;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
 
-    // initialize and set thread detached attribute
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    assert(A_cols % num_thr == 0);
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
-        r_min = 0;
-        r_max = A_rows;
-
-        cols_per_thr = A_cols / num_thr;
         c_min = thr_num * cols_per_thr;
         c_max = c_min + cols_per_thr;
 
         tt_arg_init(&args[thr_num], A, B, A_rows, A_cols,
-                    r_min, r_max, c_min, c_max, thr_num);
-        errno = pthread_create(&threads[thr_num], &attr, &transpose_thread_blocked_dbl,
+                    0, A_rows, c_min, c_max, thr_num);
+        errno = pthread_create(&threads[thr_num], NULL, &transpose_thread_blocked_dbl,
                                &args[thr_num]);
-
         if (errno) {
-                perror("pthread_create");
-                exit(errno);
+            perror("pthread_create");
+            exit(errno);
         }
     }
 
-    // free attribute and wait for the other threads
-    pthread_attr_destroy(&attr);
-    for(thr_num = 0; thr_num < num_thr; thr_num++) {
+    // wait for the other threads
+    for (thr_num = 0; thr_num < num_thr; thr_num++) {
         errno = pthread_join(threads[thr_num], NULL);
         if (errno) {
             perror("pthread_join");
