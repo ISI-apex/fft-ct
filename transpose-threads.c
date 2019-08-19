@@ -5,6 +5,7 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-08-06
  */
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -253,6 +254,7 @@ static void transpose_threads_row_blocked(const void* restrict A,
     const size_t rows_per_thr = A_rows / num_thr;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
+    assert(A_rows % num_thr == 0);
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
         r_min = thr_num * rows_per_thr;
@@ -291,6 +293,7 @@ void transpose_threads_col_blocked(const void* restrict A,
     const size_t cols_per_thr = A_cols / num_thr;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
+    assert(A_cols % num_thr == 0);
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
         c_min = thr_num * cols_per_thr;
