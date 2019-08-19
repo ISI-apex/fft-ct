@@ -53,7 +53,7 @@ static void *transpose_thread_flt(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     TRANSPOSE_BLK((const float* restrict)tt_arg->A,
-                  (float* restrict )tt_arg->B,
+                  (float* restrict)tt_arg->B,
                   tt_arg->A_rows, tt_arg->A_cols,
                   tt_arg->r_min, tt_arg->c_min, tt_arg->r_max, tt_arg->c_max);
     pthread_exit((void *)tt_arg->thr_num);
@@ -63,33 +63,30 @@ static void *transpose_thread_dbl(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     TRANSPOSE_BLK((const double* restrict)tt_arg->A,
-                  (double* restrict )tt_arg->B,
+                  (double* restrict)tt_arg->B,
                   tt_arg->A_rows, tt_arg->A_cols,
                   tt_arg->r_min, tt_arg->c_min, tt_arg->r_max, tt_arg->c_max);
     pthread_exit((void *)tt_arg->thr_num);
 }
 
 static void *transpose_thread_blocked_flt(void *args) {
-    const struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    size_t start_rblk_num, end_rblk_num, rblk_num;
-    size_t start_cblk_num, end_cblk_num, cblk_num;
-    size_t r_block_min, r_block_max, c_block_min, c_block_max;
-
-    start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
-    end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
-    start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
-    end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
+    const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
+    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
+    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
+    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
+    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
+    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
 
     for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
+        rblk_min = rblk_num * tt_arg->blk_rows;
+        rblk_max = rblk_min + tt_arg->blk_rows;
         for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
-            r_block_min = rblk_num * tt_arg->blk_rows;
-            c_block_min = cblk_num * tt_arg->blk_cols;
-            r_block_max = r_block_min + tt_arg->blk_rows;
-            c_block_max = c_block_min + tt_arg->blk_cols;
+            cblk_min = cblk_num * tt_arg->blk_cols;
+            cblk_max = cblk_min + tt_arg->blk_cols;
             TRANSPOSE_BLK((const float* restrict)tt_arg->A,
-                          (float* restrict )tt_arg->B,
+                          (float* restrict)tt_arg->B,
                           tt_arg->A_rows, tt_arg->A_cols,
-                          r_block_min, c_block_min, r_block_max, c_block_max);
+                          rblk_min, cblk_min, rblk_max, cblk_max);
         }
     }
 
@@ -97,26 +94,23 @@ static void *transpose_thread_blocked_flt(void *args) {
 }
 
 static void *transpose_thread_blocked_dbl(void *args) {
-    const struct tr_thread_arg *tt_arg = (struct tr_thread_arg *)args;
-    size_t start_rblk_num, end_rblk_num, rblk_num;
-    size_t start_cblk_num, end_cblk_num, cblk_num;
-    size_t r_block_min, r_block_max, c_block_min, c_block_max;
-
-    start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
-    end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
-    start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
-    end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
+    const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
+    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
+    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
+    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
+    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
+    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
 
     for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
+        rblk_min = rblk_num * tt_arg->blk_rows;
+        rblk_max = rblk_min + tt_arg->blk_rows;
         for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
-            r_block_min = rblk_num * tt_arg->blk_rows;
-            c_block_min = cblk_num * tt_arg->blk_cols;
-            r_block_max = r_block_min + tt_arg->blk_rows;
-            c_block_max = c_block_min + tt_arg->blk_cols;
+            cblk_min = cblk_num * tt_arg->blk_cols;
+            cblk_max = cblk_min + tt_arg->blk_cols;
             TRANSPOSE_BLK((const double* restrict)tt_arg->A,
-                          (double* restrict )tt_arg->B,
+                          (double* restrict)tt_arg->B,
                           tt_arg->A_rows, tt_arg->A_cols,
-                          r_block_min, c_block_min, r_block_max, c_block_max);
+                          rblk_min, cblk_min, rblk_max, cblk_max);
         }
     }
 
