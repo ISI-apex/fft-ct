@@ -122,14 +122,12 @@ static void transpose_threads_row(const void* restrict A, void* restrict B,
                                   void *(*start_routine)(void *))
 {
     size_t thr_num, r_min, r_max;
-    size_t num_thr_with_max_rows, min_rows_per_thread, max_rows_per_thread;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
-
     // divide the rows as evenly as possible among the threads
-    num_thr_with_max_rows = A_rows % num_thr;
-    min_rows_per_thread = A_rows / num_thr;
-    max_rows_per_thread = min_rows_per_thread + 1;
+    const size_t num_thr_with_max_rows = A_rows % num_thr;
+    const size_t min_rows_per_thread = A_rows / num_thr;
+    const size_t max_rows_per_thread = min_rows_per_thread + 1;
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
         if (thr_num < num_thr_with_max_rows) {
@@ -168,14 +166,12 @@ static void transpose_threads_col(const void* restrict A, void* restrict B,
                                   void *(*start_routine)(void *))
 {
     size_t thr_num, c_min, c_max;
-    size_t num_thr_with_max_cols, min_cols_per_thread, max_cols_per_thread;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
-
     // divide the columns as evenly as possible among the threads
-    num_thr_with_max_cols = A_cols % num_thr;
-    min_cols_per_thread = A_cols / num_thr;
-    max_cols_per_thread = min_cols_per_thread + 1;
+    const size_t num_thr_with_max_cols = A_cols % num_thr;
+    const size_t min_cols_per_thread = A_cols / num_thr;
+    const size_t max_cols_per_thread = min_cols_per_thread + 1;
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
         if (thr_num < num_thr_with_max_cols) {
