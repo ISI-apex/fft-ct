@@ -36,11 +36,11 @@ void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
     static const __m512i idx_4x4_1 = {
         0x000c, 0x000d, 0x000e, 0x000f, 0x0004, 0x0005, 0x0006, 0x0007
     };
+    const size_t num_row_blocks = A_rows / 8;
+    const size_t num_col_blocks = A_cols / 8;
     const double *A_block;
     double *B_block;
-    size_t i_min, j_min;
-    size_t num_row_blocks, num_col_blocks;
-    size_t rblk_num, cblk_num;
+    size_t rblk_num, cblk_num, r_min, c_min;
     // alternate the reads and writes between the r and s vector registers, all
     // of which hold matrix rows
     __m512d r[8], s[8];
@@ -48,17 +48,14 @@ void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
     assert(A_rows % 8 == 0);
     assert(A_cols % 8 == 0);
 
-    num_row_blocks = A_rows / 8;
-    num_col_blocks = A_cols / 8;
-
     // perform transpose over all blocks
     for (rblk_num = 0; rblk_num < num_row_blocks; rblk_num++) {
-        i_min = rblk_num * 8;
+        r_min = rblk_num * 8;
         for (cblk_num = 0; cblk_num < num_col_blocks; cblk_num++) {
-            j_min = cblk_num * 8;
+            c_min = cblk_num * 8;
 
-            A_block = &A[i_min * A_cols + j_min];
-            B_block = &B[j_min * A_rows + i_min];
+            A_block = &A[r_min * A_cols + c_min];
+            B_block = &B[c_min * A_rows + r_min];
 
             // read 8x8 block of read array
             r[0] = _mm512_load_pd(&A_block[0]);
