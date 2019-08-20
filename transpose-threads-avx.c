@@ -39,7 +39,8 @@ static void tt_arg_init(struct tr_thread_arg *tt_arg,
     tt_arg->thr_num = thr_num;
 }
 
-static void *transpose_thread_blocked_dbl(void *args) {
+static void *transpose_thread_blocked_dbl(void *args)
+{
     // used for swapping 2x2 blocks using _mm512_permutex2var_pd()
     static const __m512i idx_2x2_0 = {
         0x0000, 0x0001, 0x0008, 0x0009, 0x0004, 0x0005, 0x000c, 0x000d

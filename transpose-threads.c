@@ -93,7 +93,8 @@ static void *transpose_thread_dcmplx(void *args)
     pthread_exit((void *)tt_arg->thr_num);
 }
 
-static void *transpose_thread_blocked_flt(void *args) {
+static void *transpose_thread_blocked_flt(void *args)
+{
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
     const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
@@ -117,7 +118,8 @@ static void *transpose_thread_blocked_flt(void *args) {
     pthread_exit((void *)tt_arg->thr_num);
 }
 
-static void *transpose_thread_blocked_dbl(void *args) {
+static void *transpose_thread_blocked_dbl(void *args)
+{
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
     const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
@@ -141,7 +143,8 @@ static void *transpose_thread_blocked_dbl(void *args) {
     pthread_exit((void *)tt_arg->thr_num);
 }
 
-static void *transpose_thread_blocked_fcmplx(void *args) {
+static void *transpose_thread_blocked_fcmplx(void *args)
+{
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
     const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
@@ -165,7 +168,8 @@ static void *transpose_thread_blocked_fcmplx(void *args) {
     pthread_exit((void *)tt_arg->thr_num);
 }
 
-static void *transpose_thread_blocked_dcmplx(void *args) {
+static void *transpose_thread_blocked_dcmplx(void *args)
+{
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
     const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
