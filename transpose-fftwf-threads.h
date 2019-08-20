@@ -4,8 +4,8 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-08-20
  */
-#ifndef TRANSPOSE_THREADS_FFTWF_H
-#define TRANSPOSE_THREADS_FFTWF_H
+#ifndef TRANSPOSE_FFTWF_THREADS_H
+#define TRANSPOSE_FFTWF_THREADS_H
 
 #include <complex.h>
 #include <stdlib.h>
@@ -34,4 +34,4 @@ void transpose_fftwf_threads_col_blocked(const fftwf_complex* restrict A,
                                          size_t num_thr,
                                          size_t blk_rows, size_t blk_cols);
 
-#endif /* TRANSPOSE_THREADS_FFTWF_H */
+#endif /* TRANSPOSE_FFTWF_THREADS_H */

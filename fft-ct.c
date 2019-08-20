@@ -28,8 +28,8 @@
     defined(USE_FFTWF_THRCOL_AVX512_INTR)
 #include "transpose-fftwf.h"
 #include "transpose-fftwf-avx.h"
+#include "transpose-fftwf-threads.h"
 #include "transpose-fftwf-threads-avx.h"
-#include "transpose-threads-fftwf.h"
 #include "util-fftwf.h"
 typedef fftwf_complex       FFTW_COMPLEX_T;
 typedef fftwf_plan          FFTW_PLAN_T;
@@ -41,7 +41,7 @@ typedef fftwf_plan          FFTW_PLAN_T;
 #define FILL_RAND           fill_rand_fftwf
 #else
 #include "transpose-fftw.h"
-#include "transpose-threads-fftw.h"
+#include "transpose-fftw-threads.h"
 #include "util-fftw.h"
 typedef fftw_complex        FFTW_COMPLEX_T;
 typedef fftw_plan           FFTW_PLAN_T;

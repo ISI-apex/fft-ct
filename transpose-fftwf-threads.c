@@ -2,15 +2,15 @@
  * Transpose functions.
  *
  * @author Connor Imes <cimes@isi.edu>
- * @date 2019-07-15 
+ * @date 2019-08-20
  */
 #include <complex.h>
 #include <stdlib.h>
 
 #include <fftw3.h>
 
+#include "transpose-fftwf-threads.h"
 #include "transpose-threads.h"
-#include "transpose-threads-fftwf.h"
 
 void transpose_fftwf_threads_row(const fftwf_complex* restrict A,
                                  fftwf_complex* restrict B,

@@ -135,7 +135,7 @@ endif(FFTWF_FOUND)
 if(Threads_FOUND AND FFTWF_FOUND)
   function(add_exec_threads_fftwf name main definitions)
     add_executable(${name} ${main} ptime.c
-                                   transpose-threads.c transpose-threads-fftwf.c
+                                   transpose-threads.c transpose-fftwf-threads.c
                                    util.c util-fftwf.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
@@ -178,7 +178,7 @@ endif(FFTW_FOUND)
 if(Threads_FOUND AND FFTW_FOUND)
   function(add_exec_threads_fftw name main definitions)
     add_executable(${name} ${main} ptime.c
-                                   transpose-threads.c transpose-threads-fftw.c
+                                   transpose-threads.c transpose-fftw-threads.c
                                    util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}

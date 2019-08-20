@@ -86,8 +86,8 @@
 #include <fftw3.h>
 #include "transpose-fftwf.h"
 #include "transpose-fftwf-avx.h"
+#include "transpose-fftwf-threads.h"
 #include "transpose-fftwf-threads-avx.h"
-#include "transpose-threads-fftwf.h"
 #include "util-fftwf.h"
 #endif
 #if defined(USE_FFTW_NAIVE) || \
@@ -98,7 +98,7 @@
     defined(USE_FFTW_THRCOL_BLOCKED)
 #include <fftw3.h>
 #include "transpose-fftw.h"
-#include "transpose-threads-fftw.h"
+#include "transpose-fftw-threads.h"
 #include "util-fftw.h"
 #endif
 
