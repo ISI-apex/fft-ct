@@ -6,7 +6,6 @@
  * @date 2019-08-07
  */
 #include <assert.h>
-#include <inttypes.h>
 #include <stdlib.h>
 
 // intrinsics
