@@ -189,12 +189,12 @@ static void transpose_threads_row_blocked(const void* restrict A,
     free(threads);
 }
 
-void transpose_threads_col_blocked(const void* restrict A,
-                                   void* restrict B,
-                                   size_t A_rows, size_t A_cols,
-                                   size_t num_thr,
-                                   size_t blk_rows, size_t blk_cols,
-                                   void *(*start_routine)(void *))
+static void transpose_threads_col_blocked(const void* restrict A,
+                                          void* restrict B,
+                                          size_t A_rows, size_t A_cols,
+                                          size_t num_thr,
+                                          size_t blk_rows, size_t blk_cols,
+                                          void *(*start_routine)(void *))
 {
     size_t c_min, c_max, thr_num;
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
