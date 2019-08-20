@@ -155,7 +155,6 @@ if(Threads_FOUND AND FFTWF_FOUND)
                          "-DUSE_FFTWF_THRROW_BLOCKED")
   add_exec_threads_fftwf(fft-ct-fftwf-thrcol-blocked fft-ct.c
                          "-DUSE_FFTWF_THRCOL_BLOCKED")
-  
 endif(Threads_FOUND AND FFTWF_FOUND)
 
 # Use FFTW library
