@@ -53,6 +53,24 @@ static void tt_arg_init(struct tr_thread_arg *tt_arg,
     } \
 }
 
+#define TRANSP_THREAD_BLK(arg, A, B) { \
+    const size_t start_rblk_num = arg->r_min / arg->blk_rows; \
+    const size_t end_rblk_num = arg->r_max / arg->blk_rows; \
+    const size_t start_cblk_num = arg->c_min / arg->blk_cols; \
+    const size_t end_cblk_num = arg->c_max / arg->blk_cols; \
+    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max; \
+    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) { \
+        rblk_min = rblk_num * arg->blk_rows; \
+        rblk_max = rblk_min + arg->blk_rows; \
+        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) { \
+            cblk_min = cblk_num * arg->blk_cols; \
+            cblk_max = cblk_min + arg->blk_cols; \
+            TRANSPOSE_BLK(A, B, arg->A_rows, arg->A_cols, \
+                          rblk_min, cblk_min, rblk_max, cblk_max); \
+        } \
+    } \
+}
+
 static void *transpose_thread_flt(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
@@ -96,100 +114,32 @@ static void *transpose_thread_dcmplx(void *args)
 static void *transpose_thread_blocked_flt(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
-    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
-    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
-    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
-    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
-    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
-
-    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
-        rblk_min = rblk_num * tt_arg->blk_rows;
-        rblk_max = rblk_min + tt_arg->blk_rows;
-        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
-            cblk_min = cblk_num * tt_arg->blk_cols;
-            cblk_max = cblk_min + tt_arg->blk_cols;
-            TRANSPOSE_BLK((const float* restrict)tt_arg->A,
-                          (float* restrict)tt_arg->B,
-                          tt_arg->A_rows, tt_arg->A_cols,
-                          rblk_min, cblk_min, rblk_max, cblk_max);
-        }
-    }
-
+    TRANSP_THREAD_BLK(tt_arg, (const float* restrict)tt_arg->A,
+                      (float* restrict)tt_arg->B);
     pthread_exit((void *)tt_arg->thr_num);
 }
 
 static void *transpose_thread_blocked_dbl(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
-    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
-    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
-    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
-    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
-    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
-
-    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
-        rblk_min = rblk_num * tt_arg->blk_rows;
-        rblk_max = rblk_min + tt_arg->blk_rows;
-        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
-            cblk_min = cblk_num * tt_arg->blk_cols;
-            cblk_max = cblk_min + tt_arg->blk_cols;
-            TRANSPOSE_BLK((const double* restrict)tt_arg->A,
-                          (double* restrict)tt_arg->B,
-                          tt_arg->A_rows, tt_arg->A_cols,
-                          rblk_min, cblk_min, rblk_max, cblk_max);
-        }
-    }
-
+    TRANSP_THREAD_BLK(tt_arg, (const double* restrict)tt_arg->A,
+                      (double* restrict)tt_arg->B);
     pthread_exit((void *)tt_arg->thr_num);
 }
 
 static void *transpose_thread_blocked_fcmplx(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
-    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
-    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
-    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
-    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
-    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
-
-    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
-        rblk_min = rblk_num * tt_arg->blk_rows;
-        rblk_max = rblk_min + tt_arg->blk_rows;
-        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
-            cblk_min = cblk_num * tt_arg->blk_cols;
-            cblk_max = cblk_min + tt_arg->blk_cols;
-            TRANSPOSE_BLK((const float complex* restrict)tt_arg->A,
-                          (float complex* restrict)tt_arg->B,
-                          tt_arg->A_rows, tt_arg->A_cols,
-                          rblk_min, cblk_min, rblk_max, cblk_max);
-        }
-    }
-
+    TRANSP_THREAD_BLK(tt_arg, (const float complex* restrict)tt_arg->A,
+                      (float complex* restrict)tt_arg->B);
     pthread_exit((void *)tt_arg->thr_num);
 }
 
 static void *transpose_thread_blocked_dcmplx(void *args)
 {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
-    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
-    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
-    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
-    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
-    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
-
-    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
-        rblk_min = rblk_num * tt_arg->blk_rows;
-        rblk_max = rblk_min + tt_arg->blk_rows;
-        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
-            cblk_min = cblk_num * tt_arg->blk_cols;
-            cblk_max = cblk_min + tt_arg->blk_cols;
-            TRANSPOSE_BLK((const double complex* restrict)tt_arg->A,
-                          (double complex* restrict)tt_arg->B,
-                          tt_arg->A_rows, tt_arg->A_cols,
-                          rblk_min, cblk_min, rblk_max, cblk_max);
-        }
-    }
-
+    TRANSP_THREAD_BLK(tt_arg, (const double complex* restrict)tt_arg->A,
+                      (double complex* restrict)tt_arg->B);
     pthread_exit((void *)tt_arg->thr_num);
 }
 
