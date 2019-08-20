@@ -293,6 +293,7 @@ if(ENABLE_AVX AND NOT C_FLAGS_AVX)
                         "Set C_FLAGS_AVX explicitly or set ENABLE_AVX=OFF")
   endif()
 endif(ENABLE_AVX AND NOT C_FLAGS_AVX)
+string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
 
 # Use automatic and intrinsic AVX
 if(ENABLE_AVX)
@@ -300,7 +301,6 @@ if(ENABLE_AVX)
   function(add_exec_avx name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-avx.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
-    string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
   endfunction(add_exec_avx)
 
@@ -317,10 +317,8 @@ endif(ENABLE_AVX)
 # Use threads with intrinsic AVX
 if(Threads_FOUND AND ENABLE_AVX)
   function(add_exec_threads_avx name main definitions)
-    add_executable(${name} ${main} ptime.c transpose.c transpose-threads-avx.c
-                                   util.c)
+    add_executable(${name} ${main} ptime.c transpose-threads-avx.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
-    string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads_avx)
@@ -334,3 +332,52 @@ if(Threads_FOUND AND ENABLE_AVX)
   add_exec_threads_avx(transp-dbl-thrcol-avx512-intr-ss transp.c
                        "-DUSE_DBL_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(Threads_FOUND AND ENABLE_AVX)
+
+if(FFTWF_FOUND AND ENABLE_AVX)
+  function(add_exec_fftwf_avx name main definitions)
+    add_executable(${name} ${main} ptime.c transpose-fftwf-avx.c transpose-avx.c
+                                   util.c util-fftwf.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+  endfunction(add_exec_fftwf_avx)
+
+  add_exec_fftwf_avx(transp-fftwf-avx512-intr transp.c
+                     "-DUSE_FFTWF_AVX512_INTR")
+  add_exec_fftwf_avx(transp-fftwf-avx512-intr-ss transp.c
+                     "-DUSE_FFTWF_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+
+  add_exec_fftwf_avx(fft-ct-fftwf-avx512-intr fft-ct.c
+                     "-DUSE_FFTWF_AVX512_INTR")
+  add_exec_fftwf_avx(fft-ct-fftwf-avx512-intr-ss fft-ct.c
+                     "-DUSE_FFTWF_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+endif(FFTWF_FOUND AND ENABLE_AVX)
+
+if(Threads_FOUND AND FFTWF_FOUND AND ENABLE_AVX)
+  function(add_exec_fftwf_threads_avx name main definitions)
+    add_executable(${name} ${main} ptime.c transpose-fftwf-threads-avx.c
+                                   transpose-threads-avx.c util.c util-fftwf.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
+                                  ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+  endfunction(add_exec_fftwf_threads_avx)
+
+  add_exec_fftwf_threads_avx(transp-fftwf-thrrow-avx512-intr transp.c
+                             "-DUSE_FFTWF_THRROW_AVX512_INTR")
+  add_exec_fftwf_threads_avx(transp-fftwf-thrrow-avx512-intr-ss transp.c
+                             "-DUSE_FFTWF_THRROW_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+  add_exec_fftwf_threads_avx(transp-fftwf-thrcol-avx512-intr transp.c
+                             "-DUSE_FFTWF_THRCOL_AVX512_INTR")
+  add_exec_fftwf_threads_avx(transp-fftwf-thrcol-avx512-intr-ss transp.c
+                             "-DUSE_FFTWF_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+
+  add_exec_fftwf_threads_avx(fft-ct-fftwf-thrrow-avx512-intr fft-ct.c
+                             "-DUSE_FFTWF_THRROW_AVX512_INTR")
+  add_exec_fftwf_threads_avx(fft-ct-fftwf-thrrow-avx512-intr-ss fft-ct.c
+                             "-DUSE_FFTWF_THRROW_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+  add_exec_fftwf_threads_avx(fft-ct-fftwf-thrcol-avx512-intr fft-ct.c
+                             "-DUSE_FFTWF_THRCOL_AVX512_INTR")
+  add_exec_fftwf_threads_avx(fft-ct-fftwf-thrcol-avx512-intr-ss fft-ct.c
+                             "-DUSE_FFTWF_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+endif(Threads_FOUND AND FFTWF_FOUND AND ENABLE_AVX)
