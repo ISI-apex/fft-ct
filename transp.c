@@ -72,29 +72,25 @@
 #define _USE_TRANSP_THREADS 1
 #endif
 
-#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTWF_BLOCKED)
-#include <fftw3.h>
-#include "transpose-fftwf.h"
-#include "util-fftwf.h"
-#endif
-#if defined(USE_FFTW_NAIVE) || defined(USE_FFTW_BLOCKED)
-#include <fftw3.h>
-#include "transpose-fftw.h"
-#include "util-fftw.h"
-#endif
-#if defined(USE_FFTWF_THREADS_ROW) || \
+#if defined(USE_FFTWF_NAIVE) || \
+    defined(USE_FFTWF_BLOCKED) || \
+    defined(USE_FFTWF_THREADS_ROW) || \
     defined(USE_FFTWF_THREADS_COL) || \
     defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
     defined(USE_FFTWF_THREADS_COL_BLOCKED)
 #include <fftw3.h>
+#include "transpose-fftwf.h"
 #include "transpose-threads-fftwf.h"
 #include "util-fftwf.h"
 #endif
-#if defined(USE_FFTW_THREADS_ROW) || \
+#if defined(USE_FFTW_NAIVE) || \
+    defined(USE_FFTW_BLOCKED) || \
+    defined(USE_FFTW_THREADS_ROW) || \
     defined(USE_FFTW_THREADS_COL) || \
     defined(USE_FFTW_THREADS_ROW_BLOCKED) || \
     defined(USE_FFTW_THREADS_COL_BLOCKED)
 #include <fftw3.h>
+#include "transpose-fftw.h"
 #include "transpose-threads-fftw.h"
 #include "util-fftw.h"
 #endif
