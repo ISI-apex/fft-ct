@@ -19,10 +19,10 @@
 
 #if defined(USE_FFTWF_NAIVE) || \
     defined(USE_FFTWF_BLOCKED) || \
-    defined(USE_FFTWF_THREADS_ROW) || \
-    defined(USE_FFTWF_THREADS_COL) || \
-    defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
-    defined(USE_FFTWF_THREADS_COL_BLOCKED)
+    defined(USE_FFTWF_THRROW) || \
+    defined(USE_FFTWF_THRCOL) || \
+    defined(USE_FFTWF_THRROW_BLOCKED) || \
+    defined(USE_FFTWF_THRCOL_BLOCKED)
 #include "transpose-fftwf.h"
 #include "transpose-threads-fftwf.h"
 #include "util-fftwf.h"
@@ -49,22 +49,22 @@ typedef fftw_plan           FFTW_PLAN_T;
 #endif
 
 #if defined(USE_FFTWF_BLOCKED) || \
-    defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
-    defined(USE_FFTWF_THREADS_COL_BLOCKED) || \
+    defined(USE_FFTWF_THRROW_BLOCKED) || \
+    defined(USE_FFTWF_THRCOL_BLOCKED) || \
     defined(USE_FFTW_BLOCKED) || \
-    defined(USE_FFTW_THREADS_ROW_BLOCKED) || \
-    defined(USE_FFTW_THREADS_COL_BLOCKED)
+    defined(USE_FFTW_THRROW_BLOCKED) || \
+    defined(USE_FFTW_THRCOL_BLOCKED)
 #define _USE_TRANSP_BLOCKED 1
 #endif
 
-#if defined(USE_FFTWF_THREADS_ROW) || \
-    defined(USE_FFTWF_THREADS_COL) || \
-    defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
-    defined(USE_FFTWF_THREADS_COL_BLOCKED) || \
-    defined(USE_FFTW_THREADS_ROW) || \
-    defined(USE_FFTW_THREADS_COL) || \
-    defined(USE_FFTW_THREADS_ROW_BLOCKED) || \
-    defined(USE_FFTW_THREADS_COL_BLOCKED)
+#if defined(USE_FFTWF_THRROW) || \
+    defined(USE_FFTWF_THRCOL) || \
+    defined(USE_FFTWF_THRROW_BLOCKED) || \
+    defined(USE_FFTWF_THRCOL_BLOCKED) || \
+    defined(USE_FFTW_THRROW) || \
+    defined(USE_FFTW_THRCOL) || \
+    defined(USE_FFTW_THRROW_BLOCKED) || \
+    defined(USE_FFTW_THRCOL_BLOCKED)
 #define _USE_TRANSP_THREADS 1
 #endif
 
@@ -130,16 +130,16 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
 #elif defined(USE_FFTWF_BLOCKED)
     transpose_fftwf_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
                                     nblkcols);
-#elif defined(USE_FFTWF_THREADS_ROW)
+#elif defined(USE_FFTWF_THRROW)
     transpose_fftwf_complex_threads_row(fft1_out, fft2_in, nrows, ncols,
                                         nthreads);
-#elif defined(USE_FFTWF_THREADS_COL)
+#elif defined(USE_FFTWF_THRCOL)
     transpose_fftwf_complex_threads_col(fft1_out, fft2_in, nrows, ncols,
                                         nthreads);
-#elif defined(USE_FFTWF_THREADS_ROW_BLOCKED)
+#elif defined(USE_FFTWF_THRROW_BLOCKED)
     transpose_fftwf_complex_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
                                                 nthreads, nblkrows, nblkcols);
-#elif defined(USE_FFTWF_THREADS_COL_BLOCKED)
+#elif defined(USE_FFTWF_THRCOL_BLOCKED)
     transpose_fftwf_complex_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
                                                 nthreads, nblkrows, nblkcols);
 #elif defined(USE_FFTW_NAIVE)
@@ -147,16 +147,16 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
 #elif defined(USE_FFTW_BLOCKED)
     transpose_fftw_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
                                    nblkcols);
-#elif defined(USE_FFTW_THREADS_ROW)
+#elif defined(USE_FFTW_THRROW)
     transpose_fftw_complex_threads_row(fft1_out, fft2_in, nrows, ncols,
                                        nthreads);
-#elif defined(USE_FFTW_THREADS_COL)
+#elif defined(USE_FFTW_THRCOL)
     transpose_fftw_complex_threads_col(fft1_out, fft2_in, nrows, ncols,
                                        nthreads);
-#elif defined(USE_FFTW_THREADS_ROW_BLOCKED)
+#elif defined(USE_FFTW_THRROW_BLOCKED)
     transpose_fftw_complex_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
                                                nthreads, nblkrows, nblkcols);
-#elif defined(USE_FFTW_THREADS_COL_BLOCKED)
+#elif defined(USE_FFTW_THRCOL_BLOCKED)
     transpose_fftw_complex_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
                                                nthreads, nblkrows, nblkcols);
 #else

@@ -69,15 +69,15 @@ function(add_exec_prim name main definitions)
   target_compile_definitions(${name} PRIVATE ${definitions})
 endfunction(add_exec_prim)
 
-add_exec_prim(transp-flt-naive transp.c "-DUSE_FLOAT_NAIVE")
-add_exec_prim(transp-dbl-naive transp.c "-DUSE_DOUBLE_NAIVE")
-add_exec_prim(transp-fcmplx-naive transp.c "-DUSE_FLOAT_COMPLEX_NAIVE")
-add_exec_prim(transp-dcmplx-naive transp.c "-DUSE_DOUBLE_COMPLEX_NAIVE")
+add_exec_prim(transp-flt-naive transp.c "-DUSE_FLT_NAIVE")
+add_exec_prim(transp-dbl-naive transp.c "-DUSE_DBL_NAIVE")
+add_exec_prim(transp-fcmplx-naive transp.c "-DUSE_FCMPLX_NAIVE")
+add_exec_prim(transp-dcmplx-naive transp.c "-DUSE_DCMPLX_NAIVE")
 
-add_exec_prim(transp-flt-blocked transp.c "-DUSE_FLOAT_BLOCKED")
-add_exec_prim(transp-dbl-blocked transp.c "-DUSE_DOUBLE_BLOCKED")
-add_exec_prim(transp-fcmplx-blocked transp.c "-DUSE_FLOAT_COMPLEX_BLOCKED")
-add_exec_prim(transp-dcmplx-blocked transp.c "-DUSE_DOUBLE_COMPLEX_BLOCKED")
+add_exec_prim(transp-flt-blocked transp.c "-DUSE_FLT_BLOCKED")
+add_exec_prim(transp-dbl-blocked transp.c "-DUSE_DBL_BLOCKED")
+add_exec_prim(transp-fcmplx-blocked transp.c "-DUSE_FCMPLX_BLOCKED")
+add_exec_prim(transp-dcmplx-blocked transp.c "-DUSE_DCMPLX_BLOCKED")
 
 # Use threads
 if(Threads_FOUND)
@@ -87,35 +87,31 @@ if(Threads_FOUND)
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads)
 
-  add_exec_threads(transp-flt-thrrow transp.c "-DUSE_FLOAT_THREADS_ROW")
-  add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DOUBLE_THREADS_ROW")
-  add_exec_threads(transp-flt-thrcol transp.c "-DUSE_FLOAT_THREADS_COL")
-  add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DOUBLE_THREADS_COL")
-  add_exec_threads(transp-fcmplx-thrrow transp.c
-                   "-DUSE_FLOAT_COMPLEX_THREADS_ROW")
-  add_exec_threads(transp-dcmplx-thrrow transp.c
-                   "-DUSE_DOUBLE_COMPLEX_THREADS_ROW")
-  add_exec_threads(transp-fcmplx-thrcol transp.c
-                   "-DUSE_FLOAT_COMPLEX_THREADS_COL")
-  add_exec_threads(transp-dcmplx-thrcol transp.c
-                   "-DUSE_DOUBLE_COMPLEX_THREADS_COL")
+  add_exec_threads(transp-flt-thrrow transp.c "-DUSE_FLT_THRROW")
+  add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DBL_THRROW")
+  add_exec_threads(transp-flt-thrcol transp.c "-DUSE_FLT_THRCOL")
+  add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DBL_THRCOL")
+  add_exec_threads(transp-fcmplx-thrrow transp.c "-DUSE_FCMPLX_THRROW")
+  add_exec_threads(transp-dcmplx-thrrow transp.c "-DUSE_DCMPLX_THRROW")
+  add_exec_threads(transp-fcmplx-thrcol transp.c "-DUSE_FCMPLX_THRCOL")
+  add_exec_threads(transp-dcmplx-thrcol transp.c "-DUSE_DCMPLX_THRCOL")
 
   add_exec_threads(transp-flt-thrrow-blocked transp.c
-                   "-DUSE_FLOAT_THREADS_ROW_BLOCKED")
+                   "-DUSE_FLT_THRROW_BLOCKED")
   add_exec_threads(transp-dbl-thrrow-blocked transp.c
-                   "-DUSE_DOUBLE_THREADS_ROW_BLOCKED")
+                   "-DUSE_DBL_THRROW_BLOCKED")
   add_exec_threads(transp-flt-thrcol-blocked transp.c
-                   "-DUSE_FLOAT_THREADS_COL_BLOCKED")
+                   "-DUSE_FLT_THRCOL_BLOCKED")
   add_exec_threads(transp-dbl-thrcol-blocked transp.c
-                   "-DUSE_DOUBLE_THREADS_COL_BLOCKED")
+                   "-DUSE_DBL_THRCOL_BLOCKED")
   add_exec_threads(transp-fcmplx-thrrow-blocked transp.c
-                   "-DUSE_FLOAT_COMPLEX_THREADS_ROW_BLOCKED")
+                   "-DUSE_FCMPLX_THRROW_BLOCKED")
   add_exec_threads(transp-dcmplx-thrrow-blocked transp.c
-                   "-DUSE_DOUBLE_COMPLEX_THREADS_ROW_BLOCKED")
+                   "-DUSE_DCMPLX_THRROW_BLOCKED")
   add_exec_threads(transp-fcmplx-thrcol-blocked transp.c
-                   "-DUSE_FLOAT_COMPLEX_THREADS_COL_BLOCKED")
+                   "-DUSE_FCMPLX_THRCOL_BLOCKED")
   add_exec_threads(transp-dcmplx-thrcol-blocked transp.c
-                   "-DUSE_DOUBLE_COMPLEX_THREADS_COL_BLOCKED")
+                   "-DUSE_DCMPLX_THRCOL_BLOCKED")
 endif(Threads_FOUND)
 
 # Use FFTWF library
@@ -146,19 +142,19 @@ if(Threads_FOUND AND FFTWF_FOUND)
                           ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
   endfunction(add_exec_threads_fftwf)
 
-  add_exec_threads_fftwf(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THREADS_ROW")
-  add_exec_threads_fftwf(transp-fftwf-thrcol transp.c "-DUSE_FFTWF_THREADS_COL")
+  add_exec_threads_fftwf(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THRROW")
+  add_exec_threads_fftwf(transp-fftwf-thrcol transp.c "-DUSE_FFTWF_THRCOL")
   add_exec_threads_fftwf(transp-fftwf-thrrow-blocked transp.c
-                         "-DUSE_FFTWF_THREADS_ROW_BLOCKED")
+                         "-DUSE_FFTWF_THRROW_BLOCKED")
   add_exec_threads_fftwf(transp-fftwf-thrcol-blocked transp.c
-                         "-DUSE_FFTWF_THREADS_COL_BLOCKED")
+                         "-DUSE_FFTWF_THRCOL_BLOCKED")
 
-  add_exec_threads_fftwf(fft-ct-fftwf-thrrow fft-ct.c "-DUSE_FFTWF_THREADS_ROW")
-  add_exec_threads_fftwf(fft-ct-fftwf-thrcol fft-ct.c "-DUSE_FFTWF_THREADS_COL")
+  add_exec_threads_fftwf(fft-ct-fftwf-thrrow fft-ct.c "-DUSE_FFTWF_THRROW")
+  add_exec_threads_fftwf(fft-ct-fftwf-thrcol fft-ct.c "-DUSE_FFTWF_THRCOL")
   add_exec_threads_fftwf(fft-ct-fftwf-thrrow-blocked fft-ct.c
-                         "-DUSE_FFTWF_THREADS_ROW_BLOCKED")
+                         "-DUSE_FFTWF_THRROW_BLOCKED")
   add_exec_threads_fftwf(fft-ct-fftwf-thrcol-blocked fft-ct.c
-                         "-DUSE_FFTWF_THREADS_COL_BLOCKED")
+                         "-DUSE_FFTWF_THRCOL_BLOCKED")
   
 endif(Threads_FOUND AND FFTWF_FOUND)
 
@@ -190,19 +186,19 @@ if(Threads_FOUND AND FFTW_FOUND)
                           ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
   endfunction(add_exec_threads_fftw)
 
-  add_exec_threads_fftw(transp-fftw-thrrow transp.c "-DUSE_FFTW_THREADS_ROW")
-  add_exec_threads_fftw(transp-fftw-thrcol transp.c "-DUSE_FFTW_THREADS_COL")
+  add_exec_threads_fftw(transp-fftw-thrrow transp.c "-DUSE_FFTW_THRROW")
+  add_exec_threads_fftw(transp-fftw-thrcol transp.c "-DUSE_FFTW_THRCOL")
   add_exec_threads_fftw(transp-fftw-thrrow-blocked transp.c
-                        "-DUSE_FFTW_THREADS_ROW_BLOCKED")
+                        "-DUSE_FFTW_THRROW_BLOCKED")
   add_exec_threads_fftw(transp-fftw-thrcol-blocked transp.c
-                        "-DUSE_FFTW_THREADS_COL_BLOCKED")
+                        "-DUSE_FFTW_THRCOL_BLOCKED")
 
-  add_exec_threads_fftw(fft-ct-fftw-thrrow fft-ct.c "-DUSE_FFTW_THREADS_ROW")
-  add_exec_threads_fftw(fft-ct-fftw-thrcol fft-ct.c "-DUSE_FFTW_THREADS_COL")
+  add_exec_threads_fftw(fft-ct-fftw-thrrow fft-ct.c "-DUSE_FFTW_THRROW")
+  add_exec_threads_fftw(fft-ct-fftw-thrcol fft-ct.c "-DUSE_FFTW_THRCOL")
   add_exec_threads_fftw(fft-ct-fftw-thrrow-blocked fft-ct.c
-                        "-DUSE_FFTW_THREADS_ROW_BLOCKED")
+                        "-DUSE_FFTW_THRROW_BLOCKED")
   add_exec_threads_fftw(fft-ct-fftw-thrcol-blocked fft-ct.c
-                        "-DUSE_FFTW_THREADS_COL_BLOCKED")
+                        "-DUSE_FFTW_THRCOL_BLOCKED")
 endif(Threads_FOUND AND FFTW_FOUND)
 
 # Use MKL library
@@ -309,14 +305,14 @@ if(ENABLE_AVX)
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
   endfunction(add_exec_avx)
 
-  add_exec_avx(transp-flt-avx-auto transp.c "-DUSE_FLOAT_NAIVE")
-  add_exec_avx(transp-dbl-avx-auto transp.c "-DUSE_DOUBLE_NAIVE")
-  add_exec_avx(transp-flt-blocked-avx-auto transp.c "-DUSE_FLOAT_BLOCKED")
-  add_exec_avx(transp-dbl-blocked-avx-auto transp.c "-DUSE_DOUBLE_BLOCKED")
+  add_exec_avx(transp-flt-avx-auto transp.c "-DUSE_FLT_NAIVE")
+  add_exec_avx(transp-dbl-avx-auto transp.c "-DUSE_DBL_NAIVE")
+  add_exec_avx(transp-flt-blocked-avx-auto transp.c "-DUSE_FLT_BLOCKED")
+  add_exec_avx(transp-dbl-blocked-avx-auto transp.c "-DUSE_DBL_BLOCKED")
 
-  add_exec_avx(transp-dbl-avx-intr transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
+  add_exec_avx(transp-dbl-avx-intr transp.c "-DUSE_DBL_AVX_INTR_8X8")
   add_exec_avx(transp-dbl-avx-intr-ss transp.c
-               "-DUSE_DOUBLE_AVX_INTR_8X8;-DUSE_AVX_STREAMING_STORES")
+               "-DUSE_DBL_AVX_INTR_8X8;-DUSE_AVX_STREAMING_STORES")
 endif(ENABLE_AVX)
 
 # Use threads with intrinsic AVX
@@ -331,7 +327,7 @@ if(Threads_FOUND AND ENABLE_AVX)
   endfunction(add_exec_threads_avx)
 
   add_exec_threads_avx(transp-dbl-thrrow-avx-intr transp.c
-                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_ROW")
+                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_ROW")
   add_exec_threads_avx(transp-dbl-thrcol-avx-intr transp.c
-                       "-DUSE_DOUBLE_THREADS_AVX_INTR_8X8_COL")
+                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_COL")
 endif(Threads_FOUND AND ENABLE_AVX)
