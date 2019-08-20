@@ -91,6 +91,14 @@ if(Threads_FOUND)
   add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DOUBLE_THREADS_ROW")
   add_exec_threads(transp-flt-thrcol transp.c "-DUSE_FLOAT_THREADS_COL")
   add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DOUBLE_THREADS_COL")
+  add_exec_threads(transp-fcmplx-thrrow transp.c
+                   "-DUSE_FLOAT_COMPLEX_THREADS_ROW")
+  add_exec_threads(transp-dcmplx-thrrow transp.c
+                   "-DUSE_DOUBLE_COMPLEX_THREADS_ROW")
+  add_exec_threads(transp-fcmplx-thrcol transp.c
+                   "-DUSE_FLOAT_COMPLEX_THREADS_COL")
+  add_exec_threads(transp-dcmplx-thrcol transp.c
+                   "-DUSE_DOUBLE_COMPLEX_THREADS_COL")
 
   add_exec_threads(transp-flt-thrrow-blocked transp.c
                    "-DUSE_FLOAT_THREADS_ROW_BLOCKED")
@@ -100,6 +108,14 @@ if(Threads_FOUND)
                    "-DUSE_FLOAT_THREADS_COL_BLOCKED")
   add_exec_threads(transp-dbl-thrcol-blocked transp.c
                    "-DUSE_DOUBLE_THREADS_COL_BLOCKED")
+  add_exec_threads(transp-fcmplx-thrrow-blocked transp.c
+                   "-DUSE_FLOAT_COMPLEX_THREADS_ROW_BLOCKED")
+  add_exec_threads(transp-dcmplx-thrrow-blocked transp.c
+                   "-DUSE_DOUBLE_COMPLEX_THREADS_ROW_BLOCKED")
+  add_exec_threads(transp-fcmplx-thrcol-blocked transp.c
+                   "-DUSE_FLOAT_COMPLEX_THREADS_COL_BLOCKED")
+  add_exec_threads(transp-dcmplx-thrcol-blocked transp.c
+                   "-DUSE_DOUBLE_COMPLEX_THREADS_COL_BLOCKED")
 endif(Threads_FOUND)
 
 # Use FFTWF library
