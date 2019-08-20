@@ -295,7 +295,7 @@ if(ENABLE_AVX AND NOT C_FLAGS_AVX)
                         "Set C_FLAGS_AVX explicitly or set ENABLE_AVX=OFF")
   endif()
 endif(ENABLE_AVX AND NOT C_FLAGS_AVX)
-string(REPLACE " " ";" C_FLAGS_AVX_LIST ${C_FLAGS_AVX}) # string->list
+string(REPLACE " " ";" C_FLAGS_AVX_LIST "${C_FLAGS_AVX}") # string->list
 
 # Use automatic and intrinsic AVX
 if(ENABLE_AVX)
