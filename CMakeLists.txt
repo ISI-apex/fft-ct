@@ -132,6 +132,7 @@ if(FFTWF_FOUND)
   add_exec_fftwf(fft-2d-fftwf-lib-lfftw fft-2d.c "-DUSE_FFTWF")
 endif(FFTWF_FOUND)
 
+# Use FFTWF library with threads
 if(FFTWF_FOUND AND Threads_FOUND)
   function(add_exec_fftwf_threads name main definitions)
     add_executable(${name} ${main} ptime.c
@@ -175,6 +176,7 @@ if(FFTW_FOUND)
   add_exec_fftw(fft-2d-fftw-lib-lfftw fft-2d.c "")
 endif(FFTW_FOUND)
 
+# Use FFTW library with threads
 if(FFTW_FOUND AND Threads_FOUND)
   function(add_exec_fftw_threads name main definitions)
     add_executable(${name} ${main} ptime.c
@@ -333,6 +335,7 @@ if(Threads_FOUND AND ENABLE_AVX)
                        "-DUSE_DBL_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(Threads_FOUND AND ENABLE_AVX)
 
+# Use FFTWF library with intrinsic AVX
 if(FFTWF_FOUND AND ENABLE_AVX)
   function(add_exec_fftwf_avx name main definitions)
     add_executable(${name} ${main} ptime.c transpose-fftwf-avx.c transpose-avx.c
@@ -353,6 +356,7 @@ if(FFTWF_FOUND AND ENABLE_AVX)
                      "-DUSE_FFTWF_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(FFTWF_FOUND AND ENABLE_AVX)
 
+# Use FFTWF library with threads and intrinsic AVX
 if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
   function(add_exec_fftwf_threads_avx name main definitions)
     add_executable(${name} ${main} ptime.c transpose-fftwf-threads-avx.c
