@@ -132,30 +132,30 @@ if(FFTWF_FOUND)
   add_exec_fftwf(fft-2d-fftwf-lib-lfftw fft-2d.c "-DUSE_FFTWF")
 endif(FFTWF_FOUND)
 
-if(Threads_FOUND AND FFTWF_FOUND)
-  function(add_exec_threads_fftwf name main definitions)
+if(FFTWF_FOUND AND Threads_FOUND)
+  function(add_exec_fftwf_threads name main definitions)
     add_executable(${name} ${main} ptime.c
                                    transpose-threads.c transpose-fftwf-threads.c
                                    util.c util-fftwf.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                           ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
-  endfunction(add_exec_threads_fftwf)
+  endfunction(add_exec_fftwf_threads)
 
-  add_exec_threads_fftwf(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THRROW")
-  add_exec_threads_fftwf(transp-fftwf-thrcol transp.c "-DUSE_FFTWF_THRCOL")
-  add_exec_threads_fftwf(transp-fftwf-thrrow-blocked transp.c
+  add_exec_fftwf_threads(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THRROW")
+  add_exec_fftwf_threads(transp-fftwf-thrcol transp.c "-DUSE_FFTWF_THRCOL")
+  add_exec_fftwf_threads(transp-fftwf-thrrow-blocked transp.c
                          "-DUSE_FFTWF_THRROW_BLOCKED")
-  add_exec_threads_fftwf(transp-fftwf-thrcol-blocked transp.c
+  add_exec_fftwf_threads(transp-fftwf-thrcol-blocked transp.c
                          "-DUSE_FFTWF_THRCOL_BLOCKED")
 
-  add_exec_threads_fftwf(fft-ct-fftwf-thrrow fft-ct.c "-DUSE_FFTWF_THRROW")
-  add_exec_threads_fftwf(fft-ct-fftwf-thrcol fft-ct.c "-DUSE_FFTWF_THRCOL")
-  add_exec_threads_fftwf(fft-ct-fftwf-thrrow-blocked fft-ct.c
+  add_exec_fftwf_threads(fft-ct-fftwf-thrrow fft-ct.c "-DUSE_FFTWF_THRROW")
+  add_exec_fftwf_threads(fft-ct-fftwf-thrcol fft-ct.c "-DUSE_FFTWF_THRCOL")
+  add_exec_fftwf_threads(fft-ct-fftwf-thrrow-blocked fft-ct.c
                          "-DUSE_FFTWF_THRROW_BLOCKED")
-  add_exec_threads_fftwf(fft-ct-fftwf-thrcol-blocked fft-ct.c
+  add_exec_fftwf_threads(fft-ct-fftwf-thrcol-blocked fft-ct.c
                          "-DUSE_FFTWF_THRCOL_BLOCKED")
-endif(Threads_FOUND AND FFTWF_FOUND)
+endif(FFTWF_FOUND AND Threads_FOUND)
 
 # Use FFTW library
 if(FFTW_FOUND)
@@ -175,30 +175,30 @@ if(FFTW_FOUND)
   add_exec_fftw(fft-2d-fftw-lib-lfftw fft-2d.c "")
 endif(FFTW_FOUND)
 
-if(Threads_FOUND AND FFTW_FOUND)
-  function(add_exec_threads_fftw name main definitions)
+if(FFTW_FOUND AND Threads_FOUND)
+  function(add_exec_fftw_threads name main definitions)
     add_executable(${name} ${main} ptime.c
                                    transpose-threads.c transpose-fftw-threads.c
                                    util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                           ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
-  endfunction(add_exec_threads_fftw)
+  endfunction(add_exec_fftw_threads)
 
-  add_exec_threads_fftw(transp-fftw-thrrow transp.c "-DUSE_FFTW_THRROW")
-  add_exec_threads_fftw(transp-fftw-thrcol transp.c "-DUSE_FFTW_THRCOL")
-  add_exec_threads_fftw(transp-fftw-thrrow-blocked transp.c
+  add_exec_fftw_threads(transp-fftw-thrrow transp.c "-DUSE_FFTW_THRROW")
+  add_exec_fftw_threads(transp-fftw-thrcol transp.c "-DUSE_FFTW_THRCOL")
+  add_exec_fftw_threads(transp-fftw-thrrow-blocked transp.c
                         "-DUSE_FFTW_THRROW_BLOCKED")
-  add_exec_threads_fftw(transp-fftw-thrcol-blocked transp.c
+  add_exec_fftw_threads(transp-fftw-thrcol-blocked transp.c
                         "-DUSE_FFTW_THRCOL_BLOCKED")
 
-  add_exec_threads_fftw(fft-ct-fftw-thrrow fft-ct.c "-DUSE_FFTW_THRROW")
-  add_exec_threads_fftw(fft-ct-fftw-thrcol fft-ct.c "-DUSE_FFTW_THRCOL")
-  add_exec_threads_fftw(fft-ct-fftw-thrrow-blocked fft-ct.c
+  add_exec_fftw_threads(fft-ct-fftw-thrrow fft-ct.c "-DUSE_FFTW_THRROW")
+  add_exec_fftw_threads(fft-ct-fftw-thrcol fft-ct.c "-DUSE_FFTW_THRCOL")
+  add_exec_fftw_threads(fft-ct-fftw-thrrow-blocked fft-ct.c
                         "-DUSE_FFTW_THRROW_BLOCKED")
-  add_exec_threads_fftw(fft-ct-fftw-thrcol-blocked fft-ct.c
+  add_exec_fftw_threads(fft-ct-fftw-thrcol-blocked fft-ct.c
                         "-DUSE_FFTW_THRCOL_BLOCKED")
-endif(Threads_FOUND AND FFTW_FOUND)
+endif(FFTW_FOUND AND Threads_FOUND)
 
 # Use MKL library
 if(MKL_FOUND)
@@ -353,7 +353,7 @@ if(FFTWF_FOUND AND ENABLE_AVX)
                      "-DUSE_FFTWF_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(FFTWF_FOUND AND ENABLE_AVX)
 
-if(Threads_FOUND AND FFTWF_FOUND AND ENABLE_AVX)
+if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
   function(add_exec_fftwf_threads_avx name main definitions)
     add_executable(${name} ${main} ptime.c transpose-fftwf-threads-avx.c
                                    transpose-threads-avx.c util.c util-fftwf.c)
@@ -380,4 +380,4 @@ if(Threads_FOUND AND FFTWF_FOUND AND ENABLE_AVX)
                              "-DUSE_FFTWF_THRCOL_AVX512_INTR")
   add_exec_fftwf_threads_avx(fft-ct-fftwf-thrcol-avx512-intr-ss fft-ct.c
                              "-DUSE_FFTWF_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
-endif(Threads_FOUND AND FFTWF_FOUND AND ENABLE_AVX)
+endif(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
