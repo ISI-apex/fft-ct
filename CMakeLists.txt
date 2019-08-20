@@ -327,6 +327,10 @@ if(Threads_FOUND AND ENABLE_AVX)
 
   add_exec_threads_avx(transp-dbl-thrrow-avx-intr transp.c
                        "-DUSE_DBL_THREADS_AVX_INTR_8X8_ROW")
+  add_exec_threads_avx(transp-dbl-thrrow-avx-intr-ss transp.c
+                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_ROW;-DUSE_AVX_STREAMING_STORES")
   add_exec_threads_avx(transp-dbl-thrcol-avx-intr transp.c
                        "-DUSE_DBL_THREADS_AVX_INTR_8X8_COL")
+  add_exec_threads_avx(transp-dbl-thrcol-avx-intr-ss transp.c
+                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_COL;-DUSE_AVX_STREAMING_STORES")
 endif(Threads_FOUND AND ENABLE_AVX)
