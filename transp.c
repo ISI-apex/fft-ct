@@ -67,8 +67,8 @@
     defined(USE_FFTW_THRCOL) || \
     defined(USE_FFTW_THRROW_BLOCKED) || \
     defined(USE_FFTW_THRCOL_BLOCKED) || \
-    defined(USE_DBL_THREADS_AVX_INTR_8X8_ROW) || \
-    defined(USE_DBL_THREADS_AVX_INTR_8X8_COL)
+    defined(USE_DBL_THRROW_AVX512_INTR) || \
+    defined(USE_DBL_THRCOL_AVX512_INTR)
 #define _USE_TRANSP_THREADS 1
 #endif
 
@@ -461,18 +461,18 @@ int main(int argc, char **argv)
     TRANSP(MKL_Complex16, assert_malloc_al, free,
            fill_rand_cmplx16, matrix_print_cmplx16, transpose_cmplx16_mkl,
            is_eq_cmplx16);
-#elif defined(USE_DBL_AVX_INTR_8X8)
+#elif defined(USE_DBL_AVX512_INTR)
     TRANSP(double, assert_malloc_al, free,
-           fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx_intr_8x8,
+           fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx512_intr,
            is_eq_dbl);
-#elif defined(USE_DBL_THREADS_AVX_INTR_8X8_ROW)
+#elif defined(USE_DBL_THRROW_AVX512_INTR)
     TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl,
-                    transpose_dbl_threads_avx_intr_8x8_row, is_eq_dbl);
-#elif defined(USE_DBL_THREADS_AVX_INTR_8X8_COL)
+                    transpose_dbl_thrrow_avx512_intr, is_eq_dbl);
+#elif defined(USE_DBL_THRCOL_AVX512_INTR)
     TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl,
-                    transpose_dbl_threads_avx_intr_8x8_col, is_eq_dbl);
+                    transpose_dbl_thrcol_avx512_intr, is_eq_dbl);
 #else
     #error "No matching transpose implementation found!"
 #endif

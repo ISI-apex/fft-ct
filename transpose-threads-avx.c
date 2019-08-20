@@ -150,10 +150,10 @@ static void *transpose_thread_blocked_dbl(void *args)
     pthread_exit((void *)tt_arg->thr_num);
 }
 
-void transpose_dbl_threads_avx_intr_8x8_row(const double* restrict A,
-                                            double* restrict B,
-                                            size_t A_rows, size_t A_cols,
-                                            size_t num_thr)
+void transpose_dbl_thrrow_avx512_intr(const double* restrict A,
+                                      double* restrict B,
+                                      size_t A_rows, size_t A_cols,
+                                      size_t num_thr)
 {
     size_t r_min, r_max, thr_num;
     const size_t rows_per_thr = A_rows / num_thr;
@@ -189,10 +189,10 @@ void transpose_dbl_threads_avx_intr_8x8_row(const double* restrict A,
     free(threads);
 }
 
-void transpose_dbl_threads_avx_intr_8x8_col(const double* restrict A,
-                                            double* restrict B,
-                                            size_t A_rows, size_t A_cols,
-                                            size_t num_thr)
+void transpose_dbl_thrcol_avx512_intr(const double* restrict A,
+                                      double* restrict B,
+                                      size_t A_rows, size_t A_cols,
+                                      size_t num_thr)
 {
     size_t c_min, c_max, thr_num;
     const size_t cols_per_thr = A_cols / num_thr;

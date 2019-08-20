@@ -19,8 +19,8 @@
  * using a recursive transpose algorithm.  It will not work correctly
  * unless both A_rows and A_cols are multiples of 8.
  */
-void transpose_dbl_avx_intr_8x8(const double* restrict A, double* restrict B,
-                                size_t A_rows, size_t A_cols)
+void transpose_dbl_avx512_intr(const double* restrict A, double* restrict B,
+                               size_t A_rows, size_t A_cols)
 {
     // used for swapping 2x2 blocks using _mm512_permutex2var_pd()
     static const __m512i idx_2x2_0 = {

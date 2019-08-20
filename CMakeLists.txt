@@ -58,9 +58,9 @@ endif(HAVE_ALIGNED_ALLOC)
 #   naive, blocked,
 #   thr{row,col}[-blocked] (thread-by-{row,column} [and blocked]),
 #   lib (library-defined),
-#   [blocked-]avx-auto ([blocked] AVX-512 automatic),
-#   avx-intr[-ss] (AVX-512 intrinsics [with streaming stores]),
-#   thr{row,col}-avx-intr (threaded-by-{row,column} AVX-512 intrinsics)
+#   [blocked-]avx512-auto ([blocked] AVX-512 automatic),
+#   avx512-intr[-ss] (AVX-512 intrinsics [with streaming stores]),
+#   thr{row,col}-avx512-intr (threaded-by-{row,column} AVX-512 intrinsics)
 # 'lib' is probably one of:
 #   lfftw, lmkl
 
@@ -304,14 +304,14 @@ if(ENABLE_AVX)
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
   endfunction(add_exec_avx)
 
-  add_exec_avx(transp-flt-avx-auto transp.c "-DUSE_FLT_NAIVE")
-  add_exec_avx(transp-dbl-avx-auto transp.c "-DUSE_DBL_NAIVE")
-  add_exec_avx(transp-flt-blocked-avx-auto transp.c "-DUSE_FLT_BLOCKED")
-  add_exec_avx(transp-dbl-blocked-avx-auto transp.c "-DUSE_DBL_BLOCKED")
+  add_exec_avx(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
+  add_exec_avx(transp-dbl-avx512-auto transp.c "-DUSE_DBL_NAIVE")
+  add_exec_avx(transp-flt-blocked-avx512-auto transp.c "-DUSE_FLT_BLOCKED")
+  add_exec_avx(transp-dbl-blocked-avx512-auto transp.c "-DUSE_DBL_BLOCKED")
 
-  add_exec_avx(transp-dbl-avx-intr transp.c "-DUSE_DBL_AVX_INTR_8X8")
-  add_exec_avx(transp-dbl-avx-intr-ss transp.c
-               "-DUSE_DBL_AVX_INTR_8X8;-DUSE_AVX_STREAMING_STORES")
+  add_exec_avx(transp-dbl-avx512-intr transp.c "-DUSE_DBL_AVX512_INTR")
+  add_exec_avx(transp-dbl-avx512-intr-ss transp.c
+               "-DUSE_DBL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(ENABLE_AVX)
 
 # Use threads with intrinsic AVX
@@ -325,12 +325,12 @@ if(Threads_FOUND AND ENABLE_AVX)
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
   endfunction(add_exec_threads_avx)
 
-  add_exec_threads_avx(transp-dbl-thrrow-avx-intr transp.c
-                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_ROW")
-  add_exec_threads_avx(transp-dbl-thrrow-avx-intr-ss transp.c
-                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_ROW;-DUSE_AVX_STREAMING_STORES")
-  add_exec_threads_avx(transp-dbl-thrcol-avx-intr transp.c
-                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_COL")
-  add_exec_threads_avx(transp-dbl-thrcol-avx-intr-ss transp.c
-                       "-DUSE_DBL_THREADS_AVX_INTR_8X8_COL;-DUSE_AVX_STREAMING_STORES")
+  add_exec_threads_avx(transp-dbl-thrrow-avx512-intr transp.c
+                       "-DUSE_DBL_THRROW_AVX512_INTR")
+  add_exec_threads_avx(transp-dbl-thrrow-avx512-intr-ss transp.c
+                       "-DUSE_DBL_THRROW_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+  add_exec_threads_avx(transp-dbl-thrcol-avx512-intr transp.c
+                       "-DUSE_DBL_THRCOL_AVX512_INTR")
+  add_exec_threads_avx(transp-dbl-thrcol-avx512-intr-ss transp.c
+                       "-DUSE_DBL_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(Threads_FOUND AND ENABLE_AVX)

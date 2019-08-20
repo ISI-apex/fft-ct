@@ -9,14 +9,14 @@
 
 #include <stdlib.h>
 
-void transpose_dbl_threads_avx_intr_8x8_row(const double* restrict A,
-                                            double* restrict B,
-                                            size_t A_rows, size_t A_cols,
-                                            size_t num_thr);
+void transpose_dbl_thrrow_avx512_intr(const double* restrict A,
+                                      double* restrict B,
+                                      size_t A_rows, size_t A_cols,
+                                      size_t num_thr);
 
-void transpose_dbl_threads_avx_intr_8x8_col(const double* restrict A,
-                                            double* restrict B,
-                                            size_t A_rows, size_t A_cols,
-                                            size_t num_thr);
+void transpose_dbl_thrcol_avx512_intr(const double* restrict A,
+                                      double* restrict B,
+                                      size_t A_rows, size_t A_cols,
+                                      size_t num_thr);
 
 #endif /* TRANSPOSE_THREADS_AVX_H */
