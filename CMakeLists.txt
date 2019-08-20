@@ -301,7 +301,6 @@ if(ENABLE_AVX)
   add_exec_avx(transp-flt-blocked-avx-auto transp.c "-DUSE_FLOAT_BLOCKED")
   add_exec_avx(transp-dbl-blocked-avx-auto transp.c "-DUSE_DOUBLE_BLOCKED")
 
-  # add_exec_avx(transp-flt-avx-intr transp.c "-DUSE_FLOAT_AVX_INTR_8X8")
   add_exec_avx(transp-dbl-avx-intr transp.c "-DUSE_DOUBLE_AVX_INTR_8X8")
   add_exec_avx(transp-dbl-avx-intr-ss transp.c
                "-DUSE_DOUBLE_AVX_INTR_8X8;-DUSE_AVX_STREAMING_STORES")

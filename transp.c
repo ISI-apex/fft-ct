@@ -474,9 +474,6 @@ int main(int argc, char **argv)
     TRANSP(MKL_Complex16, assert_malloc_al, free,
            fill_rand_cmplx16, matrix_print_cmplx16, transpose_cmplx16_mkl,
            is_eq_cmplx16);
-#elif defined(USE_FLOAT_AVX_INTR_8X8)
-    // TODO
-    return ENOTSUP;
 #elif defined(USE_DOUBLE_AVX_INTR_8X8)
     TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx_intr_8x8,
