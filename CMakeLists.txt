@@ -173,6 +173,25 @@ if(FFTW_FOUND)
   add_exec_fftw(fft-2d-fftw-lib-lfftw fft-2d.c "")
 endif(FFTW_FOUND)
 
+if(Threads_FOUND AND FFTW_FOUND)
+  function(add_exec_threads_fftw name main definitions)
+    add_executable(${name} ${main} ptime.c
+                                   transpose-threads.c transpose-threads-fftw.c
+                                   util.c util-fftw.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
+                          ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+  endfunction(add_exec_threads_fftw)
+
+  add_exec_threads_fftw(transp-fftw-thrrow transp.c "-DUSE_FFTW_THREADS_ROW")
+  add_exec_threads_fftw(transp-fftw-thrcol transp.c "-DUSE_FFTW_THREADS_COL")
+
+  add_exec_threads_fftw(transp-fftw-thrrow-blocked transp.c
+                        "-DUSE_FFTW_THREADS_ROW_BLOCKED")
+  add_exec_threads_fftw(transp-fftw-thrcol-blocked transp.c
+                        "-DUSE_FFTW_THREADS_COL_BLOCKED")
+endif(Threads_FOUND AND FFTW_FOUND)
+
 # Use MKL library
 if(MKL_FOUND)
   function(add_exec_mkl name main definitions)
