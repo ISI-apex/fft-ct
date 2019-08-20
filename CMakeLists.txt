@@ -148,11 +148,18 @@ if(Threads_FOUND AND FFTWF_FOUND)
 
   add_exec_threads_fftwf(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THREADS_ROW")
   add_exec_threads_fftwf(transp-fftwf-thrcol transp.c "-DUSE_FFTWF_THREADS_COL")
-
   add_exec_threads_fftwf(transp-fftwf-thrrow-blocked transp.c
                          "-DUSE_FFTWF_THREADS_ROW_BLOCKED")
   add_exec_threads_fftwf(transp-fftwf-thrcol-blocked transp.c
                          "-DUSE_FFTWF_THREADS_COL_BLOCKED")
+
+  add_exec_threads_fftwf(fft-ct-fftwf-thrrow fft-ct.c "-DUSE_FFTWF_THREADS_ROW")
+  add_exec_threads_fftwf(fft-ct-fftwf-thrcol fft-ct.c "-DUSE_FFTWF_THREADS_COL")
+  add_exec_threads_fftwf(fft-ct-fftwf-thrrow-blocked fft-ct.c
+                         "-DUSE_FFTWF_THREADS_ROW_BLOCKED")
+  add_exec_threads_fftwf(fft-ct-fftwf-thrcol-blocked fft-ct.c
+                         "-DUSE_FFTWF_THREADS_COL_BLOCKED")
+  
 endif(Threads_FOUND AND FFTWF_FOUND)
 
 # Use FFTW library
@@ -185,10 +192,16 @@ if(Threads_FOUND AND FFTW_FOUND)
 
   add_exec_threads_fftw(transp-fftw-thrrow transp.c "-DUSE_FFTW_THREADS_ROW")
   add_exec_threads_fftw(transp-fftw-thrcol transp.c "-DUSE_FFTW_THREADS_COL")
-
   add_exec_threads_fftw(transp-fftw-thrrow-blocked transp.c
                         "-DUSE_FFTW_THREADS_ROW_BLOCKED")
   add_exec_threads_fftw(transp-fftw-thrcol-blocked transp.c
+                        "-DUSE_FFTW_THREADS_COL_BLOCKED")
+
+  add_exec_threads_fftw(fft-ct-fftw-thrrow fft-ct.c "-DUSE_FFTW_THREADS_ROW")
+  add_exec_threads_fftw(fft-ct-fftw-thrcol fft-ct.c "-DUSE_FFTW_THREADS_COL")
+  add_exec_threads_fftw(fft-ct-fftw-thrrow-blocked fft-ct.c
+                        "-DUSE_FFTW_THREADS_ROW_BLOCKED")
+  add_exec_threads_fftw(fft-ct-fftw-thrcol-blocked fft-ct.c
                         "-DUSE_FFTW_THREADS_COL_BLOCKED")
 endif(Threads_FOUND AND FFTW_FOUND)
 
