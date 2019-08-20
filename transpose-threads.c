@@ -6,6 +6,7 @@
  * @date 2019-08-06
  */
 #include <assert.h>
+#include <complex.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +18,10 @@
 struct tr_thread_arg {
     const void* restrict A;
     void* restrict B;
-    size_t A_rows, A_cols, r_min, r_max, c_min, c_max, blk_rows, blk_cols, thr_num;
+    size_t A_rows, A_cols;
+    size_t r_min, r_max, c_min, c_max;
+    size_t blk_rows, blk_cols;
+    size_t thr_num;
 };
 
 static void tt_arg_init(struct tr_thread_arg *tt_arg,
@@ -69,6 +73,26 @@ static void *transpose_thread_dbl(void *args)
     pthread_exit((void *)tt_arg->thr_num);
 }
 
+static void *transpose_thread_flt_cmplx(void *args)
+{
+    const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
+    TRANSPOSE_BLK((const float complex* restrict)tt_arg->A,
+                  (float complex* restrict)tt_arg->B,
+                  tt_arg->A_rows, tt_arg->A_cols,
+                  tt_arg->r_min, tt_arg->c_min, tt_arg->r_max, tt_arg->c_max);
+    pthread_exit((void *)tt_arg->thr_num);
+}
+
+static void *transpose_thread_dbl_cmplx(void *args)
+{
+    const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
+    TRANSPOSE_BLK((const double complex* restrict)tt_arg->A,
+                  (double complex* restrict)tt_arg->B,
+                  tt_arg->A_rows, tt_arg->A_cols,
+                  tt_arg->r_min, tt_arg->c_min, tt_arg->r_max, tt_arg->c_max);
+    pthread_exit((void *)tt_arg->thr_num);
+}
+
 static void *transpose_thread_blocked_flt(void *args) {
     const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
     const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
@@ -109,6 +133,54 @@ static void *transpose_thread_blocked_dbl(void *args) {
             cblk_max = cblk_min + tt_arg->blk_cols;
             TRANSPOSE_BLK((const double* restrict)tt_arg->A,
                           (double* restrict)tt_arg->B,
+                          tt_arg->A_rows, tt_arg->A_cols,
+                          rblk_min, cblk_min, rblk_max, cblk_max);
+        }
+    }
+
+    pthread_exit((void *)tt_arg->thr_num);
+}
+
+static void *transpose_thread_blocked_flt_cmplx(void *args) {
+    const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
+    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
+    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
+    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
+    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
+    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
+
+    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
+        rblk_min = rblk_num * tt_arg->blk_rows;
+        rblk_max = rblk_min + tt_arg->blk_rows;
+        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
+            cblk_min = cblk_num * tt_arg->blk_cols;
+            cblk_max = cblk_min + tt_arg->blk_cols;
+            TRANSPOSE_BLK((const float complex* restrict)tt_arg->A,
+                          (float complex* restrict)tt_arg->B,
+                          tt_arg->A_rows, tt_arg->A_cols,
+                          rblk_min, cblk_min, rblk_max, cblk_max);
+        }
+    }
+
+    pthread_exit((void *)tt_arg->thr_num);
+}
+
+static void *transpose_thread_blocked_dbl_cmplx(void *args) {
+    const struct tr_thread_arg *tt_arg = (const struct tr_thread_arg *)args;
+    const size_t start_rblk_num = tt_arg->r_min / tt_arg->blk_rows;
+    const size_t end_rblk_num = tt_arg->r_max / tt_arg->blk_rows;
+    const size_t start_cblk_num = tt_arg->c_min / tt_arg->blk_cols;
+    const size_t end_cblk_num = tt_arg->c_max / tt_arg->blk_cols;
+    size_t rblk_num, rblk_min, rblk_max, cblk_num, cblk_min, cblk_max;
+
+    for (rblk_num = start_rblk_num; rblk_num < end_rblk_num; rblk_num++) {
+        rblk_min = rblk_num * tt_arg->blk_rows;
+        rblk_max = rblk_min + tt_arg->blk_rows;
+        for (cblk_num = start_cblk_num; cblk_num < end_cblk_num; cblk_num++) {
+            cblk_min = cblk_num * tt_arg->blk_cols;
+            cblk_max = cblk_min + tt_arg->blk_cols;
+            TRANSPOSE_BLK((const double complex* restrict)tt_arg->A,
+                          (double complex* restrict)tt_arg->B,
                           tt_arg->A_rows, tt_arg->A_cols,
                           rblk_min, cblk_min, rblk_max, cblk_max);
         }
@@ -233,6 +305,42 @@ void transpose_dbl_threads_col(const double* restrict A, double* restrict B,
     transpose_threads_col(A, B, A_rows, A_cols, num_thr, &transpose_thread_dbl);
 }
 
+void transpose_flt_cmplx_threads_row(const float complex* restrict A,
+                                     float complex* restrict B,
+                                     size_t A_rows, size_t A_cols,
+                                     size_t num_thr)
+{
+    transpose_threads_row(A, B, A_rows, A_cols, num_thr,
+                          &transpose_thread_flt_cmplx);
+}
+
+void transpose_dbl_cmplx_threads_row(const double complex* restrict A,
+                                     double complex* restrict B,
+                                     size_t A_rows, size_t A_cols,
+                                     size_t num_thr)
+{
+    transpose_threads_row(A, B, A_rows, A_cols, num_thr,
+                          &transpose_thread_dbl_cmplx);
+}
+
+void transpose_flt_cmplx_threads_col(const float complex* restrict A,
+                                     float complex* restrict B,
+                                     size_t A_rows, size_t A_cols,
+                                     size_t num_thr)
+{
+    transpose_threads_col(A, B, A_rows, A_cols, num_thr,
+                          &transpose_thread_flt_cmplx);
+}
+
+void transpose_dbl_cmplx_threads_col(const double complex* restrict A,
+                                     double complex* restrict B,
+                                     size_t A_rows, size_t A_cols,
+                                     size_t num_thr)
+{
+    transpose_threads_col(A, B, A_rows, A_cols, num_thr,
+                          &transpose_thread_dbl_cmplx);
+}
+
 static void transpose_threads_row_blocked(const void* restrict A,
                                           void* restrict B,
                                           size_t A_rows, size_t A_cols,
@@ -349,4 +457,44 @@ void transpose_dbl_threads_col_blocked(const double* restrict A,
 {
     transpose_threads_col_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
                                   blk_cols, &transpose_thread_blocked_dbl);
+}
+
+void transpose_flt_cmplx_threads_row_blocked(const float complex* restrict A,
+                                             float complex* restrict B,
+                                             size_t A_rows, size_t A_cols,
+                                             size_t num_thr,
+                                             size_t blk_rows, size_t blk_cols)
+{
+    transpose_threads_row_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
+                                  blk_cols, &transpose_thread_blocked_flt_cmplx);
+}
+
+void transpose_dbl_cmplx_threads_row_blocked(const double complex* restrict A,
+                                             double complex* restrict B,
+                                             size_t A_rows, size_t A_cols,
+                                             size_t num_thr,
+                                             size_t blk_rows, size_t blk_cols)
+{
+    transpose_threads_row_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
+                                  blk_cols, &transpose_thread_blocked_dbl_cmplx);
+}
+
+void transpose_flt_cmplx_threads_col_blocked(const float complex* restrict A,
+                                             float complex* restrict B,
+                                             size_t A_rows, size_t A_cols,
+                                             size_t num_thr,
+                                             size_t blk_rows, size_t blk_cols)
+{
+    transpose_threads_col_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
+                                  blk_cols, &transpose_thread_blocked_flt_cmplx);
+}
+
+void transpose_dbl_cmplx_threads_col_blocked(const double complex* restrict A,
+                                             double complex* restrict B,
+                                             size_t A_rows, size_t A_cols,
+                                             size_t num_thr,
+                                             size_t blk_rows, size_t blk_cols)
+{
+    transpose_threads_col_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
+                                  blk_cols, &transpose_thread_blocked_dbl_cmplx);
 }
