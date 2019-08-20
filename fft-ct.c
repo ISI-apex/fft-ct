@@ -17,8 +17,14 @@
 
 #include "ptime.h"
 
-#if defined(USE_FFTWF_NAIVE) || defined(USE_FFTWF_BLOCKED)
+#if defined(USE_FFTWF_NAIVE) || \
+    defined(USE_FFTWF_BLOCKED) || \
+    defined(USE_FFTWF_THREADS_ROW) || \
+    defined(USE_FFTWF_THREADS_COL) || \
+    defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
+    defined(USE_FFTWF_THREADS_COL_BLOCKED)
 #include "transpose-fftwf.h"
+#include "transpose-threads-fftwf.h"
 #include "util-fftwf.h"
 typedef fftwf_complex       FFTW_COMPLEX_T;
 typedef fftwf_plan          FFTW_PLAN_T;
@@ -30,6 +36,7 @@ typedef fftwf_plan          FFTW_PLAN_T;
 #define FILL_RAND           fill_rand_fftwf_complex
 #else
 #include "transpose-fftw.h"
+#include "transpose-threads-fftw.h"
 #include "util-fftw.h"
 typedef fftw_complex        FFTW_COMPLEX_T;
 typedef fftw_plan           FFTW_PLAN_T;
@@ -41,8 +48,24 @@ typedef fftw_plan           FFTW_PLAN_T;
 #define FILL_RAND           fill_rand_fftw_complex
 #endif
 
-#if defined(USE_FFTWF_BLOCKED) || defined(USE_FFTW_BLOCKED)
+#if defined(USE_FFTWF_BLOCKED) || \
+    defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
+    defined(USE_FFTWF_THREADS_COL_BLOCKED) || \
+    defined(USE_FFTW_BLOCKED) || \
+    defined(USE_FFTW_THREADS_ROW_BLOCKED) || \
+    defined(USE_FFTW_THREADS_COL_BLOCKED)
 #define _USE_TRANSP_BLOCKED 1
+#endif
+
+#if defined(USE_FFTWF_THREADS_ROW) || \
+    defined(USE_FFTWF_THREADS_COL) || \
+    defined(USE_FFTWF_THREADS_ROW_BLOCKED) || \
+    defined(USE_FFTWF_THREADS_COL_BLOCKED) || \
+    defined(USE_FFTW_THREADS_ROW) || \
+    defined(USE_FFTW_THREADS_COL) || \
+    defined(USE_FFTW_THREADS_ROW_BLOCKED) || \
+    defined(USE_FFTW_THREADS_COL_BLOCKED)
+#define _USE_TRANSP_THREADS 1
 #endif
 
 static size_t nrows = 0;
@@ -53,6 +76,10 @@ static struct timespec t2;
 #if defined(_USE_TRANSP_BLOCKED)
 static size_t nblkrows = 0;
 static size_t nblkcols = 0;
+#endif
+
+#if defined(_USE_TRANSP_THREADS)
+static size_t nthreads = 1;
 #endif
 
 #define PRINT_ELAPSED_TIME(prefix, t1, t2) \
@@ -103,11 +130,35 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
 #elif defined(USE_FFTWF_BLOCKED)
     transpose_fftwf_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
                                     nblkcols);
+#elif defined(USE_FFTWF_THREADS_ROW)
+    transpose_fftwf_complex_threads_row(fft1_out, fft2_in, nrows, ncols,
+                                        nthreads);
+#elif defined(USE_FFTWF_THREADS_COL)
+    transpose_fftwf_complex_threads_col(fft1_out, fft2_in, nrows, ncols,
+                                        nthreads);
+#elif defined(USE_FFTWF_THREADS_ROW_BLOCKED)
+    transpose_fftwf_complex_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
+                                                nthreads, nblkrows, nblkcols);
+#elif defined(USE_FFTWF_THREADS_COL_BLOCKED)
+    transpose_fftwf_complex_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
+                                                nthreads, nblkrows, nblkcols);
 #elif defined(USE_FFTW_NAIVE)
     transpose_fftw_complex_naive(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTW_BLOCKED)
     transpose_fftw_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
                                    nblkcols);
+#elif defined(USE_FFTW_THREADS_ROW)
+    transpose_fftw_complex_threads_row(fft1_out, fft2_in, nrows, ncols,
+                                       nthreads);
+#elif defined(USE_FFTW_THREADS_COL)
+    transpose_fftw_complex_threads_col(fft1_out, fft2_in, nrows, ncols,
+                                       nthreads);
+#elif defined(USE_FFTW_THREADS_ROW_BLOCKED)
+    transpose_fftw_complex_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
+                                               nthreads, nblkrows, nblkcols);
+#elif defined(USE_FFTW_THREADS_COL_BLOCKED)
+    transpose_fftw_complex_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
+                                               nthreads, nblkrows, nblkcols);
 #else
     #error "No matching transpose implementation found!"
 #endif
@@ -149,7 +200,14 @@ static void fft_ct_1d(void)
 static void usage(const char *pname, int code)
 {
     fprintf(code ? stderr : stdout,
-            "Usage: %s -r ROWS -c COLS [-h]\n"
+            "Usage: %s -r ROWS -c COLS"
+#if defined(_USE_TRANSP_BLOCKED)
+            " [-R ROWS] [-C COLS]"
+#endif
+#if defined(_USE_TRANSP_THREADS)
+            " [-t THREADS]"
+#endif
+            " [-h]\n"
             "  -r, --rows=ROWS          Matrix row count, in [1, ULONG_MAX]\n"
             "  -c, --cols=COLS          Matrix column count, in [1, ULONG_MAX]\n"
 #if defined(_USE_TRANSP_BLOCKED)
@@ -158,6 +216,9 @@ static void usage(const char *pname, int code)
             "                           ROWS/COLS must be divisors of the corresponding\n"
             "                           matrix dimension\n"
             "                           (default=0, implies no blocking in that dimension)\n"
+#endif
+#if defined(_USE_TRANSP_THREADS)
+            "  -t, --threads=THREADS    Number of threads, in (0, ULONG_MAX] (default=1)\n"
 #endif
             "  -h, --help               Print this message and exit\n",
             pname);
@@ -173,12 +234,13 @@ static size_t assert_to_size_t(const char* str, const char* pname)
     return s;
 }
 
-static const char opts_short[] = "r:c:R:C:h";
+static const char opts_short[] = "r:c:R:C:t:h";
 static const struct option opts_long[] = {
     {"rows",        required_argument,  NULL,   'r'},
     {"cols",        required_argument,  NULL,   'c'},
     {"block-rows",  required_argument,  NULL,   'R'},
     {"block-cols",  required_argument,  NULL,   'C'},
+    {"threads",     required_argument,  NULL,   't'},
     {"help",        no_argument,        NULL,   'h'},
     {0, 0, 0, 0}
 };
@@ -201,6 +263,14 @@ int main(int argc, char **argv)
             break;
         case 'C':
             nblkcols = assert_to_size_t(optarg, argv[0]);
+            break;
+#endif
+#if defined(_USE_TRANSP_THREADS)
+        case 't':
+            nthreads = assert_to_size_t(optarg, argv[0]);
+            if (!nthreads) {
+                usage(argv[0], EINVAL);
+            }
             break;
 #endif
         case 'h':
