@@ -26,12 +26,12 @@ double rand_dbl(void)
     return (d / (double) RAND_MAX) - 0.5;
 }
 
-float complex rand_flt_cmplx(void)
+float complex rand_fcmplx(void)
 {
     return CMPLXF(rand_flt(), rand_flt());
 }
 
-double complex rand_dbl_cmplx(void)
+double complex rand_dcmplx(void)
 {
     return CMPLX(rand_dbl(), rand_dbl());
 }
@@ -53,14 +53,14 @@ void fill_rand_dbl(double *a, size_t len)
     FILL_RAND(a, len, rand_dbl);
 }
 
-void fill_rand_flt_cmplx(float complex *a, size_t len)
+void fill_rand_fcmplx(float complex *a, size_t len)
 {
-    FILL_RAND(a, len, rand_flt_cmplx);
+    FILL_RAND(a, len, rand_fcmplx);
 }
 
-void fill_rand_dbl_cmplx(double complex *a, size_t len)
+void fill_rand_dcmplx(double complex *a, size_t len)
 {
-    FILL_RAND(a, len, rand_dbl_cmplx);
+    FILL_RAND(a, len, rand_dcmplx);
 }
 
 #define MATRIX_PRINT(A, nrows, ncols) \
@@ -97,12 +97,12 @@ void matrix_print_dbl(const double *A, size_t nrows, size_t ncols)
     MATRIX_PRINT(A, nrows, ncols);
 }
 
-void matrix_print_flt_cmplx(const float complex *A, size_t nrows, size_t ncols)
+void matrix_print_fcmplx(const float complex *A, size_t nrows, size_t ncols)
 {
     MATRIX_PRINT_CMPLX(A, nrows, ncols);
 }
 
-void matrix_print_dbl_cmplx(const double complex *A, size_t nrows, size_t ncols)
+void matrix_print_dcmplx(const double complex *A, size_t nrows, size_t ncols)
 {
     MATRIX_PRINT_CMPLX(A, nrows, ncols);
 }
@@ -119,12 +119,12 @@ int is_eq_dbl(double a, double b)
     return v >= 0.0 ? (v < DBL_EPSILON) : (v > -DBL_EPSILON);
 }
 
-int is_eq_flt_cmplx(float complex a, float complex b)
+int is_eq_fcmplx(float complex a, float complex b)
 {
     return is_eq_flt(crealf(a), crealf(b)) && is_eq_flt(cimagf(a), cimagf(b));
 }
 
-int is_eq_dbl_cmplx(double complex a, double complex b)
+int is_eq_dcmplx(double complex a, double complex b)
 {
     return is_eq_dbl(creal(a), creal(b)) && is_eq_dbl(cimag(a), cimag(b));
 }

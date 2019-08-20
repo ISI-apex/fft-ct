@@ -12,12 +12,11 @@
 
 #include <fftw3.h>
 
-void fill_rand_fftwf_complex(fftwf_complex *a, size_t len);
+void fill_rand_fftwf(fftwf_complex *a, size_t len);
 
-void matrix_print_fftwf_complex(const fftwf_complex *A,
-                                size_t nrows, size_t ncols);
+void matrix_print_fftwf(const fftwf_complex *A, size_t nrows, size_t ncols);
 
-int is_eq_fftwf_complex(fftwf_complex a, fftwf_complex b);
+int is_eq_fftwf(fftwf_complex a, fftwf_complex b);
 
 void *assert_fftwf_malloc(size_t sz);
 

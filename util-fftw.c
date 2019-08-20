@@ -14,20 +14,19 @@
 #include "util.h"
 #include "util-fftw.h"
 
-void fill_rand_fftw_complex(fftw_complex *a, size_t len)
+void fill_rand_fftw(fftw_complex *a, size_t len)
 {
-    fill_rand_dbl_cmplx(a, len);
+    fill_rand_dcmplx(a, len);
 }
 
-void matrix_print_fftw_complex(const fftw_complex *A,
-                               size_t nrows, size_t ncols)
+void matrix_print_fftw(const fftw_complex *A, size_t nrows, size_t ncols)
 {
-    matrix_print_dbl_cmplx(A, nrows, ncols);
+    matrix_print_dcmplx(A, nrows, ncols);
 }
 
-int is_eq_fftw_complex(fftw_complex a, fftw_complex b)
+int is_eq_fftw(fftw_complex a, fftw_complex b)
 {
-    return is_eq_dbl_cmplx(a, b);
+    return is_eq_dcmplx(a, b);
 }
 
 void *assert_fftw_malloc(size_t sz)

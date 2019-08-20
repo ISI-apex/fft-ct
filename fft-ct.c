@@ -33,7 +33,7 @@ typedef fftwf_plan          FFTW_PLAN_T;
 #define FFTW_PLAN_1D        fftwf_plan_dft_1d
 #define FFTW_PLAN_DESTROY   fftwf_destroy_plan
 #define FFTW_EXECUTE        fftwf_execute
-#define FILL_RAND           fill_rand_fftwf_complex
+#define FILL_RAND           fill_rand_fftwf
 #else
 #include "transpose-fftw.h"
 #include "transpose-threads-fftw.h"
@@ -45,7 +45,7 @@ typedef fftw_plan           FFTW_PLAN_T;
 #define FFTW_PLAN_1D        fftw_plan_dft_1d
 #define FFTW_PLAN_DESTROY   fftw_destroy_plan
 #define FFTW_EXECUTE        fftw_execute
-#define FILL_RAND           fill_rand_fftw_complex
+#define FILL_RAND           fill_rand_fftw
 #endif
 
 #if defined(USE_FFTWF_BLOCKED) || \
@@ -126,39 +126,35 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
     // Matrix transpose
     ptime_gettime_monotonic(&t1);
 #if defined(USE_FFTWF_NAIVE)
-    transpose_fftwf_complex_naive(fft1_out, fft2_in, nrows, ncols);
+    transpose_fftwf_naive(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTWF_BLOCKED)
-    transpose_fftwf_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
-                                    nblkcols);
+    transpose_fftwf_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
+                            nblkcols);
 #elif defined(USE_FFTWF_THRROW)
-    transpose_fftwf_complex_threads_row(fft1_out, fft2_in, nrows, ncols,
-                                        nthreads);
+    transpose_fftwf_threads_row(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTWF_THRCOL)
-    transpose_fftwf_complex_threads_col(fft1_out, fft2_in, nrows, ncols,
-                                        nthreads);
+    transpose_fftwf_threads_col(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTWF_THRROW_BLOCKED)
-    transpose_fftwf_complex_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
-                                                nthreads, nblkrows, nblkcols);
+    transpose_fftwf_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
+                                        nthreads, nblkrows, nblkcols);
 #elif defined(USE_FFTWF_THRCOL_BLOCKED)
-    transpose_fftwf_complex_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
-                                                nthreads, nblkrows, nblkcols);
+    transpose_fftwf_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
+                                        nthreads, nblkrows, nblkcols);
 #elif defined(USE_FFTW_NAIVE)
-    transpose_fftw_complex_naive(fft1_out, fft2_in, nrows, ncols);
+    transpose_fftw_naive(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTW_BLOCKED)
-    transpose_fftw_complex_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
-                                   nblkcols);
+    transpose_fftw_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
+                           nblkcols);
 #elif defined(USE_FFTW_THRROW)
-    transpose_fftw_complex_threads_row(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads);
+    transpose_fftw_threads_row(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTW_THRCOL)
-    transpose_fftw_complex_threads_col(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads);
+    transpose_fftw_threads_col(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTW_THRROW_BLOCKED)
-    transpose_fftw_complex_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
-                                               nthreads, nblkrows, nblkcols);
+    transpose_fftw_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
+                                       nthreads, nblkrows, nblkcols);
 #elif defined(USE_FFTW_THRCOL_BLOCKED)
-    transpose_fftw_complex_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
-                                               nthreads, nblkrows, nblkcols);
+    transpose_fftw_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
+                                       nthreads, nblkrows, nblkcols);
 #else
     #error "No matching transpose implementation found!"
 #endif

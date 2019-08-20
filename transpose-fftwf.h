@@ -12,13 +12,13 @@
 
 #include <fftw3.h>
 
-void transpose_fftwf_complex_naive(const fftwf_complex* restrict A,
-                                   fftwf_complex* restrict B,
-                                   size_t A_rows, size_t A_cols);
+void transpose_fftwf_naive(const fftwf_complex* restrict A,
+                           fftwf_complex* restrict B,
+                           size_t A_rows, size_t A_cols);
 
-void transpose_fftwf_complex_blocked(const fftwf_complex* restrict A,
-                                     fftwf_complex* restrict B,
-                                     size_t A_rows, size_t A_cols,
-                                     size_t blk_rows, size_t blk_cols);
+void transpose_fftwf_blocked(const fftwf_complex* restrict A,
+                             fftwf_complex* restrict B,
+                             size_t A_rows, size_t A_cols,
+                             size_t blk_rows, size_t blk_cols);
 
 #endif /* TRANSPOSE_FFTWF_H */

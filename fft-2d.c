@@ -26,7 +26,7 @@ typedef fftwf_plan          FFTW_PLAN_T;
 #define FFTW_PLAN_2D        fftwf_plan_dft_2d
 #define FFTW_PLAN_DESTROY   fftwf_destroy_plan
 #define FFTW_EXECUTE        fftwf_execute
-#define FILL_RAND           fill_rand_fftwf_complex
+#define FILL_RAND           fill_rand_fftwf
 #else
 #include "util-fftw.h"
 typedef fftw_complex        FFTW_COMPLEX_T;
@@ -36,7 +36,7 @@ typedef fftw_plan           FFTW_PLAN_T;
 #define FFTW_PLAN_2D        fftw_plan_dft_2d
 #define FFTW_PLAN_DESTROY   fftw_destroy_plan
 #define FFTW_EXECUTE        fftw_execute
-#define FILL_RAND           fill_rand_fftw_complex
+#define FILL_RAND           fill_rand_fftw
 #endif
 
 static struct timespec t1;
