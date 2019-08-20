@@ -68,7 +68,9 @@
     defined(USE_FFTW_THRROW_BLOCKED) || \
     defined(USE_FFTW_THRCOL_BLOCKED) || \
     defined(USE_DBL_THRROW_AVX512_INTR) || \
-    defined(USE_DBL_THRCOL_AVX512_INTR)
+    defined(USE_DBL_THRCOL_AVX512_INTR) || \
+    defined(USE_FFTWF_THRROW_AVX512_INTR) || \
+    defined(USE_FFTWF_THRCOL_AVX512_INTR)
 #define _USE_TRANSP_THREADS 1
 #endif
 
@@ -77,9 +79,14 @@
     defined(USE_FFTWF_THRROW) || \
     defined(USE_FFTWF_THRCOL) || \
     defined(USE_FFTWF_THRROW_BLOCKED) || \
-    defined(USE_FFTWF_THRCOL_BLOCKED)
+    defined(USE_FFTWF_THRCOL_BLOCKED) || \
+    defined(USE_FFTWF_AVX512_INTR) || \
+    defined(USE_FFTWF_THRROW_AVX512_INTR) || \
+    defined(USE_FFTWF_THRCOL_AVX512_INTR)
 #include <fftw3.h>
 #include "transpose-fftwf.h"
+#include "transpose-fftwf-avx.h"
+#include "transpose-fftwf-threads-avx.h"
 #include "transpose-threads-fftwf.h"
 #include "util-fftwf.h"
 #endif
@@ -465,6 +472,10 @@ int main(int argc, char **argv)
     TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx512_intr,
            is_eq_dbl);
+#elif defined(USE_FFTWF_AVX512_INTR)
+    TRANSP(fftwf_complex, assert_fftwf_malloc, fftwf_free,
+           fill_rand_fftwf, matrix_print_fftwf,
+           transpose_fftwf_avx512_intr, is_eq_fftwf);
 #elif defined(USE_DBL_THRROW_AVX512_INTR)
     TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl,
@@ -473,6 +484,14 @@ int main(int argc, char **argv)
     TRANSP_THREADED(double, assert_malloc_al, free,
                     fill_rand_dbl, matrix_print_dbl,
                     transpose_dbl_thrcol_avx512_intr, is_eq_dbl);
+#elif defined(USE_FFTWF_THRROW_AVX512_INTR)
+    TRANSP_THREADED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
+                    fill_rand_fftwf, matrix_print_fftwf,
+                    transpose_fftwf_thrrow_avx512_intr, is_eq_fftwf);
+#elif defined(USE_FFTWF_THRCOL_AVX512_INTR)
+    TRANSP_THREADED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
+                    fill_rand_fftwf, matrix_print_fftwf,
+                    transpose_fftwf_thrcol_avx512_intr, is_eq_fftwf);
 #else
     #error "No matching transpose implementation found!"
 #endif
