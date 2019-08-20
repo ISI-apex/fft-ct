@@ -136,6 +136,25 @@ if(FFTWF_FOUND)
   add_exec_fftwf(fft-2d-fftwf-lib-lfftw fft-2d.c "-DUSE_FFTWF")
 endif(FFTWF_FOUND)
 
+if(Threads_FOUND AND FFTWF_FOUND)
+  function(add_exec_threads_fftwf name main definitions)
+    add_executable(${name} ${main} ptime.c
+                                   transpose-threads.c transpose-threads-fftwf.c
+                                   util.c util-fftwf.c)
+    target_compile_definitions(${name} PRIVATE ${definitions})
+    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
+                          ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+  endfunction(add_exec_threads_fftwf)
+
+  add_exec_threads_fftwf(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THREADS_ROW")
+  add_exec_threads_fftwf(transp-fftwf-thrcol transp.c "-DUSE_FFTWF_THREADS_COL")
+
+  add_exec_threads_fftwf(transp-fftwf-thrrow-blocked transp.c
+                         "-DUSE_FFTWF_THREADS_ROW_BLOCKED")
+  add_exec_threads_fftwf(transp-fftwf-thrcol-blocked transp.c
+                         "-DUSE_FFTWF_THREADS_COL_BLOCKED")
+endif(Threads_FOUND AND FFTWF_FOUND)
+
 # Use FFTW library
 if(FFTW_FOUND)
   function(add_exec_fftw name main definitions)
