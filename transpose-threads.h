@@ -7,6 +7,7 @@
 #ifndef TRANSPOSE_THREADS_H
 #define TRANSPOSE_THREADS_H
 
+#include <complex.h>
 #include <stdlib.h>
 
 void transpose_flt_threads_row(const float* restrict A, float* restrict B,
