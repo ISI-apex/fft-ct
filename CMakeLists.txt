@@ -13,6 +13,15 @@ option(ENABLE_AVX "Enable Skylake AVX-512 binaries" ON)
 
 # Dependencies
 
+if(CMAKE_HOST_UNIX)
+  include(GNUInstallDirs)
+else()
+  set(CMAKE_INSTALL_LIBDIR lib)
+  set(CMAKE_INSTALL_INCLUDEDIR include)
+  set(CMAKE_INSTALL_BINDIR bin)
+  set(CMAKE_INSTALL_MANDIR share/man)
+endif()
+
 find_package(Threads)
 
 find_package(PkgConfig)
@@ -67,6 +76,7 @@ endif(HAVE_ALIGNED_ALLOC)
 function(add_exec_prim name main definitions)
   add_executable(${name} ${main} ptime.c transpose.c util.c)
   target_compile_definitions(${name} PRIVATE ${definitions})
+  install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction(add_exec_prim)
 
 add_exec_prim(transp-flt-naive transp.c "-DUSE_FLT_NAIVE")
@@ -85,6 +95,7 @@ if(Threads_FOUND)
     add_executable(${name} ${main} ptime.c transpose-threads.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_threads)
 
   add_exec_threads(transp-flt-thrrow transp.c "-DUSE_FLT_THRROW")
@@ -121,6 +132,7 @@ if(FFTWF_FOUND)
                                    util.c util-fftwf.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf)
 
   add_exec_fftwf(transp-fftwf-naive transp.c "-DUSE_FFTWF_NAIVE")
@@ -141,6 +153,7 @@ if(FFTWF_FOUND AND Threads_FOUND)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                           ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_threads)
 
   add_exec_fftwf_threads(transp-fftwf-thrrow transp.c "-DUSE_FFTWF_THRROW")
@@ -165,6 +178,7 @@ if(FFTW_FOUND)
                                    util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftw)
 
   add_exec_fftw(transp-fftw-naive transp.c "-DUSE_FFTW_NAIVE")
@@ -185,6 +199,7 @@ if(FFTW_FOUND AND Threads_FOUND)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                           ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftw_threads)
 
   add_exec_fftw_threads(transp-fftw-thrrow transp.c "-DUSE_FFTW_THRROW")
@@ -209,6 +224,7 @@ if(MKL_FOUND)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
     target_link_libraries(${name} ${MKL_LDFLAGS})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl)
 
   add_exec_mkl(transp-flt-lib-lmkl transp.c "-DUSE_MKL_FLOAT")
@@ -224,6 +240,7 @@ if(MKL_FOUND)
                                    util.c util-fftwf.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${MKL_LDFLAGS})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl_fftwf)
 
   add_exec_mkl_fftwf(transp-fftwf-naive-lmkl transp.c "-DUSE_FFTWF_NAIVE")
@@ -242,6 +259,7 @@ if(MKL_FOUND)
                                    util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${MKL_LDFLAGS})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl_fftw)
 
   add_exec_mkl_fftw(transp-fftw-naive-lmkl transp.c "-DUSE_FFTW_NAIVE")
@@ -304,6 +322,7 @@ if(ENABLE_AVX)
     add_executable(${name} ${main} ptime.c transpose.c transpose-avx.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_avx)
 
   add_exec_avx(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
@@ -323,6 +342,7 @@ if(Threads_FOUND AND ENABLE_AVX)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_threads_avx)
 
   add_exec_threads_avx(transp-dbl-thrrow-avx512-intr transp.c
@@ -343,6 +363,7 @@ if(FFTWF_FOUND AND ENABLE_AVX)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_avx)
 
   add_exec_fftwf_avx(transp-fftwf-avx512-intr transp.c
@@ -365,6 +386,7 @@ if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                                   ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_threads_avx)
 
   add_exec_fftwf_threads_avx(transp-fftwf-thrrow-avx512-intr transp.c
@@ -385,3 +407,13 @@ if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
   add_exec_fftwf_threads_avx(fft-ct-fftwf-thrcol-avx512-intr-ss fft-ct.c
                              "-DUSE_FFTWF_THRCOL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
+
+
+# Uninstall
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+  @ONLY
+)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
