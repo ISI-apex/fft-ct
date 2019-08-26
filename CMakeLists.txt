@@ -26,21 +26,12 @@ find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
   # FFTW3 single precision
   pkg_check_modules(FFTWF fftw3f)
-  if(FFTWF_FOUND)
-    include_directories(${FFTWF_INCLUDE_DIRS})
-  endif(FFTWF_FOUND)
 
   # FFTW3 double precision
   pkg_check_modules(FFTW fftw3)
-  if(FFTW_FOUND)
-    include_directories(${FFTW_INCLUDE_DIRS})
-  endif(FFTW_FOUND)
 
   # Intel MKL
   pkg_check_modules(MKL mkl-static-ilp64-seq)
-  if(MKL_FOUND)
-    include_directories(${MKL_INCLUDE_DIRS})
-  endif(MKL_FOUND)
 endif(PKG_CONFIG_FOUND)
 
 include(CheckSymbolExists)
@@ -128,6 +119,7 @@ if(FFTWF_FOUND)
   function(add_exec_fftwf name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftwf.c
                                    util.c util-fftwf.c)
+    target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -148,6 +140,7 @@ if(FFTWF_FOUND AND Threads_FOUND)
     add_executable(${name} ${main} ptime.c
                                    transpose-threads.c transpose-fftwf-threads.c
                                    util.c util-fftwf.c)
+    target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                           ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
@@ -174,6 +167,7 @@ if(FFTW_FOUND)
   function(add_exec_fftw name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c
                                    util.c util-fftw.c)
+    target_include_directories(${name} PRIVATE ${FFTW_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -194,6 +188,7 @@ if(FFTW_FOUND AND Threads_FOUND)
     add_executable(${name} ${main} ptime.c
                                    transpose-threads.c transpose-fftw-threads.c
                                    util.c util-fftw.c)
+    target_include_directories(${name} PRIVATE ${FFTW_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
                           ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
@@ -219,6 +214,7 @@ endif(FFTW_FOUND AND Threads_FOUND)
 if(MKL_FOUND)
   function(add_exec_mkl name main definitions)
     add_executable(${name} ${main} ptime.c transpose-mkl.c util.c util-mkl.c)
+    target_include_directories(${name} PRIVATE ${MKL_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
     target_link_libraries(${name} ${MKL_LDFLAGS})
@@ -236,6 +232,7 @@ if(MKL_FOUND)
   function(add_exec_mkl_fftwf name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftwf.c
                                    util.c util-fftwf.c)
+    target_include_directories(${name} PRIVATE ${MKL_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${MKL_LDFLAGS})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -255,6 +252,7 @@ if(MKL_FOUND)
   function(add_exec_mkl_fftw name main definitions)
     add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c
                                    util.c util-fftw.c)
+    target_include_directories(${name} PRIVATE ${MKL_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_link_libraries(${name} ${MKL_LDFLAGS})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -353,6 +351,7 @@ if(FFTWF_FOUND AND ENABLE_AVX)
   function(add_exec_fftwf_avx name main definitions)
     add_executable(${name} ${main} ptime.c transpose-fftwf-avx.c transpose-avx.c
                                    util.c util-fftwf.c)
+    target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
@@ -375,6 +374,7 @@ if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
   function(add_exec_fftwf_threads_avx name main definitions)
     add_executable(${name} ${main} ptime.c transpose-fftwf-threads-avx.c
                                    transpose-threads-avx.c util.c util-fftwf.c)
+    target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
