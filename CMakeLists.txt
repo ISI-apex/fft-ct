@@ -8,8 +8,6 @@ set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c11")
 
-option(ENABLE_AVX "Enable Skylake AVX-512 binaries" ON)
-
 
 # Dependencies
 
@@ -275,44 +273,39 @@ endif(MKL_FOUND)
 # Note: Complete auto-detection for architectures and compilers would require
 #       checking target CPUIDs; the list would also get outdated with new CPUs.
 #       Maybe another project maintains such a CMake capability we can use.
-set(C_FLAGS_AVX CACHE STRING "C compiler AVX flags (implies ENABLE_AVX)")
+set(C_FLAGS_AVX CACHE STRING "C compiler AVX flags")
 if(C_FLAGS_AVX)
   message("-- Checking for C_FLAGS_AVX - found")
   set(ENABLE_AVX ON)
 else(C_FLAGS_AVX)
   message("-- Checking for C_FLAGS_AVX - not found")
-endif(C_FLAGS_AVX)
-if(ENABLE_AVX AND NOT C_FLAGS_AVX)
   message("--   Defaulting to AVX-512 for Skylake...")
   # TODO: Does specifying optimization level conflict with CMAKE_BUILD_TYPE?
   #       Certain per-compiler levels are needed for automatic vectorization.
   if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
-    if(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
-      message(FATAL_ERROR "GNU C compiler version is too old for AVX-512: "
-                          "${CMAKE_C_COMPILER_VERSION} < 5.0\n"
-                          "Set option: ENABLE_AVX=OFF")
-    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
+    set(CMAKE_C_COMPILER_VERSION_MIN 5.0)
     set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
   elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
-    if(CMAKE_C_COMPILER_VERSION VERSION_LESS 3.9.1)
-      message(FATAL_ERROR "Clang compiler version is too old for AVX-512: "
-                          "${CMAKE_C_COMPILER_VERSION} < 3.9.1\n"
-                          "Set option: ENABLE_AVX=OFF")
-    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 3.9.1)
+    set(CMAKE_C_COMPILER_VERSION_MIN 3.9.1)
     set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
   elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Intel")
-    if(CMAKE_C_COMPILER_VERSION VERSION_LESS 15.0.1)
-      message(FATAL_ERROR "Intel C compiler version is too old for AVX-512: "
-                          "${CMAKE_C_COMPILER_VERSION} < 15.0.1\n"
-                          "Set option: ENABLE_AVX=OFF")
-    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS 15.0.1)
+    set(CMAKE_C_COMPILER_VERSION_MIN 15.0.1)
     set(C_FLAGS_AVX "-xCORE-AVX512 -qopt-zmm-usage=high -O3")
   else()
-    message(FATAL_ERROR "No default AVX-512 flags for C compiler: "
-                        "${CMAKE_C_COMPILER_ID}\n"
-                        "Set C_FLAGS_AVX explicitly or set ENABLE_AVX=OFF")
+    message(WARNING "No default AVX-512 flags for C compiler: "
+                    "${CMAKE_C_COMPILER_ID}\n"
+                    "Set C_FLAGS_AVX explicitly to force build with AVX-512")
   endif()
-endif(ENABLE_AVX AND NOT C_FLAGS_AVX)
+  if(CMAKE_C_COMPILER_VERSION_MIN)
+    if(CMAKE_C_COMPILER_VERSION VERSION_LESS ${CMAKE_C_COMPILER_VERSION_MIN})
+      message(WARNING
+              "${CMAKE_C_COMPILER_ID} C compiler version is too old for AVX-512: "
+              "${CMAKE_C_COMPILER_VERSION} < ${CMAKE_C_COMPILER_VERSION_MIN}")
+    else(CMAKE_C_COMPILER_VERSION_MIN)
+      set(ENABLE_AVX ON)
+    endif(CMAKE_C_COMPILER_VERSION VERSION_LESS ${CMAKE_C_COMPILER_VERSION_MIN})
+  endif(CMAKE_C_COMPILER_VERSION_MIN)
+endif(C_FLAGS_AVX)
 string(REPLACE " " ";" C_FLAGS_AVX_LIST "${C_FLAGS_AVX}") # string->list
 
 # Use automatic and intrinsic AVX
