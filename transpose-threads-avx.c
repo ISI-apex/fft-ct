@@ -4,6 +4,7 @@
  * @author Kaushik Datta <kdatta@isi.edu>
  * @date 2019-08-15
  */
+#undef NDEBUG
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>

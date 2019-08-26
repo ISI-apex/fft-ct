@@ -5,6 +5,7 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-08-07
  */
+#undef NDEBUG
 #include <assert.h>
 #include <stdlib.h>
 
