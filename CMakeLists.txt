@@ -282,13 +282,17 @@ else(C_FLAGS_AVX)
   #       Certain per-compiler levels are needed for automatic vectorization.
   if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
     set(CMAKE_C_COMPILER_VERSION_MIN 5.0)
-    set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
+    set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 -fopt-info-vec-all")
   elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_C_COMPILER_VERSION_MIN 3.9.1)
-    set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
+    # Note: regardless of whether we set C_FLAGS_AVX as a string or list, cmake
+    # turns params of form `-Rpass="loop|vect"` into `"-Rpass=\"loop|vect\""`,
+    # and clang seems to then ignore the param, so we don't get verbose output.
+    # For now, just set `loop` and `vect` options separately.
+    set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3 -Rpass=loop -Rpass-missed=loop -Rpass-analysis=loop -Rpass=vect -Rpass-missed=vect -Rpass-analysis=vect")
   elseif("${CMAKE_C_COMPILER_ID}" MATCHES "Intel")
     set(CMAKE_C_COMPILER_VERSION_MIN 15.0.1)
-    set(C_FLAGS_AVX "-xCORE-AVX512 -qopt-zmm-usage=high -O3")
+    set(C_FLAGS_AVX "-xCORE-AVX512 -qopt-zmm-usage=high -O3 -vec-threshold0 -qopt-report=5 -qopt-report-file=stdout")
   else()
     message(WARNING "No default AVX-512 flags for C compiler: "
                     "${CMAKE_C_COMPILER_ID}\n"
