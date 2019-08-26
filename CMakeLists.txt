@@ -305,25 +305,35 @@ else(C_FLAGS_AVX)
   endif(CMAKE_C_COMPILER_VERSION_MIN)
 endif(C_FLAGS_AVX)
 string(REPLACE " " ";" C_FLAGS_AVX_LIST "${C_FLAGS_AVX}") # string->list
-
-# Use automatic and intrinsic AVX
 if(ENABLE_AVX)
   message("--   C_FLAGS_AVX: ${C_FLAGS_AVX}")
-  function(add_exec_avx name main definitions)
-    add_executable(${name} ${main} ptime.c transpose.c transpose-avx.c util.c)
+endif(ENABLE_AVX)
+
+# Use automatic AVX
+if(ENABLE_AVX)
+  function(add_exec_avx_auto name main definitions)
+    add_exec_prim(${name} ${main} ${definitions})
+    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+  endfunction(add_exec_avx_auto)
+
+  add_exec_avx_auto(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
+  add_exec_avx_auto(transp-dbl-avx512-auto transp.c "-DUSE_DBL_NAIVE")
+  add_exec_avx_auto(transp-flt-blocked-avx512-auto transp.c "-DUSE_FLT_BLOCKED")
+  add_exec_avx_auto(transp-dbl-blocked-avx512-auto transp.c "-DUSE_DBL_BLOCKED")
+endif(ENABLE_AVX)
+
+# Use intrinsic AVX
+if(ENABLE_AVX)
+  function(add_exec_avx_intr name main definitions)
+    add_executable(${name} ${main} ptime.c transpose-avx.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
-  endfunction(add_exec_avx)
+  endfunction(add_exec_avx_intr)
 
-  add_exec_avx(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
-  add_exec_avx(transp-dbl-avx512-auto transp.c "-DUSE_DBL_NAIVE")
-  add_exec_avx(transp-flt-blocked-avx512-auto transp.c "-DUSE_FLT_BLOCKED")
-  add_exec_avx(transp-dbl-blocked-avx512-auto transp.c "-DUSE_DBL_BLOCKED")
-
-  add_exec_avx(transp-dbl-avx512-intr transp.c "-DUSE_DBL_AVX512_INTR")
-  add_exec_avx(transp-dbl-avx512-intr-ss transp.c
-               "-DUSE_DBL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
+  add_exec_avx_intr(transp-dbl-avx512-intr transp.c "-DUSE_DBL_AVX512_INTR")
+  add_exec_avx_intr(transp-dbl-avx512-intr-ss transp.c
+                    "-DUSE_DBL_AVX512_INTR;-DUSE_AVX_STREAMING_STORES")
 endif(ENABLE_AVX)
 
 # Use threads with intrinsic AVX
