@@ -10,6 +10,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c11")
 
 option(CFLAGS_AVX_VERBOSE "Use verbose AVX compile flags" OFF)
 
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "No build type selected, default to Release")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
+endif()
 
 # Dependencies
 
