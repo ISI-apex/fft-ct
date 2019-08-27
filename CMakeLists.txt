@@ -15,6 +15,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
 endif()
 
+
 # Dependencies
 
 if(CMAKE_HOST_UNIX)
@@ -25,6 +26,22 @@ else()
   set(CMAKE_INSTALL_BINDIR bin)
   set(CMAKE_INSTALL_MANDIR share/man)
 endif()
+
+include(CheckFunctionExists)
+include(CheckSymbolExists)
+
+# Determine if we should link with librt
+if(UNIX AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  CHECK_FUNCTION_EXISTS(clock_gettime HAVE_CLOCK_GETTIME)
+  if(NOT HAVE_CLOCK_GETTIME)
+    find_library(LIBRT NAMES rt)
+  endif(NOT HAVE_CLOCK_GETTIME)
+endif(UNIX AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+# Determine if we should link with libm
+if(UNIX)
+  set(LIBM m)
+endif(UNIX)
 
 find_package(Threads)
 
@@ -39,8 +56,6 @@ if(PKG_CONFIG_FOUND)
   # Intel MKL
   pkg_check_modules(MKL mkl-static-ilp64-seq)
 endif(PKG_CONFIG_FOUND)
-
-include(CheckSymbolExists)
 
 # Some C11 implementations are incomplete, e.g., on OSX with clang
 CHECK_SYMBOL_EXISTS(aligned_alloc stdlib.h HAVE_ALIGNED_ALLOC)
@@ -71,6 +86,7 @@ endif(HAVE_ALIGNED_ALLOC)
 function(add_exec_prim name main definitions)
   add_executable(${name} ${main} ptime.c transpose.c util.c)
   target_compile_definitions(${name} PRIVATE ${definitions})
+  target_link_libraries(${name} ${LIBRT} ${LIBM})
   install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction(add_exec_prim)
 
@@ -89,7 +105,7 @@ if(Threads_FOUND)
   function(add_exec_threads name main definitions)
     add_executable(${name} ${main} ptime.c transpose-threads.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT} ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_threads)
 
@@ -127,7 +143,8 @@ if(FFTWF_FOUND)
                                    util.c util-fftwf.c)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+                                  ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf)
 
@@ -148,8 +165,9 @@ if(FFTWF_FOUND AND Threads_FOUND)
                                    util.c util-fftwf.c)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
-                          ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+                                  ${CMAKE_THREAD_LIBS_INIT}
+                                  ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_threads)
 
@@ -175,7 +193,8 @@ if(FFTW_FOUND)
                                    util.c util-fftw.c)
     target_include_directories(${name} PRIVATE ${FFTW_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES}
+                                  ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftw)
 
@@ -196,8 +215,9 @@ if(FFTW_FOUND AND Threads_FOUND)
                                    util.c util-fftw.c)
     target_include_directories(${name} PRIVATE ${FFTW_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
-                          ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES})
+    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES}
+                                  ${CMAKE_THREAD_LIBS_INIT}
+                                  ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftw_threads)
 
@@ -223,7 +243,7 @@ if(MKL_FOUND)
     target_include_directories(${name} PRIVATE ${MKL_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
-    target_link_libraries(${name} ${MKL_LDFLAGS})
+    target_link_libraries(${name} ${MKL_LDFLAGS} ${LIBRT})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl)
 
@@ -240,7 +260,7 @@ if(MKL_FOUND)
                                    util.c util-fftwf.c)
     target_include_directories(${name} PRIVATE ${MKL_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${MKL_LDFLAGS})
+    target_link_libraries(${name} ${MKL_LDFLAGS} ${LIBRT})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl_fftwf)
 
@@ -260,7 +280,7 @@ if(MKL_FOUND)
                                    util.c util-fftw.c)
     target_include_directories(${name} PRIVATE ${MKL_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${MKL_LDFLAGS})
+    target_link_libraries(${name} ${MKL_LDFLAGS} ${LIBRT})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl_fftw)
 
@@ -333,6 +353,7 @@ if(ENABLE_AVX)
   function(add_exec_avx_auto name main definitions)
     add_exec_prim(${name} ${main} ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+    target_link_libraries(${name} ${LIBRT} ${LIBM})
   endfunction(add_exec_avx_auto)
 
   add_exec_avx_auto(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
@@ -347,6 +368,7 @@ if(ENABLE_AVX)
     add_executable(${name} ${main} ptime.c transpose-avx.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
+    target_link_libraries(${name} ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_avx_intr)
 
@@ -361,7 +383,7 @@ if(Threads_FOUND AND ENABLE_AVX)
     add_executable(${name} ${main} ptime.c transpose-threads-avx.c util.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
-    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT} ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_threads_avx)
 
@@ -383,7 +405,8 @@ if(FFTWF_FOUND AND ENABLE_AVX)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
-    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+                                  ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_avx)
 
@@ -406,8 +429,9 @@ if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
-    target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT}
-                                  ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES})
+    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+                                  ${CMAKE_THREAD_LIBS_INIT}
+                                  ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_threads_avx)
 
