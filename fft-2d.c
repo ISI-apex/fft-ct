@@ -39,9 +39,6 @@ typedef fftw_plan           FFTW_PLAN_T;
 #define FILL_RAND           fill_rand_fftw
 #endif
 
-static struct timespec t1;
-static struct timespec t2;
-
 #define PRINT_ELAPSED_TIME(prefix, t1, t2) \
     printf("%s (ms): %f\n", prefix, ptime_elapsed_ns(t1, t2) / 1000000.0);
 
@@ -62,6 +59,7 @@ static void data_free(FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B, FFTW_PLAN_T p)
 
 static void fft_2d(size_t nrows, size_t ncols)
 {
+    struct timespec t1, t2;
     FFTW_COMPLEX_T *mat_in, *mat_out;
     FFTW_PLAN_T p;
     data_alloc(&mat_in, &mat_out, &p, nrows, ncols);
