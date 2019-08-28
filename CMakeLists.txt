@@ -97,13 +97,12 @@ function(add_exec_prim name main definitions)
 endfunction(add_exec_prim)
 
 add_exec_prim(transp-flt-naive transp.c "-DUSE_FLT_NAIVE")
-add_exec_prim(transp-dbl-naive transp.c "-DUSE_DBL_NAIVE")
-add_exec_prim(transp-fcmplx-naive transp.c "-DUSE_FCMPLX_NAIVE")
-add_exec_prim(transp-dcmplx-naive transp.c "-DUSE_DCMPLX_NAIVE")
-
 add_exec_prim(transp-flt-blocked transp.c "-DUSE_FLT_BLOCKED")
+add_exec_prim(transp-dbl-naive transp.c "-DUSE_DBL_NAIVE")
 add_exec_prim(transp-dbl-blocked transp.c "-DUSE_DBL_BLOCKED")
+add_exec_prim(transp-fcmplx-naive transp.c "-DUSE_FCMPLX_NAIVE")
 add_exec_prim(transp-fcmplx-blocked transp.c "-DUSE_FCMPLX_BLOCKED")
+add_exec_prim(transp-dcmplx-naive transp.c "-DUSE_DCMPLX_NAIVE")
 add_exec_prim(transp-dcmplx-blocked transp.c "-DUSE_DCMPLX_BLOCKED")
 
 # Use threads
@@ -116,28 +115,27 @@ if(Threads_FOUND)
   endfunction(add_exec_threads)
 
   add_exec_threads(transp-flt-thrrow transp.c "-DUSE_FLT_THRROW")
-  add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DBL_THRROW")
   add_exec_threads(transp-flt-thrcol transp.c "-DUSE_FLT_THRCOL")
-  add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DBL_THRCOL")
-  add_exec_threads(transp-fcmplx-thrrow transp.c "-DUSE_FCMPLX_THRROW")
-  add_exec_threads(transp-dcmplx-thrrow transp.c "-DUSE_DCMPLX_THRROW")
-  add_exec_threads(transp-fcmplx-thrcol transp.c "-DUSE_FCMPLX_THRCOL")
-  add_exec_threads(transp-dcmplx-thrcol transp.c "-DUSE_DCMPLX_THRCOL")
-
   add_exec_threads(transp-flt-thrrow-blocked transp.c
                    "-DUSE_FLT_THRROW_BLOCKED")
-  add_exec_threads(transp-dbl-thrrow-blocked transp.c
-                   "-DUSE_DBL_THRROW_BLOCKED")
   add_exec_threads(transp-flt-thrcol-blocked transp.c
                    "-DUSE_FLT_THRCOL_BLOCKED")
+  add_exec_threads(transp-dbl-thrrow transp.c "-DUSE_DBL_THRROW")
+  add_exec_threads(transp-dbl-thrcol transp.c "-DUSE_DBL_THRCOL")
+  add_exec_threads(transp-dbl-thrrow-blocked transp.c
+                   "-DUSE_DBL_THRROW_BLOCKED")
   add_exec_threads(transp-dbl-thrcol-blocked transp.c
                    "-DUSE_DBL_THRCOL_BLOCKED")
+  add_exec_threads(transp-fcmplx-thrrow transp.c "-DUSE_FCMPLX_THRROW")
+  add_exec_threads(transp-fcmplx-thrcol transp.c "-DUSE_FCMPLX_THRCOL")
   add_exec_threads(transp-fcmplx-thrrow-blocked transp.c
                    "-DUSE_FCMPLX_THRROW_BLOCKED")
-  add_exec_threads(transp-dcmplx-thrrow-blocked transp.c
-                   "-DUSE_DCMPLX_THRROW_BLOCKED")
   add_exec_threads(transp-fcmplx-thrcol-blocked transp.c
                    "-DUSE_FCMPLX_THRCOL_BLOCKED")
+  add_exec_threads(transp-dcmplx-thrrow transp.c "-DUSE_DCMPLX_THRROW")
+  add_exec_threads(transp-dcmplx-thrcol transp.c "-DUSE_DCMPLX_THRCOL")
+  add_exec_threads(transp-dcmplx-thrrow-blocked transp.c
+                   "-DUSE_DCMPLX_THRROW_BLOCKED")
   add_exec_threads(transp-dcmplx-thrcol-blocked transp.c
                    "-DUSE_DCMPLX_THRCOL_BLOCKED")
 endif(Threads_FOUND)
@@ -362,8 +360,8 @@ if(ENABLE_AVX)
   endfunction(add_exec_avx_auto)
 
   add_exec_avx_auto(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
-  add_exec_avx_auto(transp-dbl-avx512-auto transp.c "-DUSE_DBL_NAIVE")
   add_exec_avx_auto(transp-flt-blocked-avx512-auto transp.c "-DUSE_FLT_BLOCKED")
+  add_exec_avx_auto(transp-dbl-avx512-auto transp.c "-DUSE_DBL_NAIVE")
   add_exec_avx_auto(transp-dbl-blocked-avx512-auto transp.c "-DUSE_DBL_BLOCKED")
 endif(ENABLE_AVX)
 
