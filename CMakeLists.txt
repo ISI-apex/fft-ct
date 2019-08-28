@@ -411,9 +411,9 @@ if(FFTWF_FOUND AND ENABLE_AVX)
     add_executable(${name} ${main} ptime.c transpose-fftwf-avx.c transpose-avx.c
                                    util.c util-fftwf.c)
     target_compile_options(${name} PRIVATE ${FFTWF_CFLAGS}
-                                           ${FFTWF_CFLAGS_OTHER})
+                                           ${FFTWF_CFLAGS_OTHER}
+                                           ${C_FLAGS_AVX_LIST})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${FFTWF_STATIC_LIBRARIES}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -436,9 +436,9 @@ if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
     add_executable(${name} ${main} ptime.c transpose-fftwf-threads-avx.c
                                    transpose-threads-avx.c util.c util-fftwf.c)
     target_compile_options(${name} PRIVATE ${FFTWF_CFLAGS}
-                                           ${FFTWF_CFLAGS_OTHER})
+                                           ${FFTWF_CFLAGS_OTHER}
+                                           ${C_FLAGS_AVX_LIST})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
     target_link_libraries(${name} ${FFTWF_STATIC_LIBRARIES}
                                   ${CMAKE_THREAD_LIBS_INIT}
                                   ${LIBRT} ${LIBM})
