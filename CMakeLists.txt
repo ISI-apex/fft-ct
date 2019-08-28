@@ -49,9 +49,15 @@ find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
   # FFTW3 single precision
   pkg_check_modules(FFTWF fftw3f)
+  if(FFTWF_FOUND)
+    link_directories(${FFTWF_LIBRARY_DIRS})
+  endif(FFTWF_FOUND)
 
   # FFTW3 double precision
   pkg_check_modules(FFTW fftw3)
+  if(FFTW_FOUND)
+    link_directories(${FFTW_LIBRARY_DIRS})
+  endif(FFTW_FOUND)
 
   # Intel MKL
   pkg_check_modules(MKL mkl-static-ilp64-seq)
@@ -143,7 +149,7 @@ if(FFTWF_FOUND)
                                    util.c util-fftwf.c)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+    target_link_libraries(${name} ${FFTWF_STATIC_LIBRARIES}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf)
@@ -165,7 +171,7 @@ if(FFTWF_FOUND AND Threads_FOUND)
                                    util.c util-fftwf.c)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+    target_link_libraries(${name} ${FFTWF_STATIC_LIBRARIES}
                                   ${CMAKE_THREAD_LIBS_INIT}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -193,7 +199,7 @@ if(FFTW_FOUND)
                                    util.c util-fftw.c)
     target_include_directories(${name} PRIVATE ${FFTW_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES}
+    target_link_libraries(${name} ${FFTW_STATIC_LIBRARIES}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftw)
@@ -215,7 +221,7 @@ if(FFTW_FOUND AND Threads_FOUND)
                                    util.c util-fftw.c)
     target_include_directories(${name} PRIVATE ${FFTW_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
-    target_link_libraries(${name} ${FFTW_LDFLAGS} ${FFTW_STATIC_LIBRARIES}
+    target_link_libraries(${name} ${FFTW_STATIC_LIBRARIES}
                                   ${CMAKE_THREAD_LIBS_INIT}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -405,7 +411,7 @@ if(FFTWF_FOUND AND ENABLE_AVX)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
-    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+    target_link_libraries(${name} ${FFTWF_STATIC_LIBRARIES}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_fftwf_avx)
@@ -429,7 +435,7 @@ if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
     target_include_directories(${name} PRIVATE ${FFTWF_INCLUDE_DIRS})
     target_compile_definitions(${name} PRIVATE ${definitions})
     target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
-    target_link_libraries(${name} ${FFTWF_LDFLAGS} ${FFTWF_STATIC_LIBRARIES}
+    target_link_libraries(${name} ${FFTWF_STATIC_LIBRARIES}
                                   ${CMAKE_THREAD_LIBS_INIT}
                                   ${LIBRT} ${LIBM})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
