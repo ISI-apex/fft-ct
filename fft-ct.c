@@ -66,12 +66,12 @@ typedef fftw_plan           FFTW_PLAN_T;
     defined(USE_FFTWF_THRCOL) || \
     defined(USE_FFTWF_THRROW_BLOCKED) || \
     defined(USE_FFTWF_THRCOL_BLOCKED) || \
+    defined(USE_FFTWF_THRROW_AVX512_INTR) || \
+    defined(USE_FFTWF_THRCOL_AVX512_INTR) || \
     defined(USE_FFTW_THRROW) || \
     defined(USE_FFTW_THRCOL) || \
     defined(USE_FFTW_THRROW_BLOCKED) || \
-    defined(USE_FFTW_THRCOL_BLOCKED) || \
-    defined(USE_FFTWF_THRROW_AVX512_INTR) || \
-    defined(USE_FFTWF_THRCOL_AVX512_INTR)
+    defined(USE_FFTW_THRCOL_BLOCKED)
 #define _USE_TRANSP_THREADS 1
 #endif
 
@@ -147,6 +147,14 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
 #elif defined(USE_FFTWF_THRCOL_BLOCKED)
     transpose_fftwf_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
                                         nthreads, nblkrows, nblkcols);
+#elif defined(USE_FFTWF_AVX512_INTR)
+    transpose_fftwf_avx512_intr(fft1_out, fft2_in, nrows, ncols);
+#elif defined(USE_FFTWF_THRROW_AVX512_INTR)
+    transpose_fftwf_thrrow_avx512_intr(fft1_out, fft2_in, nrows, ncols,
+                                       nthreads);
+#elif defined(USE_FFTWF_THRCOL_AVX512_INTR)
+    transpose_fftwf_thrcol_avx512_intr(fft1_out, fft2_in, nrows, ncols,
+                                       nthreads);
 #elif defined(USE_FFTW_NAIVE)
     transpose_fftw_naive(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTW_BLOCKED)
@@ -162,14 +170,6 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
 #elif defined(USE_FFTW_THRCOL_BLOCKED)
     transpose_fftw_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
                                        nthreads, nblkrows, nblkcols);
-#elif defined(USE_FFTWF_AVX512_INTR)
-    transpose_fftwf_avx512_intr(fft1_out, fft2_in, nrows, ncols);
-#elif defined(USE_FFTWF_THRROW_AVX512_INTR)
-    transpose_fftwf_thrrow_avx512_intr(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads);
-#elif defined(USE_FFTWF_THRCOL_AVX512_INTR)
-    transpose_fftwf_thrcol_avx512_intr(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads);
 #else
     #error "No matching transpose implementation found!"
 #endif
