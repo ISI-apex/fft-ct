@@ -87,7 +87,7 @@ endif(HAVE_ALIGNED_ALLOC)
 #   avx512-intr[-ss] (AVX-512 intrinsics [with streaming stores]),
 #   thr{row,col}-avx512-intr (threaded-by-{row,column} AVX-512 intrinsics)
 # 'lib' is probably one of:
-#   lfftw, lmkl
+#   lfftwf, lfftw, lmkl
 
 function(add_exec_prim name main definitions)
   add_executable(${name} ${main} ptime.c transpose.c util.c)
@@ -159,7 +159,7 @@ if(FFTWF_FOUND)
   add_exec_fftwf(fft-ct-fftwf-naive fft-ct.c "-DUSE_FFTWF_NAIVE")
   add_exec_fftwf(fft-ct-fftwf-blocked fft-ct.c "-DUSE_FFTWF_BLOCKED")
 
-  add_exec_fftwf(fft-2d-fftwf-lib-lfftw fft-2d.c "-DUSE_FFTWF")
+  add_exec_fftwf(fft-2d-fftwf-lib-lfftwf fft-2d.c "-DUSE_FFTWF")
 endif(FFTWF_FOUND)
 
 # Use FFTWF library with threads
