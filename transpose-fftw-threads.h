@@ -12,26 +12,26 @@
 
 #include <fftw3.h>
 
-void transpose_fftw_threads_row(const fftw_complex* restrict A,
-                                fftw_complex* restrict B,
-                                size_t A_rows, size_t A_cols,
-                                size_t num_thr);
+void transpose_fftw_thrrow(const fftw_complex* restrict A,
+                           fftw_complex* restrict B,
+                           size_t A_rows, size_t A_cols,
+                           size_t num_thr);
 
-void transpose_fftw_threads_col(const fftw_complex* restrict A,
-                                fftw_complex* restrict B,
-                                size_t A_rows, size_t A_cols,
-                                size_t num_thr);
+void transpose_fftw_thrcol(const fftw_complex* restrict A,
+                           fftw_complex* restrict B,
+                           size_t A_rows, size_t A_cols,
+                           size_t num_thr);
 
-void transpose_fftw_threads_row_blocked(const fftw_complex* restrict A,
-                                        fftw_complex* restrict B,
-                                        size_t A_rows, size_t A_cols,
-                                        size_t num_thr,
-                                        size_t blk_rows, size_t blk_cols);
+void transpose_fftw_thrrow_blocked(const fftw_complex* restrict A,
+                                   fftw_complex* restrict B,
+                                   size_t A_rows, size_t A_cols,
+                                   size_t num_thr,
+                                   size_t blk_rows, size_t blk_cols);
 
-void transpose_fftw_threads_col_blocked(const fftw_complex* restrict A,
-                                        fftw_complex* restrict B,
-                                        size_t A_rows, size_t A_cols,
-                                        size_t num_thr,
-                                        size_t blk_rows, size_t blk_cols);
+void transpose_fftw_thrcol_blocked(const fftw_complex* restrict A,
+                                   fftw_complex* restrict B,
+                                   size_t A_rows, size_t A_cols,
+                                   size_t num_thr,
+                                   size_t blk_rows, size_t blk_cols);
 
 #endif /* TRANSPOSE_FFTW_THREADS_H */

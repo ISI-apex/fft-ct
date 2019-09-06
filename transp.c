@@ -322,20 +322,20 @@ int main(int argc, char **argv)
                    is_eq_flt);
 #elif defined(USE_FLT_THRROW)
     TRANSP_THREADED(float, assert_malloc_al, free,
-                    fill_rand_flt, matrix_print_flt, transpose_flt_threads_row,
+                    fill_rand_flt, matrix_print_flt, transpose_flt_thrrow,
                     is_eq_flt);
 #elif defined(USE_FLT_THRCOL)
     TRANSP_THREADED(float, assert_malloc_al, free,
-                    fill_rand_flt, matrix_print_flt, transpose_flt_threads_col,
+                    fill_rand_flt, matrix_print_flt, transpose_flt_thrcol,
                     is_eq_flt);
 #elif defined(USE_FLT_THRROW_BLOCKED)
     TRANSP_THREADED_BLOCKED(float, assert_malloc_al, free,
                             fill_rand_flt, matrix_print_flt,
-                            transpose_flt_threads_row_blocked, is_eq_flt);
+                            transpose_flt_thrrow_blocked, is_eq_flt);
 #elif defined(USE_FLT_THRCOL_BLOCKED)
     TRANSP_THREADED_BLOCKED(float, assert_malloc_al, free,
                             fill_rand_flt, matrix_print_flt,
-                            transpose_flt_threads_col_blocked, is_eq_flt);
+                            transpose_flt_thrcol_blocked, is_eq_flt);
 #elif defined(USE_DBL_NAIVE)
     TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_naive, is_eq_dbl);
@@ -345,20 +345,20 @@ int main(int argc, char **argv)
                    is_eq_dbl);
 #elif defined(USE_DBL_THRROW)
     TRANSP_THREADED(double, assert_malloc_al, free,
-                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_row,
+                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_thrrow,
                     is_eq_dbl);
 #elif defined(USE_DBL_THRCOL)
     TRANSP_THREADED(double, assert_malloc_al, free,
-                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_threads_col,
+                    fill_rand_dbl, matrix_print_dbl, transpose_dbl_thrcol,
                     is_eq_dbl);
 #elif defined(USE_DBL_THRROW_BLOCKED)
     TRANSP_THREADED_BLOCKED(double, assert_malloc_al, free,
                             fill_rand_dbl, matrix_print_dbl,
-                            transpose_dbl_threads_row_blocked, is_eq_dbl);
+                            transpose_dbl_thrrow_blocked, is_eq_dbl);
 #elif defined(USE_DBL_THRCOL_BLOCKED)
     TRANSP_THREADED_BLOCKED(double, assert_malloc_al, free,
                             fill_rand_dbl, matrix_print_dbl,
-                            transpose_dbl_threads_col_blocked, is_eq_dbl);
+                            transpose_dbl_thrcol_blocked, is_eq_dbl);
 #elif defined(USE_DBL_AVX512_INTR)
     TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_avx512_intr,
@@ -382,19 +382,19 @@ int main(int argc, char **argv)
 #elif defined(USE_FCMPLX_THRROW)
     TRANSP_THREADED(float complex, assert_malloc_al, free,
                     fill_rand_fcmplx, matrix_print_fcmplx,
-                    transpose_fcmplx_threads_row, is_eq_fcmplx);
+                    transpose_fcmplx_thrrow, is_eq_fcmplx);
 #elif defined(USE_FCMPLX_THRCOL)
     TRANSP_THREADED(float complex, assert_malloc_al, free,
                     fill_rand_fcmplx, matrix_print_fcmplx,
-                    transpose_fcmplx_threads_col, is_eq_fcmplx);
+                    transpose_fcmplx_thrcol, is_eq_fcmplx);
 #elif defined(USE_FCMPLX_THRROW_BLOCKED)
     TRANSP_THREADED_BLOCKED(float complex, assert_malloc_al, free,
                             fill_rand_fcmplx, matrix_print_fcmplx,
-                            transpose_fcmplx_threads_row_blocked, is_eq_fcmplx);
+                            transpose_fcmplx_thrrow_blocked, is_eq_fcmplx);
 #elif defined(USE_FCMPLX_THRCOL_BLOCKED)
     TRANSP_THREADED_BLOCKED(float complex, assert_malloc_al, free,
                             fill_rand_fcmplx, matrix_print_fcmplx,
-                            transpose_fcmplx_threads_col_blocked, is_eq_fcmplx);
+                            transpose_fcmplx_thrcol_blocked, is_eq_fcmplx);
 #elif defined(USE_DCMPLX_NAIVE)
     TRANSP(double complex, assert_malloc_al, free,
            fill_rand_dcmplx, matrix_print_dcmplx, transpose_dcmplx_naive,
@@ -406,19 +406,19 @@ int main(int argc, char **argv)
 #elif defined(USE_DCMPLX_THRROW)
     TRANSP_THREADED(double complex, assert_malloc_al, free,
                     fill_rand_dcmplx, matrix_print_dcmplx,
-                    transpose_dcmplx_threads_row, is_eq_dcmplx);
+                    transpose_dcmplx_thrrow, is_eq_dcmplx);
 #elif defined(USE_DCMPLX_THRCOL)
     TRANSP_THREADED(double complex, assert_malloc_al, free,
                     fill_rand_dcmplx, matrix_print_dcmplx,
-                    transpose_dcmplx_threads_col, is_eq_dcmplx);
+                    transpose_dcmplx_thrcol, is_eq_dcmplx);
 #elif defined(USE_DCMPLX_THRROW_BLOCKED)
     TRANSP_THREADED_BLOCKED(double complex, assert_malloc_al, free,
                             fill_rand_dcmplx, matrix_print_dcmplx,
-                            transpose_dcmplx_threads_row_blocked, is_eq_dcmplx);
+                            transpose_dcmplx_thrrow_blocked, is_eq_dcmplx);
 #elif defined(USE_DCMPLX_THRCOL_BLOCKED)
     TRANSP_THREADED_BLOCKED(double complex, assert_malloc_al, free,
                             fill_rand_dcmplx, matrix_print_dcmplx,
-                            transpose_dcmplx_threads_col_blocked, is_eq_dcmplx);
+                            transpose_dcmplx_thrcol_blocked, is_eq_dcmplx);
 #elif defined(USE_FFTWF_NAIVE)
     TRANSP(fftwf_complex, assert_fftwf_malloc, fftwf_free,
            fill_rand_fftwf, matrix_print_fftwf, transpose_fftwf_naive,
@@ -430,19 +430,19 @@ int main(int argc, char **argv)
 #elif defined(USE_FFTWF_THRROW)
     TRANSP_THREADED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
                     fill_rand_fftwf, matrix_print_fftwf,
-                    transpose_fftwf_threads_row, is_eq_fftwf);
+                    transpose_fftwf_thrrow, is_eq_fftwf);
 #elif defined(USE_FFTWF_THRCOL)
     TRANSP_THREADED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
                     fill_rand_fftwf, matrix_print_fftwf,
-                    transpose_fftwf_threads_col, is_eq_fftwf);
+                    transpose_fftwf_thrcol, is_eq_fftwf);
 #elif defined(USE_FFTWF_THRROW_BLOCKED)
     TRANSP_THREADED_BLOCKED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
                             fill_rand_fftwf, matrix_print_fftwf,
-                            transpose_fftwf_threads_row_blocked, is_eq_fftwf);
+                            transpose_fftwf_thrrow_blocked, is_eq_fftwf);
 #elif defined(USE_FFTWF_THRCOL_BLOCKED)
     TRANSP_THREADED_BLOCKED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
                             fill_rand_fftwf, matrix_print_fftwf,
-                            transpose_fftwf_threads_col_blocked, is_eq_fftwf);
+                            transpose_fftwf_thrcol_blocked, is_eq_fftwf);
 #elif defined(USE_FFTWF_AVX512_INTR)
     TRANSP(fftwf_complex, assert_fftwf_malloc, fftwf_free,
            fill_rand_fftwf, matrix_print_fftwf,
@@ -465,19 +465,19 @@ int main(int argc, char **argv)
 #elif defined(USE_FFTW_THRROW)
     TRANSP_THREADED(fftw_complex, assert_fftw_malloc, fftw_free,
                     fill_rand_fftw, matrix_print_fftw,
-                    transpose_fftw_threads_row, is_eq_fftw);
+                    transpose_fftw_thrrow, is_eq_fftw);
 #elif defined(USE_FFTW_THRCOL)
     TRANSP_THREADED(fftw_complex, assert_fftw_malloc, fftw_free,
                     fill_rand_fftw, matrix_print_fftw,
-                    transpose_fftw_threads_col, is_eq_fftw);
+                    transpose_fftw_thrcol, is_eq_fftw);
 #elif defined(USE_FFTW_THRROW_BLOCKED)
     TRANSP_THREADED_BLOCKED(fftw_complex, assert_fftw_malloc, fftw_free,
                             fill_rand_fftw, matrix_print_fftw,
-                            transpose_fftw_threads_row_blocked, is_eq_fftw);
+                            transpose_fftw_thrrow_blocked, is_eq_fftw);
 #elif defined(USE_FFTW_THRCOL_BLOCKED)
     TRANSP_THREADED_BLOCKED(fftw_complex, assert_fftw_malloc, fftw_free,
                             fill_rand_fftw, matrix_print_fftw,
-                            transpose_fftw_threads_col_blocked, is_eq_fftw);
+                            transpose_fftw_thrcol_blocked, is_eq_fftw);
 #elif defined(USE_MKL_FLOAT)
     TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_mkl, is_eq_flt);

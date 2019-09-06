@@ -138,15 +138,15 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
     transpose_fftwf_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
                             nblkcols);
 #elif defined(USE_FFTWF_THRROW)
-    transpose_fftwf_threads_row(fft1_out, fft2_in, nrows, ncols, nthreads);
+    transpose_fftwf_thrrow(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTWF_THRCOL)
-    transpose_fftwf_threads_col(fft1_out, fft2_in, nrows, ncols, nthreads);
+    transpose_fftwf_thrcol(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTWF_THRROW_BLOCKED)
-    transpose_fftwf_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
-                                        nthreads, nblkrows, nblkcols);
+    transpose_fftwf_thrrow_blocked(fft1_out, fft2_in, nrows, ncols, nthreads,
+                                   nblkrows, nblkcols);
 #elif defined(USE_FFTWF_THRCOL_BLOCKED)
-    transpose_fftwf_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
-                                        nthreads, nblkrows, nblkcols);
+    transpose_fftwf_thrcol_blocked(fft1_out, fft2_in, nrows, ncols, nthreads,
+                                   nblkrows, nblkcols);
 #elif defined(USE_FFTWF_AVX512_INTR)
     transpose_fftwf_avx512_intr(fft1_out, fft2_in, nrows, ncols);
 #elif defined(USE_FFTWF_THRROW_AVX512_INTR)
@@ -161,14 +161,14 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
     transpose_fftw_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
                            nblkcols);
 #elif defined(USE_FFTW_THRROW)
-    transpose_fftw_threads_row(fft1_out, fft2_in, nrows, ncols, nthreads);
+    transpose_fftw_thrrow(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTW_THRCOL)
-    transpose_fftw_threads_col(fft1_out, fft2_in, nrows, ncols, nthreads);
+    transpose_fftw_thrcol(fft1_out, fft2_in, nrows, ncols, nthreads);
 #elif defined(USE_FFTW_THRROW_BLOCKED)
-    transpose_fftw_threads_row_blocked(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads, nblkrows, nblkcols);
+    transpose_fftw_thrrow_blocked(fft1_out, fft2_in, nrows, ncols, nthreads,
+                                  nblkrows, nblkcols);
 #elif defined(USE_FFTW_THRCOL_BLOCKED)
-    transpose_fftw_threads_col_blocked(fft1_out, fft2_in, nrows, ncols,
+    transpose_fftw_thrcol_blocked(fft1_out, fft2_in, nrows, ncols,
                                        nthreads, nblkrows, nblkcols);
 #else
     #error "No matching transpose implementation found!"

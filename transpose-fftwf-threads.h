@@ -12,26 +12,26 @@
 
 #include <fftw3.h>
 
-void transpose_fftwf_threads_row(const fftwf_complex* restrict A,
-                                 fftwf_complex* restrict B,
-                                 size_t A_rows, size_t A_cols,
-                                 size_t num_thr);
+void transpose_fftwf_thrrow(const fftwf_complex* restrict A,
+                            fftwf_complex* restrict B,
+                            size_t A_rows, size_t A_cols,
+                            size_t num_thr);
 
-void transpose_fftwf_threads_col(const fftwf_complex* restrict A,
-                                 fftwf_complex* restrict B,
-                                 size_t A_rows, size_t A_cols,
-                                 size_t num_thr);
+void transpose_fftwf_thrcol(const fftwf_complex* restrict A,
+                            fftwf_complex* restrict B,
+                            size_t A_rows, size_t A_cols,
+                            size_t num_thr);
 
-void transpose_fftwf_threads_row_blocked(const fftwf_complex* restrict A,
-                                         fftwf_complex* restrict B,
-                                         size_t A_rows, size_t A_cols,
-                                         size_t num_thr,
-                                         size_t blk_rows, size_t blk_cols);
+void transpose_fftwf_thrrow_blocked(const fftwf_complex* restrict A,
+                                    fftwf_complex* restrict B,
+                                    size_t A_rows, size_t A_cols,
+                                    size_t num_thr,
+                                    size_t blk_rows, size_t blk_cols);
 
-void transpose_fftwf_threads_col_blocked(const fftwf_complex* restrict A,
-                                         fftwf_complex* restrict B,
-                                         size_t A_rows, size_t A_cols,
-                                         size_t num_thr,
-                                         size_t blk_rows, size_t blk_cols);
+void transpose_fftwf_thrcol_blocked(const fftwf_complex* restrict A,
+                                    fftwf_complex* restrict B,
+                                    size_t A_rows, size_t A_cols,
+                                    size_t num_thr,
+                                    size_t blk_rows, size_t blk_cols);
 
 #endif /* TRANSPOSE_FFTWF_THREADS_H */
