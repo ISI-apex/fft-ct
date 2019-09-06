@@ -250,22 +250,6 @@ void transpose_dbl_thrrow(const double* restrict A, double* restrict B,
                              &transpose_thread_dbl);
 }
 
-void transpose_flt_thrcol(const float* restrict A, float* restrict B,
-                          size_t A_rows, size_t A_cols,
-                          size_t num_thr)
-{
-    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, 0, 0,
-                             &transpose_thread_flt);
-}
-
-void transpose_dbl_thrcol(const double* restrict A, double* restrict B,
-                          size_t A_rows, size_t A_cols,
-                          size_t num_thr)
-{
-    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, 0, 0,
-                             &transpose_thread_dbl);
-}
-
 void transpose_fcmplx_thrrow(const float complex* restrict A,
                              float complex* restrict B,
                              size_t A_rows, size_t A_cols,
@@ -282,6 +266,23 @@ void transpose_dcmplx_thrrow(const double complex* restrict A,
 {
     transpose_thrrow_blocked(A, B, A_rows, A_cols, num_thr, 0, 0,
                              &transpose_thread_dcmplx);
+}
+
+
+void transpose_flt_thrcol(const float* restrict A, float* restrict B,
+                          size_t A_rows, size_t A_cols,
+                          size_t num_thr)
+{
+    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, 0, 0,
+                             &transpose_thread_flt);
+}
+
+void transpose_dbl_thrcol(const double* restrict A, double* restrict B,
+                          size_t A_rows, size_t A_cols,
+                          size_t num_thr)
+{
+    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, 0, 0,
+                             &transpose_thread_dbl);
 }
 
 void transpose_fcmplx_thrcol(const float complex* restrict A,
@@ -322,26 +323,6 @@ void transpose_dbl_thrrow_blocked(const double* restrict A,
                              blk_cols, &transpose_thread_blocked_dbl);
 }
 
-void transpose_flt_thrcol_blocked(const float* restrict A,
-                                  float* restrict B,
-                                  size_t A_rows, size_t A_cols,
-                                  size_t num_thr,
-                                  size_t blk_rows, size_t blk_cols)
-{
-    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
-                             blk_cols, &transpose_thread_blocked_flt);
-}
-
-void transpose_dbl_thrcol_blocked(const double* restrict A,
-                                  double* restrict B,
-                                  size_t A_rows, size_t A_cols,
-                                  size_t num_thr,
-                                  size_t blk_rows, size_t blk_cols)
-{
-    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
-                             blk_cols, &transpose_thread_blocked_dbl);
-}
-
 void transpose_fcmplx_thrrow_blocked(const float complex* restrict A,
                                      float complex* restrict B,
                                      size_t A_rows, size_t A_cols,
@@ -360,6 +341,26 @@ void transpose_dcmplx_thrrow_blocked(const double complex* restrict A,
 {
     transpose_thrrow_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
                              blk_cols, &transpose_thread_blocked_dcmplx);
+}
+
+void transpose_flt_thrcol_blocked(const float* restrict A,
+                                  float* restrict B,
+                                  size_t A_rows, size_t A_cols,
+                                  size_t num_thr,
+                                  size_t blk_rows, size_t blk_cols)
+{
+    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
+                             blk_cols, &transpose_thread_blocked_flt);
+}
+
+void transpose_dbl_thrcol_blocked(const double* restrict A,
+                                  double* restrict B,
+                                  size_t A_rows, size_t A_cols,
+                                  size_t num_thr,
+                                  size_t blk_rows, size_t blk_cols)
+{
+    transpose_thrcol_blocked(A, B, A_rows, A_cols, num_thr, blk_rows,
+                             blk_cols, &transpose_thread_blocked_dbl);
 }
 
 void transpose_fcmplx_thrcol_blocked(const float complex* restrict A,
