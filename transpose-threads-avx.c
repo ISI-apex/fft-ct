@@ -161,7 +161,7 @@ void transpose_dbl_thrrow_avx512_intr(const double* restrict A,
     pthread_t *threads = assert_malloc(num_thr * sizeof(pthread_t));
     struct tr_thread_arg *args = assert_malloc(num_thr * sizeof(struct tr_thread_arg));
 
-    assert(rows_per_thr % num_thr == 0);
+    assert(A_rows % num_thr == 0);
 
     for (thr_num = 0; thr_num < num_thr; thr_num++) {
         r_min = thr_num * rows_per_thr;
