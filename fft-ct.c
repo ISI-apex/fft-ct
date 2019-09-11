@@ -166,9 +166,21 @@ static void transpose(const FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B)
 #endif
 }
 
-static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
-                          FFTW_COMPLEX_T *fft1_out, FFTW_COMPLEX_T *fft2_in)
+static void fft_ct_1d(void)
 {
+    FFTW_COMPLEX_T *fft1_in, *fft1_out, *fft2_in, *fft2_out;
+    FFTW_PLAN_T *p1, *p2;
+
+    // Setup FFT 1 (before transpose) and FFT 2 (after transpose)
+    data_alloc(&fft1_in, &fft1_out, &p1, nrows, ncols);
+    data_alloc(&fft2_in, &fft2_out, &p2, ncols, nrows);
+
+    // Populate input with random data
+    ptime_gettime_monotonic(&t1);
+    FILL_RAND(fft1_in, nrows * ncols);
+    ptime_gettime_monotonic(&t2);
+    PRINT_ELAPSED_TIME("fill", &t1, &t2);
+
     // Perform first set of 1D FFTs
     ptime_gettime_monotonic(&t1);
     fft_1d(p1, nrows);
@@ -186,29 +198,10 @@ static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
     fft_1d(p2, ncols);
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("fft-1d-2", &t1, &t2);
-}
-
-static void fft_ct_1d(void)
-{
-    FFTW_COMPLEX_T *mat_fft1_in, *mat_fft1_out, *mat_fft2_in, *mat_fft2_out;
-    FFTW_PLAN_T *p_fft1, *p_fft2;
-
-    // Setup FFT 1 (before transpose) and FFT 2 (after transpose)
-    data_alloc(&mat_fft1_in, &mat_fft1_out, &p_fft1, nrows, ncols);
-    data_alloc(&mat_fft2_in, &mat_fft2_out, &p_fft2, ncols, nrows);
-
-    // Populate input with random data
-    ptime_gettime_monotonic(&t1);
-    FILL_RAND(mat_fft1_in, nrows * ncols);
-    ptime_gettime_monotonic(&t2);
-    PRINT_ELAPSED_TIME("fill", &t1, &t2);
-
-    // Execute FFT 1 -> Transpose -> FFT 2
-    fft_tr_fft_1d(p_fft1, p_fft2, mat_fft1_out, mat_fft2_in);
 
     // Cleanup
-    data_free(mat_fft2_in, mat_fft2_out, p_fft2, ncols);
-    data_free(mat_fft1_in, mat_fft1_out, p_fft1, nrows);
+    data_free(fft2_in, fft2_out, p2, ncols);
+    data_free(fft1_in, fft1_out, p1, nrows);
 }
 
 static void usage(const char *pname, int code)
