@@ -117,70 +117,73 @@ static void data_free(FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B, FFTW_PLAN_T *p,
     FFTW_FREE(A);
 }
 
+static void fft_1d(const FFTW_PLAN_T *p, size_t r)
+{
+    size_t i;
+    for (i = 0; i < r; i++) {
+        FFTW_EXECUTE(p[i]);
+    }
+}
+
+static void transpose(const FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B)
+{
+#if defined(USE_FFTWF_NAIVE)
+    transpose_fftwf_naive(A, B, nrows, ncols);
+#elif defined(USE_FFTWF_BLOCKED)
+    transpose_fftwf_blocked(A, B, nrows, ncols, nblkrows, nblkcols);
+#elif defined(USE_FFTWF_THRROW)
+    transpose_fftwf_thrrow(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTWF_THRCOL)
+    transpose_fftwf_thrcol(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTWF_THRROW_BLOCKED)
+    transpose_fftwf_thrrow_blocked(A, B, nrows, ncols, nthreads,
+                                   nblkrows, nblkcols);
+#elif defined(USE_FFTWF_THRCOL_BLOCKED)
+    transpose_fftwf_thrcol_blocked(A, B, nrows, ncols, nthreads,
+                                   nblkrows, nblkcols);
+#elif defined(USE_FFTWF_AVX512_INTR)
+    transpose_fftwf_avx512_intr(A, B, nrows, ncols);
+#elif defined(USE_FFTWF_THRROW_AVX512_INTR)
+    transpose_fftwf_thrrow_avx512_intr(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTWF_THRCOL_AVX512_INTR)
+    transpose_fftwf_thrcol_avx512_intr(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTW_NAIVE)
+    transpose_fftw_naive(A, B, nrows, ncols);
+#elif defined(USE_FFTW_BLOCKED)
+    transpose_fftw_blocked(A, B, nrows, ncols, nblkrows, nblkcols);
+#elif defined(USE_FFTW_THRROW)
+    transpose_fftw_thrrow(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTW_THRCOL)
+    transpose_fftw_thrcol(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTW_THRROW_BLOCKED)
+    transpose_fftw_thrrow_blocked(A, B, nrows, ncols, nthreads,
+                                  nblkrows, nblkcols);
+#elif defined(USE_FFTW_THRCOL_BLOCKED)
+    transpose_fftw_thrcol_blocked(A, B, nrows, ncols, nthreads,
+                                  nblkrows, nblkcols);
+#else
+    #error "No matching transpose implementation found!"
+#endif
+}
+
 static void fft_tr_fft_1d(const FFTW_PLAN_T *p1, const FFTW_PLAN_T *p2,
                           FFTW_COMPLEX_T *fft1_out, FFTW_COMPLEX_T *fft2_in)
 {
-    size_t i;
-
     // Perform first set of 1D FFTs
     ptime_gettime_monotonic(&t1);
-    for (i = 0; i < nrows; i++) {
-        FFTW_EXECUTE(p1[i]);
-    }
+    fft_1d(p1, nrows);
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("fft-1d-1", &t1, &t2);
 
     // Matrix transpose
     ptime_gettime_monotonic(&t1);
-#if defined(USE_FFTWF_NAIVE)
-    transpose_fftwf_naive(fft1_out, fft2_in, nrows, ncols);
-#elif defined(USE_FFTWF_BLOCKED)
-    transpose_fftwf_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
-                            nblkcols);
-#elif defined(USE_FFTWF_THRROW)
-    transpose_fftwf_thrrow(fft1_out, fft2_in, nrows, ncols, nthreads);
-#elif defined(USE_FFTWF_THRCOL)
-    transpose_fftwf_thrcol(fft1_out, fft2_in, nrows, ncols, nthreads);
-#elif defined(USE_FFTWF_THRROW_BLOCKED)
-    transpose_fftwf_thrrow_blocked(fft1_out, fft2_in, nrows, ncols, nthreads,
-                                   nblkrows, nblkcols);
-#elif defined(USE_FFTWF_THRCOL_BLOCKED)
-    transpose_fftwf_thrcol_blocked(fft1_out, fft2_in, nrows, ncols, nthreads,
-                                   nblkrows, nblkcols);
-#elif defined(USE_FFTWF_AVX512_INTR)
-    transpose_fftwf_avx512_intr(fft1_out, fft2_in, nrows, ncols);
-#elif defined(USE_FFTWF_THRROW_AVX512_INTR)
-    transpose_fftwf_thrrow_avx512_intr(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads);
-#elif defined(USE_FFTWF_THRCOL_AVX512_INTR)
-    transpose_fftwf_thrcol_avx512_intr(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads);
-#elif defined(USE_FFTW_NAIVE)
-    transpose_fftw_naive(fft1_out, fft2_in, nrows, ncols);
-#elif defined(USE_FFTW_BLOCKED)
-    transpose_fftw_blocked(fft1_out, fft2_in, nrows, ncols, nblkrows,
-                           nblkcols);
-#elif defined(USE_FFTW_THRROW)
-    transpose_fftw_thrrow(fft1_out, fft2_in, nrows, ncols, nthreads);
-#elif defined(USE_FFTW_THRCOL)
-    transpose_fftw_thrcol(fft1_out, fft2_in, nrows, ncols, nthreads);
-#elif defined(USE_FFTW_THRROW_BLOCKED)
-    transpose_fftw_thrrow_blocked(fft1_out, fft2_in, nrows, ncols, nthreads,
-                                  nblkrows, nblkcols);
-#elif defined(USE_FFTW_THRCOL_BLOCKED)
-    transpose_fftw_thrcol_blocked(fft1_out, fft2_in, nrows, ncols,
-                                       nthreads, nblkrows, nblkcols);
-#else
-    #error "No matching transpose implementation found!"
-#endif
+    transpose(fft1_out, fft2_in);
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("transpose", &t1, &t2);
 
-    ptime_gettime_monotonic(&t1);
     // Perform second set of 1D FFTs
-    for (i = 0; i < ncols; i++) {
-        FFTW_EXECUTE(p2[i]);
-    }
+    ptime_gettime_monotonic(&t1);
+    fft_1d(p2, ncols);
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("fft-1d-2", &t1, &t2);
 }
@@ -200,7 +203,7 @@ static void fft_ct_1d(void)
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("fill", &t1, &t2);
 
-    // Execute FFT 1 -> Transpose -> FFT2
+    // Execute FFT 1 -> Transpose -> FFT 2
     fft_tr_fft_1d(p_fft1, p_fft2, mat_fft1_out, mat_fft2_in);
 
     // Cleanup
