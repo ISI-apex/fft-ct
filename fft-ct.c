@@ -26,6 +26,7 @@
     defined(USE_FFTWF_AVX512_INTR) || \
     defined(USE_FFTWF_THRROW_AVX512_INTR) || \
     defined(USE_FFTWF_THRCOL_AVX512_INTR)
+#include "fft-threads-fftwf.h"
 #include "transpose-fftwf.h"
 #include "transpose-fftwf-avx.h"
 #include "transpose-fftwf-threads.h"
@@ -39,7 +40,9 @@ typedef fftwf_plan          FFTW_PLAN_T;
 #define FFTW_PLAN_DESTROY   fftwf_destroy_plan
 #define FFTW_EXECUTE        fftwf_execute
 #define FILL_RAND           fill_rand_fftwf
+#define THR_EXECUTE         fft_thr_fftwf
 #else
+#include "fft-threads-fftw.h"
 #include "transpose-fftw.h"
 #include "transpose-fftw-threads.h"
 #include "util-fftw.h"
@@ -51,6 +54,7 @@ typedef fftw_plan           FFTW_PLAN_T;
 #define FFTW_PLAN_DESTROY   fftw_destroy_plan
 #define FFTW_EXECUTE        fftw_execute
 #define FILL_RAND           fill_rand_fftw
+#define THR_EXECUTE         fft_thr_fftw
 #endif
 
 #if defined(USE_FFTWF_BLOCKED) || \
@@ -119,10 +123,14 @@ static void data_free(FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B, FFTW_PLAN_T *p,
 
 static void fft_1d(const FFTW_PLAN_T *p, size_t r)
 {
+#if defined(_USE_TRANSP_THREADS)
+    THR_EXECUTE(p, r, nthreads);
+#else
     size_t i;
     for (i = 0; i < r; i++) {
         FFTW_EXECUTE(p[i]);
     }
+#endif
 }
 
 static void transpose(const FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B)

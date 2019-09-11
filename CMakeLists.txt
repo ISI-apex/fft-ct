@@ -165,7 +165,7 @@ endif(FFTWF_FOUND)
 # Use FFTWF library with threads
 if(FFTWF_FOUND AND Threads_FOUND)
   function(add_exec_fftwf_threads name main definitions)
-    add_executable(${name} ${main} ptime.c
+    add_executable(${name} ${main} ptime.c fft-threads-fftwf.c
                                    transpose-threads.c transpose-fftwf-threads.c
                                    util.c util-fftwf.c)
     target_compile_options(${name} PRIVATE ${FFTWF_CFLAGS}
@@ -216,7 +216,7 @@ endif(FFTW_FOUND)
 # Use FFTW library with threads
 if(FFTW_FOUND AND Threads_FOUND)
   function(add_exec_fftw_threads name main definitions)
-    add_executable(${name} ${main} ptime.c
+    add_executable(${name} ${main} ptime.c fft-threads-fftw.c
                                    transpose-threads.c transpose-fftw-threads.c
                                    util.c util-fftw.c)
     target_compile_options(${name} PRIVATE ${FFTW_CFLAGS} ${FFTW_CFLAGS_OTHER})
@@ -428,8 +428,10 @@ endif(FFTWF_FOUND AND ENABLE_AVX)
 # Use FFTWF library with threads and intrinsic AVX
 if(FFTWF_FOUND AND Threads_FOUND AND ENABLE_AVX)
   function(add_exec_fftwf_threads_avx name main definitions)
-    add_executable(${name} ${main} ptime.c transpose-fftwf-threads-avx.c
-                                   transpose-threads-avx.c util.c util-fftwf.c)
+    add_executable(${name} ${main} ptime.c fft-threads-fftwf.c
+                                   transpose-fftwf-threads-avx.c
+                                   transpose-threads-avx.c
+                                   util.c util-fftwf.c)
     target_compile_options(${name} PRIVATE ${FFTWF_CFLAGS}
                                            ${FFTWF_CFLAGS_OTHER}
                                            ${C_FLAGS_AVX_LIST})
