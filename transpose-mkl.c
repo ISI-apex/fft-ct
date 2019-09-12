@@ -4,6 +4,7 @@
  * @author Connor Imes <cimes@isi.edu>
  * @date 2019-07-15 
  */
+#include <complex.h>
 #include <stdlib.h>
 
 #include <mkl.h>
@@ -26,20 +27,12 @@ void transpose_cmplx8_mkl(const MKL_Complex8* restrict A,
                           MKL_Complex8* restrict B,
                           size_t A_rows, size_t A_cols)
 {
-    static const MKL_Complex8 alpha = {
-        .real = 1,
-        .imag = 0,
-    };
-    mkl_comatcopy('r', 't', A_rows, A_cols, alpha, A, A_cols, B, A_rows);
+    mkl_comatcopy('r', 't', A_rows, A_cols, CMPLXF(1, 0), A, A_cols, B, A_rows);
 }
 
 void transpose_cmplx16_mkl(const MKL_Complex16* restrict A,
                            MKL_Complex16* restrict B,
                            size_t A_rows, size_t A_cols)
 {
-    static const MKL_Complex16 alpha = {
-        .real = 1,
-        .imag = 0,
-    };
-    mkl_zomatcopy('r', 't', A_rows, A_cols, alpha, A, A_cols, B, A_rows);
+    mkl_zomatcopy('r', 't', A_rows, A_cols, CMPLX(1, 0), A, A_cols, B, A_rows);
 }
