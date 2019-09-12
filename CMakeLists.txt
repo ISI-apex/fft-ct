@@ -254,10 +254,10 @@ if(MKL_FOUND)
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl)
 
-  add_exec_mkl(transp-flt-lib-lmkl transp.c "-DUSE_MKL_FLOAT")
-  add_exec_mkl(transp-dbl-lib-lmkl transp.c "-DUSE_MKL_DOUBLE")
-  add_exec_mkl(transp-cmplx8-lib-lmkl transp.c "-DUSE_MKL_CMPLX8")
-  add_exec_mkl(transp-cmplx16-lib-lmkl transp.c "-DUSE_MKL_CMPLX16")
+  add_exec_mkl(transp-flt-lib-lmkl transp.c "-DUSE_FLT_MKL")
+  add_exec_mkl(transp-dbl-lib-lmkl transp.c "-DUSE_DBL_MKL")
+  add_exec_mkl(transp-cmplx8-lib-lmkl transp.c "-DUSE_CMPLX8_MKL")
+  add_exec_mkl(transp-cmplx16-lib-lmkl transp.c "-DUSE_CMPLX16_MKL")
 endif(MKL_FOUND)
 
 # Use MKL library implementations of the FFTWF interface

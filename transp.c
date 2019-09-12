@@ -102,8 +102,8 @@
 #include "util-fftw.h"
 #endif
 
-#if defined(USE_MKL_FLOAT) || defined(USE_MKL_DOUBLE) || \
-    defined(USE_MKL_CMPLX8) || defined(USE_MKL_CMPLX16)
+#if defined(USE_FLT_MKL) || defined(USE_DBL_MKL) || \
+    defined(USE_CMPLX8_MKL) || defined(USE_CMPLX16_MKL)
 #include <mkl.h>
 #include "transpose-mkl.h"
 #include "util-mkl.h"
@@ -478,17 +478,17 @@ int main(int argc, char **argv)
     TRANSP_THREADED_BLOCKED(fftw_complex, assert_fftw_malloc, fftw_free,
                             fill_rand_fftw, matrix_print_fftw,
                             transpose_fftw_thrcol_blocked, is_eq_fftw);
-#elif defined(USE_MKL_FLOAT)
+#elif defined(USE_FLT_MKL)
     TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_mkl, is_eq_flt);
-#elif defined(USE_MKL_DOUBLE)
+#elif defined(USE_DBL_MKL)
     TRANSP(double, assert_malloc_al, free,
            fill_rand_dbl, matrix_print_dbl, transpose_dbl_mkl, is_eq_dbl);
-#elif defined(USE_MKL_CMPLX8)
+#elif defined(USE_CMPLX8_MKL)
     TRANSP(MKL_Complex8, assert_malloc_al, free,
            fill_rand_cmplx8, matrix_print_cmplx8, transpose_cmplx8_mkl,
            is_eq_cmplx8);
-#elif defined(USE_MKL_CMPLX16)
+#elif defined(USE_CMPLX16_MKL)
     TRANSP(MKL_Complex16, assert_malloc_al, free,
            fill_rand_cmplx16, matrix_print_cmplx16, transpose_cmplx16_mkl,
            is_eq_cmplx16);
