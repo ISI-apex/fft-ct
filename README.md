@@ -52,8 +52,8 @@ To use a different C compiler than your environment's `cc`, configure CMake's
 	cmake .. -DCMAKE_C_COMPILER=/path/to/cc
 
 
-Usage
------
+Benchmarks
+----------
 
 There are a handful benchmark program templates:
 
@@ -63,12 +63,37 @@ Whether a transpose is actually performed depends on the FFT implementation.
 * `fft-ct`: Populate a matrix and perform 1-D FFTs -> transpose -> 1-D FFTs.
 In this benchmark, a transpose is always performed.
 
-These templates are used to generate benchmarks supporting a variety of data
+
+Data Types
+----------
+
+C99 types:
+
+* `float` (flt)
+* `double` (dbl)
+* `float complex` (fcmplx)
+* `double complex` (dcmplx)
+
+FFTW types:
+
+* `fftw_complex` (fftw) - redefined as `float complex`
+* `fftwf_complex` (fftwf) - redefined as `double complex`
+
+MKL types:
+
+* `MKL_Complex8` (cmplx8) - redefined as `float complex`
+* `MKL_Complex16` (cmplx16) - redefined as `double complex`
+
+
+Usage
+-----
+
+Benchmark templates are used to generate benchmarks supporting a variety of data
 types and transpose implementations using different algorithms and library APIs.
 Benchmark names are generally in the form:
 `${prog}-${datatype}-${algo}[-${lib}]`.
 
 Benchmarks require specifying, at a minimum, the matrix row and column count.
-E.g., to transpose a 2048x4096 matrix:
+E.g., to perform a naive transpose of a 2048x4096 matrix with `double` data:
 
-	./transp -r 2048 -c 4096
+	./transp-dbl-naive -r 2048 -c 4096
