@@ -82,10 +82,12 @@
     defined(USE_FFTWF_THRCOL_BLOCKED) || \
     defined(USE_FFTWF_AVX512_INTR) || \
     defined(USE_FFTWF_THRROW_AVX512_INTR) || \
-    defined(USE_FFTWF_THRCOL_AVX512_INTR)
+    defined(USE_FFTWF_THRCOL_AVX512_INTR) || \
+    defined(USE_FFTWF_MKL)
 #include <fftw3.h>
 #include "transpose-fftwf.h"
 #include "transpose-fftwf-avx.h"
+#include "transpose-fftwf-mkl.h"
 #include "transpose-fftwf-threads.h"
 #include "transpose-fftwf-threads-avx.h"
 #include "util-fftwf.h"
@@ -95,9 +97,11 @@
     defined(USE_FFTW_THRROW) || \
     defined(USE_FFTW_THRCOL) || \
     defined(USE_FFTW_THRROW_BLOCKED) || \
-    defined(USE_FFTW_THRCOL_BLOCKED)
+    defined(USE_FFTW_THRCOL_BLOCKED) || \
+    defined(USE_FFTW_MKL)
 #include <fftw3.h>
 #include "transpose-fftw.h"
+#include "transpose-fftw-mkl.h"
 #include "transpose-fftw-threads.h"
 #include "util-fftw.h"
 #endif
@@ -455,6 +459,10 @@ int main(int argc, char **argv)
     TRANSP_THREADED(fftwf_complex, assert_fftwf_malloc, fftwf_free,
                     fill_rand_fftwf, matrix_print_fftwf,
                     transpose_fftwf_thrcol_avx512_intr, is_eq_fftwf);
+#elif defined(USE_FFTWF_MKL)
+    TRANSP(fftwf_complex, assert_fftwf_malloc, fftwf_free,
+           fill_rand_fftwf, matrix_print_fftwf,
+           transpose_fftwf_mkl, is_eq_fftwf);
 #elif defined(USE_FFTW_NAIVE)
     TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
            fill_rand_fftw, matrix_print_fftw, transpose_fftw_naive, is_eq_fftw);
@@ -478,6 +486,9 @@ int main(int argc, char **argv)
     TRANSP_THREADED_BLOCKED(fftw_complex, assert_fftw_malloc, fftw_free,
                             fill_rand_fftw, matrix_print_fftw,
                             transpose_fftw_thrcol_blocked, is_eq_fftw);
+#elif defined(USE_FFTW_MKL)
+    TRANSP(fftw_complex, assert_fftw_malloc, fftw_free,
+           fill_rand_fftw, matrix_print_fftw, transpose_fftw_mkl, is_eq_fftw);
 #elif defined(USE_FLT_MKL)
     TRANSP(float, assert_malloc_al, free,
            fill_rand_flt, matrix_print_flt, transpose_flt_mkl, is_eq_flt);
