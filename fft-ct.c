@@ -25,10 +25,12 @@
     defined(USE_FFTWF_THRCOL_BLOCKED) || \
     defined(USE_FFTWF_AVX512_INTR) || \
     defined(USE_FFTWF_THRROW_AVX512_INTR) || \
-    defined(USE_FFTWF_THRCOL_AVX512_INTR)
+    defined(USE_FFTWF_THRCOL_AVX512_INTR) || \
+    defined(USE_FFTWF_MKL)
 #include "fft-threads-fftwf.h"
 #include "transpose-fftwf.h"
 #include "transpose-fftwf-avx.h"
+#include "transpose-fftwf-mkl.h"
 #include "transpose-fftwf-threads.h"
 #include "transpose-fftwf-threads-avx.h"
 #include "util-fftwf.h"
@@ -44,6 +46,7 @@ typedef fftwf_plan          FFTW_PLAN_T;
 #else
 #include "fft-threads-fftw.h"
 #include "transpose-fftw.h"
+#include "transpose-fftw-mkl.h"
 #include "transpose-fftw-threads.h"
 #include "util-fftw.h"
 typedef fftw_complex        FFTW_COMPLEX_T;
@@ -155,6 +158,8 @@ static void transpose(const FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B)
     transpose_fftwf_thrrow_avx512_intr(A, B, nrows, ncols, nthreads);
 #elif defined(USE_FFTWF_THRCOL_AVX512_INTR)
     transpose_fftwf_thrcol_avx512_intr(A, B, nrows, ncols, nthreads);
+#elif defined(USE_FFTWF_MKL)
+    transpose_fftwf_mkl(A, B, nrows, ncols);
 #elif defined(USE_FFTW_NAIVE)
     transpose_fftw_naive(A, B, nrows, ncols);
 #elif defined(USE_FFTW_BLOCKED)
@@ -169,6 +174,8 @@ static void transpose(const FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B)
 #elif defined(USE_FFTW_THRCOL_BLOCKED)
     transpose_fftw_thrcol_blocked(A, B, nrows, ncols, nthreads,
                                   nblkrows, nblkcols);
+#elif defined(USE_FFTW_MKL)
+    transpose_fftw_mkl(A, B, nrows, ncols);
 #else
     #error "No matching transpose implementation found!"
 #endif
