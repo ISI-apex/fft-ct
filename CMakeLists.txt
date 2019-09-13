@@ -83,7 +83,6 @@ endif(HAVE_ALIGNED_ALLOC)
 #   naive, blocked,
 #   thr{row,col}[-blocked] (thread-by-{row,column} [and blocked]),
 #   lib (library-defined),
-#   [blocked-]avx512-auto ([blocked] AVX-512 automatic),
 #   avx512-intr[-ss] (AVX-512 intrinsics [with streaming stores]),
 #   thr{row,col}-avx512-intr (threaded-by-{row,column} AVX-512 intrinsics)
 # 'lib' is probably one of:
@@ -308,7 +307,7 @@ else(C_FLAGS_AVX)
   message("-- Checking for C_FLAGS_AVX - not found")
   message("--   Defaulting to AVX-512 for Skylake...")
   # TODO: Does specifying optimization level conflict with CMAKE_BUILD_TYPE?
-  #       Certain per-compiler levels are needed for automatic vectorization.
+  #       Certain per-compiler levels are needed for vectorization.
   if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
     set(CMAKE_C_COMPILER_VERSION_MIN 5.0)
     set(C_FLAGS_AVX "-march=skylake-avx512 -mtune=skylake-avx512 -ffast-math -O3")
@@ -349,20 +348,6 @@ endif(C_FLAGS_AVX)
 string(REPLACE " " ";" C_FLAGS_AVX_LIST "${C_FLAGS_AVX}") # string->list
 if(ENABLE_AVX)
   message("--   C_FLAGS_AVX: ${C_FLAGS_AVX}")
-endif(ENABLE_AVX)
-
-# Use automatic AVX
-if(ENABLE_AVX)
-  function(add_exec_avx_auto name main definitions)
-    add_exec_prim(${name} ${main} ${definitions})
-    target_compile_options(${name} PRIVATE ${C_FLAGS_AVX_LIST})
-    target_link_libraries(${name} ${LIBRT} ${LIBM})
-  endfunction(add_exec_avx_auto)
-
-  add_exec_avx_auto(transp-flt-avx512-auto transp.c "-DUSE_FLT_NAIVE")
-  add_exec_avx_auto(transp-flt-blocked-avx512-auto transp.c "-DUSE_FLT_BLOCKED")
-  add_exec_avx_auto(transp-dbl-avx512-auto transp.c "-DUSE_DBL_NAIVE")
-  add_exec_avx_auto(transp-dbl-blocked-avx512-auto transp.c "-DUSE_DBL_BLOCKED")
 endif(ENABLE_AVX)
 
 # Use intrinsic AVX
