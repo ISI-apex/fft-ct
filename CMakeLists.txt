@@ -263,38 +263,36 @@ endif(MKL_FOUND)
 # Use MKL library implementations of the FFTWF interface
 if(MKL_FOUND)
   function(add_exec_mkl_fftwf name main definitions)
-    add_executable(${name} ${main} ptime.c transpose.c transpose-fftwf.c
+    add_executable(${name} ${main} ptime.c transpose-mkl.c transpose-fftwf-mkl.c
                                    util.c util-fftwf.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
+    target_compile_definitions(${name} PRIVATE "MKL_Complex8=float _Complex")
+    target_compile_definitions(${name} PRIVATE "MKL_Complex16=double _Complex")
+    target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
     target_link_libraries(${name} ${MKL_LDFLAGS} ${LIBRT})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl_fftwf)
 
-  add_exec_mkl_fftwf(transp-fftwf-naive-lmkl transp.c "-DUSE_FFTWF_NAIVE")
-  add_exec_mkl_fftwf(transp-fftwf-blocked-lmkl transp.c "-DUSE_FFTWF_BLOCKED")
-
-  add_exec_mkl_fftwf(fft-ct-fftwf-naive-lmkl fft-ct.c "-DUSE_FFTWF_NAIVE")
-  add_exec_mkl_fftwf(fft-ct-fftwf-blocked-lmkl fft-ct.c "-DUSE_FFTWF_BLOCKED")
-
+  add_exec_mkl_fftwf(transp-fftwf-lib-lmkl transp.c "-DUSE_FFTWF_MKL")
+  add_exec_mkl_fftwf(fft-ct-fftwf-lib-lmkl fft-ct.c "-DUSE_FFTWF_MKL")
   add_exec_mkl_fftwf(fft-2d-fftwf-lib-lmkl fft-2d.c "-DUSE_FFTWF")
 endif(MKL_FOUND)
 
 # Use MKL library implementations of the FFTW interface
 if(MKL_FOUND)
   function(add_exec_mkl_fftw name main definitions)
-    add_executable(${name} ${main} ptime.c transpose.c transpose-fftw.c
+    add_executable(${name} ${main} ptime.c transpose-mkl.c transpose-fftw-mkl.c
                                    util.c util-fftw.c)
     target_compile_definitions(${name} PRIVATE ${definitions})
+    target_compile_definitions(${name} PRIVATE "MKL_Complex8=float _Complex")
+    target_compile_definitions(${name} PRIVATE "MKL_Complex16=double _Complex")
+    target_compile_options(${name} PRIVATE ${MKL_CFLAGS} ${MKL_CFLAGS_OTHER})
     target_link_libraries(${name} ${MKL_LDFLAGS} ${LIBRT})
     install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endfunction(add_exec_mkl_fftw)
 
-  add_exec_mkl_fftw(transp-fftw-naive-lmkl transp.c "-DUSE_FFTW_NAIVE")
-  add_exec_mkl_fftw(transp-fftw-blocked-lmkl transp.c "-DUSE_FFTW_BLOCKED")
-
-  add_exec_mkl_fftw(fft-ct-fftw-naive-lmkl fft-ct.c "-DUSE_FFTW_NAIVE")
-  add_exec_mkl_fftw(fft-ct-fftw-blocked-lmkl fft-ct.c "-DUSE_FFTW_BLOCKED")
-
+  add_exec_mkl_fftw(transp-fftw-lib-lmkl transp.c "-DUSE_FFTW_MKL")
+  add_exec_mkl_fftw(fft-ct-fftw-lib-lmkl fft-ct.c "-DUSE_FFTW_MKL")
   add_exec_mkl_fftw(fft-2d-fftw-lib-lmkl fft-2d.c "")
 endif(MKL_FOUND)
 
