@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "ptime.h"
@@ -129,6 +130,7 @@ static size_t nthreads = 1;
 
 static bool do_print = false;
 static bool do_verify = false;
+static bool do_init = false;
 static int rc = 0;
 
 #define PRINT_ELAPSED_TIME(prefix, t1, t2) \
@@ -148,6 +150,12 @@ static int rc = 0;
     datatype *B = fn_malloc(nrows * ncols * sizeof(datatype)); \
     ptime_gettime_monotonic(&t1); \
     fn_fill(A, nrows * ncols); \
+    if (do_init) { \
+        ptime_gettime_monotonic(&t1); \
+        memset(B, 0, nrows * ncols * sizeof(datatype)); \
+        ptime_gettime_monotonic(&t2); \
+        PRINT_ELAPSED_TIME("init", &t1, &t2); \
+    } \
     ptime_gettime_monotonic(&t2); \
     PRINT_ELAPSED_TIME("fill", &t1, &t2); \
     if (do_print) { \
@@ -226,6 +234,8 @@ static void usage(const char *pname, int code)
 #if defined(_USE_TRANSP_THREADS)
             "  -t, --threads=THREADS    Number of threads, in (0, ULONG_MAX] (default=1)\n"
 #endif
+            "  -i, --init               Initialize all matrices (simulates buffer reuse)\n"
+            "                           Note: input matrix is always initialized\n"
             "  -p, --print              Print matrices\n"
             "  -v, --verify             Verify transpose\n"
             "  -h, --help               Print this message and exit\n",
@@ -242,13 +252,14 @@ static size_t assert_to_size_t(const char* str, const char* pname)
     return s;
 }
 
-static const char opts_short[] = "r:c:R:C:t:pvh";
+static const char opts_short[] = "r:c:R:C:t:ipvh";
 static const struct option opts_long[] = {
     {"rows",        required_argument,  NULL,   'r'},
     {"cols",        required_argument,  NULL,   'c'},
     {"block-rows",  required_argument,  NULL,   'R'},
     {"block-cols",  required_argument,  NULL,   'C'},
     {"threads",     required_argument,  NULL,   't'},
+    {"init",        no_argument,        NULL,   'i'},
     {"print",       no_argument,        NULL,   'p'},
     {"verify",      no_argument,        NULL,   'v'},
     {"help",        no_argument,        NULL,   'h'},
@@ -282,6 +293,9 @@ static void parse_args(int argc, char **argv)
             }
             break;
 #endif
+        case 'i':
+            do_init = true;
+            break;
         case 'p':
             do_print = true;
             break;
