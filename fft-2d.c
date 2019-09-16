@@ -10,8 +10,10 @@
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <fftw3.h>
 
@@ -57,7 +59,7 @@ static void data_free(FFTW_COMPLEX_T *A, FFTW_COMPLEX_T *B, FFTW_PLAN_T p)
     FFTW_FREE(A);
 }
 
-static void fft_2d(size_t nrows, size_t ncols)
+static void fft_2d(size_t nrows, size_t ncols, bool do_init)
 {
     struct timespec t1, t2;
     FFTW_COMPLEX_T *mat_in, *mat_out;
@@ -69,6 +71,13 @@ static void fft_2d(size_t nrows, size_t ncols)
     FILL_RAND(mat_in, nrows * ncols);
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("fill", &t1, &t2);
+
+    if (do_init) {
+        ptime_gettime_monotonic(&t1);
+        memset(mat_out, 0, nrows * ncols * sizeof(FFTW_COMPLEX_T));
+        ptime_gettime_monotonic(&t2);
+        PRINT_ELAPSED_TIME("init", &t1, &t2);
+    }
 
     ptime_gettime_monotonic(&t1);
     FFTW_EXECUTE(p);
@@ -84,6 +93,8 @@ static void usage(const char *pname, int code)
             "Usage: %s -r ROWS -c COLS [-h]\n"
             "  -r, --rows=ROWS          Matrix row count, in [1, ULONG_MAX]\n"
             "  -c, --cols=COLS          Matrix column count, in [1, ULONG_MAX]\n"
+            "  -i, --init               Initialize all matrices (simulates buffer reuse)\n"
+            "                           Note: input matrix is always initialized\n"
             "  -h, --help               Print this message and exit\n",
             pname);
     exit(code);
@@ -98,10 +109,11 @@ static size_t assert_to_size_t(const char* str, const char* pname)
     return s;
 }
 
-static const char opts_short[] = "r:c:h";
+static const char opts_short[] = "r:c:ih";
 static const struct option opts_long[] = {
     {"rows",        required_argument,  NULL,   'r'},
     {"cols",        required_argument,  NULL,   'c'},
+    {"init",        no_argument,        NULL,   'i'},
     {"help",        no_argument,        NULL,   'h'},
     {0, 0, 0, 0}
 };
@@ -110,6 +122,7 @@ int main(int argc, char **argv)
 {
     size_t nrows = 0;
     size_t ncols = 0;
+    bool do_init = false;
     int c;
 
     while ((c = getopt_long(argc, argv, opts_short, opts_long, NULL)) != -1) {
@@ -119,6 +132,9 @@ int main(int argc, char **argv)
             break;
         case 'c':
             ncols = assert_to_size_t(optarg, argv[0]);
+            break;
+        case 'i':
+            do_init = true;
             break;
         case 'h':
             usage(argv[0], 0);
@@ -131,6 +147,6 @@ int main(int argc, char **argv)
     if (!nrows || !ncols) {
         usage(argv[0], EINVAL);
     }
-    fft_2d(nrows, ncols);
+    fft_2d(nrows, ncols, do_init);
     return 0;
 }
