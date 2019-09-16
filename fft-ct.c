@@ -10,8 +10,10 @@
 #include <errno.h>
 #include <getopt.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <fftw3.h>
 
@@ -84,6 +86,7 @@ typedef fftw_plan           FFTW_PLAN_T;
 
 static size_t nrows = 0;
 static size_t ncols = 0;
+static bool do_init = false;
 static struct timespec t1;
 static struct timespec t2;
 
@@ -196,6 +199,15 @@ static void fft_ct_1d(void)
     ptime_gettime_monotonic(&t2);
     PRINT_ELAPSED_TIME("fill", &t1, &t2);
 
+    if (do_init) {
+        ptime_gettime_monotonic(&t1);
+        memset(fft1_out, 0, nrows * ncols * sizeof(FFTW_COMPLEX_T));
+        memset(fft2_in, 0, nrows * ncols * sizeof(FFTW_COMPLEX_T));
+        memset(fft2_out, 0, nrows * ncols * sizeof(FFTW_COMPLEX_T));
+        ptime_gettime_monotonic(&t2);
+        PRINT_ELAPSED_TIME("init", &t1, &t2);
+    }
+
     // Perform first set of 1D FFTs
     ptime_gettime_monotonic(&t1);
     fft_1d(p1, nrows);
@@ -242,6 +254,8 @@ static void usage(const char *pname, int code)
 #if defined(_USE_TRANSP_THREADS)
             "  -t, --threads=THREADS    Number of threads, in (0, ULONG_MAX] (default=1)\n"
 #endif
+            "  -i, --init               Initialize all matrices (simulates buffer reuse)\n"
+            "                           Note: input matrix is always initialized\n"
             "  -h, --help               Print this message and exit\n",
             pname);
     exit(code);
@@ -256,13 +270,14 @@ static size_t assert_to_size_t(const char* str, const char* pname)
     return s;
 }
 
-static const char opts_short[] = "r:c:R:C:t:h";
+static const char opts_short[] = "r:c:R:C:t:ih";
 static const struct option opts_long[] = {
     {"rows",        required_argument,  NULL,   'r'},
     {"cols",        required_argument,  NULL,   'c'},
     {"block-rows",  required_argument,  NULL,   'R'},
     {"block-cols",  required_argument,  NULL,   'C'},
     {"threads",     required_argument,  NULL,   't'},
+    {"init",        no_argument,        NULL,   'i'},
     {"help",        no_argument,        NULL,   'h'},
     {0, 0, 0, 0}
 };
@@ -295,6 +310,9 @@ int main(int argc, char **argv)
             }
             break;
 #endif
+        case 'i':
+            do_init = true;
+            break;
         case 'h':
             usage(argv[0], 0);
             break;
