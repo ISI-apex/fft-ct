@@ -76,8 +76,8 @@ C99 types:
 
 FFTW types:
 
-* `fftw_complex` (fftw) - redefined as `float complex`
-* `fftwf_complex` (fftwf) - redefined as `double complex`
+* `fftwf_complex` (fftwf) - redefined as `float complex`
+* `fftw_complex` (fftw) - redefined as `double complex`
 
 MKL types:
 
@@ -93,7 +93,20 @@ types and transpose implementations using different algorithms and library APIs.
 Benchmark names are generally in the form:
 `${prog}-${datatype}-${algo}[-${lib}]`.
 
+All benchmarks support the `-h` parameter to print a usage/help message.
+
 Benchmarks require specifying, at a minimum, the matrix row and column count.
 E.g., to perform a naive transpose of a 2048x4096 matrix with `double` data:
 
 	./transp-dbl-naive -r 2048 -c 4096
+
+Some implementations have constraints on parameters:
+
+* Blocked transposes must use block dimensions that are divisors of their
+corresponding matrix dimensions.  I.e., partial blocks are not supported.
+* Transposes using AVX-512 instructions require matrix sizes to be multiples of
+8x8 blocks.
+This constraint extends to threaded AVX-512 implementations -- each thread's
+partition of a matrix must be a multiple of 8x8, e.g., while a single thread (or
+even three threads) may transpose a 24x24 matrix, two threads cannot because
+data is partitioned evenly between threads (12x24 or 24x12, for two threads).
